@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Gamma extends TableImpl<GammaRecord> {
 
-    private static final long serialVersionUID = -1936562099;
+    private static final long serialVersionUID = 320216376;
 
     /**
      * The reference instance of <code>public.gamma</code>
@@ -54,7 +54,7 @@ public class Gamma extends TableImpl<GammaRecord> {
     /**
      * The column <code>public.gamma.name</code>.
      */
-    public final TableField<GammaRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'gamma-entity'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
+    public final TableField<GammaRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'gamma-graphEntityDto'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * Create a <code>public.gamma</code> table reference

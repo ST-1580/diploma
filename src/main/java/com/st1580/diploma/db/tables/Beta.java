@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Beta extends TableImpl<BetaRecord> {
 
-    private static final long serialVersionUID = 194174988;
+    private static final long serialVersionUID = 996706625;
 
     /**
      * The reference instance of <code>public.beta</code>
@@ -54,7 +54,7 @@ public class Beta extends TableImpl<BetaRecord> {
     /**
      * The column <code>public.beta.name</code>.
      */
-    public final TableField<BetaRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'beta-entity'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
+    public final TableField<BetaRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'beta-graphEntityDto'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * Create a <code>public.beta</code> table reference
