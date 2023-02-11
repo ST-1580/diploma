@@ -98,8 +98,8 @@
 									<excludes></excludes>
 								</database>
 								<target>
-									<packageName>db</packageName>
-									<directory>src/main/java/com/st1580/diploma</directory>
+									<packageName>com.st1580.diploma.db</packageName>
+									<directory>src/main/java</directory>
 								</target>
 							</generator>
 						</configuration>
