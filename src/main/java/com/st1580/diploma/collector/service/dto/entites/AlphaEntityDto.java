@@ -9,8 +9,8 @@ import com.st1580.diploma.collector.service.dto.GraphEntityType;
 
 public class AlphaEntityDto extends GraphEntityDto {
 
-    public AlphaEntityDto(long id, Map<String, String> payload) {
-        super(GraphEntityType.ALPHA, id, payload);
+    public AlphaEntityDto(long id) {
+        super(GraphEntityType.ALPHA, id);
     }
 
     @Override

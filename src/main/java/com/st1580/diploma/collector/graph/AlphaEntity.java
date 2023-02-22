@@ -13,6 +13,6 @@ public class AlphaEntity extends Entity {
 
     @Override
     public GraphEntityDto convertToDto() {
-        return new AlphaEntityDto(getId(), new HashMap<>());
+        return new AlphaEntityDto(getId());
     }
 }

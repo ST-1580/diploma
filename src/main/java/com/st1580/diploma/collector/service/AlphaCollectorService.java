@@ -31,7 +31,7 @@ public class AlphaCollectorService extends AbstractCollectorService implements A
 
     @Override
     public List<GraphLinkDto> collectEntityNeighbors(long alphaId) {
-        final GraphEntityDto startEntity = new AlphaEntityDto(alphaId, new HashMap<>());
+        final GraphEntityDto startEntity = new AlphaEntityDto(alphaId);
         return getEntityNeighbors(startEntity);
     }
 }

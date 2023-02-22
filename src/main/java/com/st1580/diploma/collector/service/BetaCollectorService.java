@@ -28,7 +28,7 @@ public class BetaCollectorService extends AbstractCollectorService implements Be
 
     @Override
     public List<GraphLinkDto> collectEntityNeighbors(long betaId) {
-        final GraphEntityDto startEntity = new BetaEntityDto(betaId, new HashMap<>());
+        final GraphEntityDto startEntity = new BetaEntityDto(betaId);
         return getEntityNeighbors(startEntity);
     }
 }

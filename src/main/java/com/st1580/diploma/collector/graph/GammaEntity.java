@@ -13,6 +13,6 @@ public class GammaEntity extends Entity {
 
     @Override
     public GraphEntityDto convertToDto() {
-        return new GammaEntityDto(getId(), new HashMap<>());
+        return new GammaEntityDto(getId());
     }
 }

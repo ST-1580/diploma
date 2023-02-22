@@ -8,8 +8,8 @@ import com.st1580.diploma.collector.service.dto.GraphEntityDto;
 import com.st1580.diploma.collector.service.dto.GraphEntityType;
 
 public class BetaEntityDto extends GraphEntityDto {
-    public BetaEntityDto(long id, Map<String, String> payload) {
-        super(GraphEntityType.BETA, id, payload);
+    public BetaEntityDto(long id) {
+        super(GraphEntityType.BETA, id);
     }
 
     @Override

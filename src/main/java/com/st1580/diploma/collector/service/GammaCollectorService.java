@@ -30,7 +30,7 @@ public class GammaCollectorService extends AbstractCollectorService implements G
 
     @Override
     public List<GraphLinkDto> collectEntityNeighbors(long gammaId) {
-        final GraphEntityDto startEntity = new GammaEntityDto(gammaId, new HashMap<>());
+        final GraphEntityDto startEntity = new GammaEntityDto(gammaId);
         return getEntityNeighbors(startEntity);
     }
 }

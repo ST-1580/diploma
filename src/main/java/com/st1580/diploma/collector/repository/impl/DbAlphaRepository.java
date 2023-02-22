@@ -1,11 +1,14 @@
 package com.st1580.diploma.collector.repository.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
 import com.st1580.diploma.collector.graph.Entity;
+import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.repository.AlphaRepository;
 import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
 import com.st1580.diploma.collector.repository.GammaToAlphaRepository;
@@ -24,12 +27,12 @@ public class DbAlphaRepository implements AlphaRepository {
     GammaToAlphaRepository gammaToAlphaRepository;
 
     @Override
-    public List<Entity> collectAllNeighbors(long id) {
-        List<Entity> res = new ArrayList<>();
+    public Map<EntityType, List<Long>> collectAllNeighbors(long id) {
+        Map<EntityType, List<Long>> res = new HashMap<>();
 
         context.transaction(ctx -> {
-            res.addAll(alphaToBetaRepository.getConnectedBetaEntitiesByAlpha(id));
-            res.addAll(gammaToAlphaRepository.getConnectedGammaEntitiesByAlpha(id));
+            res.put(EntityType.BETA, alphaToBetaRepository.getConnectedBetaEntitiesByAlpha(id));
+            res.put(EntityType.GAMMA, gammaToAlphaRepository.getConnectedGammaEntitiesByAlpha(id));
         });
 
         return res;

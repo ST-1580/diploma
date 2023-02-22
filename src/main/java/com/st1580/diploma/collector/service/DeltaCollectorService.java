@@ -28,7 +28,7 @@ public class DeltaCollectorService extends AbstractCollectorService implements D
 
     @Override
     public List<GraphLinkDto> collectEntityNeighbors(long deltaId) {
-        final GraphEntityDto startEntity = new DeltaEntityDto(deltaId, new HashMap<>());
+        final GraphEntityDto startEntity = new DeltaEntityDto(deltaId);
         return getEntityNeighbors(startEntity);
     }
 }

@@ -4,6 +4,7 @@ import java.util.HashMap;
 
 import com.st1580.diploma.collector.service.dto.entites.BetaEntityDto;
 import com.st1580.diploma.collector.service.dto.GraphEntityDto;
+import com.st1580.diploma.db.tables.records.BetaRecord;
 
 public class BetaEntity extends Entity {
 
@@ -11,8 +12,12 @@ public class BetaEntity extends Entity {
         super(EntityType.BETA, id);
     }
 
+    public BetaEntity(BetaRecord record) {
+        super(EntityType.BETA, record.getId());
+    }
+
     @Override
     public GraphEntityDto convertToDto() {
-        return new BetaEntityDto(getId(), new HashMap<>());
+        return new BetaEntityDto(getId());
     }
 }

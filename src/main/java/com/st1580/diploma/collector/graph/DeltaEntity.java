@@ -13,6 +13,6 @@ public class DeltaEntity extends Entity {
 
     @Override
     public GraphEntityDto convertToDto() {
-        return new DeltaEntityDto(getId(), new HashMap<>());
+        return new DeltaEntityDto(getId());
     }
 }
