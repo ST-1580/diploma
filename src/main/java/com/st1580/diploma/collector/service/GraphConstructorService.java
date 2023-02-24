@@ -53,7 +53,7 @@ public class GraphConstructorService {
         throw new IllegalArgumentException("Wrong type parameter " + type);
     }
 
-    public Map<Long, Entity> getEntitiesByIds(EntityType entitiesType, Set<Long> entitiesIds) {
+    public Map<Long, ? extends Entity> getEntitiesByIds(EntityType entitiesType, Set<Long> entitiesIds) {
         CollectorRepository collectorRepository = matchRepository(entitiesType);
         return collectorRepository.collectAllEntitiesByIds(entitiesIds);
     }

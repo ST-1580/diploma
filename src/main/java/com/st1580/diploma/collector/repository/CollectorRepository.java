@@ -5,14 +5,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.st1580.diploma.collector.graph.AbstractEntity;
 import com.st1580.diploma.collector.graph.Entity;
 import com.st1580.diploma.collector.graph.EntityType;
-import com.st1580.diploma.collector.graph.AbstractLink;
 import com.st1580.diploma.collector.graph.Link;
 
 public interface CollectorRepository {
-    Map<Long, Entity> collectAllEntitiesByIds(Collection<Long> ids);
+    Map<Long, ? extends Entity> collectAllEntitiesByIds(Collection<Long> ids);
 
     default Map<EntityType, List<Long>> collectAllNeighborsIds(long id) {
         Map<EntityType, Map<Long, List<Long>>> res = collectAllNeighborsIdsByEntities(List.of(id));

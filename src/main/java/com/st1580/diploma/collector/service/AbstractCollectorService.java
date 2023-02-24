@@ -114,7 +114,7 @@ public abstract class AbstractCollectorService {
 
         Set<Entity> heavyEntities = new HashSet<>();
         for (EntityType type : lightEntities.keySet()) {
-            Map<Long, Entity> heavyEntityById = graphConstructorService.getEntitiesByIds(type, lightEntities.get(type));
+            Map<Long, ? extends Entity> heavyEntityById = graphConstructorService.getEntitiesByIds(type, lightEntities.get(type));
             heavyEntities.addAll(heavyEntityById.values());
         }
 

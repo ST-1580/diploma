@@ -39,11 +39,20 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
 
     @Override
     public Map<Long, List<Long>> getConnectedAlphaEntitiesIdsByBetaIds(Collection<Long> betaIds) {
-        return null;
+        return context
+                .selectFrom(ALPHA_TO_BETA)
+                .where(ALPHA_TO_BETA.BETA_ID.in(betaIds))
+                .fetchGroups(ALPHA_TO_BETA.BETA_ID, ALPHA_TO_BETA.ALPHA_ID);
     }
 
     @Override
     public Map<Long, List<AlphaToBetaLink>> getConnectedAlphaEntitiesByBetaIds(Collection<Long> betaIds) {
-        return null;
+        return context
+                .selectFrom(ALPHA_TO_BETA)
+                .where(ALPHA_TO_BETA.BETA_ID.in(betaIds))
+                .fetch()
+                .stream()
+                .map(AlphaToBetaLink::new)
+                .collect(Collectors.groupingBy(AlphaToBetaLink::getBetaId));
     }
 }

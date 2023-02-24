@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
@@ -11,6 +12,7 @@ import javax.inject.Inject;
 import com.st1580.diploma.collector.graph.Entity;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.Link;
+import com.st1580.diploma.collector.graph.entities.AlphaEntity;
 import com.st1580.diploma.collector.repository.AlphaRepository;
 import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
 import com.st1580.diploma.collector.repository.GammaToAlphaRepository;
@@ -18,6 +20,8 @@ import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
 import org.jooq.impl.DSL;
 import org.springframework.stereotype.Repository;
+
+import static com.st1580.diploma.db.Tables.ALPHA;
 
 @Repository
 public class DbAlphaRepository implements AlphaRepository {
@@ -29,8 +33,17 @@ public class DbAlphaRepository implements AlphaRepository {
     GammaToAlphaRepository gammaToAlphaRepository;
 
     @Override
-    public Map<Long, Entity> collectAllEntitiesByIds(Collection<Long> ids) {
-        return null;
+    public Map<Long, AlphaEntity> collectAllEntitiesByIds(Collection<Long> ids) {
+        return context
+                .selectFrom(ALPHA)
+                .where(ALPHA.ID.in(ids))
+                .fetch()
+                .stream()
+                .map(AlphaEntity::new)
+                .collect(Collectors.toMap(
+                        AlphaEntity::getId,
+                        Function.identity()
+                ));
     }
 
     @Override
