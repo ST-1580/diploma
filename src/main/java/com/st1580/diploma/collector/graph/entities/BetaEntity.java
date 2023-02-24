@@ -1,12 +1,12 @@
-package com.st1580.diploma.collector.graph;
+package com.st1580.diploma.collector.graph.entities;
 
-import java.util.HashMap;
-
-import com.st1580.diploma.collector.service.dto.entites.BetaEntityDto;
+import com.st1580.diploma.collector.graph.AbstractEntity;
+import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.service.dto.GraphEntityDto;
+import com.st1580.diploma.collector.service.dto.GraphEntityType;
 import com.st1580.diploma.db.tables.records.BetaRecord;
 
-public class BetaEntity extends Entity {
+public class BetaEntity extends AbstractEntity {
 
     public BetaEntity(long id) {
         super(EntityType.BETA, id);
@@ -18,6 +18,6 @@ public class BetaEntity extends Entity {
 
     @Override
     public GraphEntityDto convertToDto() {
-        return new BetaEntityDto(getId());
+        return new GraphEntityDto(GraphEntityType.BETA, getId(), null);
     }
 }

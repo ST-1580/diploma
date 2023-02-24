@@ -1,14 +1,15 @@
 package com.st1580.diploma.collector.service;
 
-import java.util.HashMap;
 import java.util.List;
 
 import com.st1580.diploma.collector.api.BetaCollectorController;
+import com.st1580.diploma.collector.graph.Entity;
+import com.st1580.diploma.collector.graph.EntityType;
+import com.st1580.diploma.collector.graph.entities.BetaEntity;
+import com.st1580.diploma.collector.policy.StartEntityPolicy;
 import com.st1580.diploma.collector.repository.BetaRepository;
 import com.st1580.diploma.collector.service.dto.GraphDto;
-import com.st1580.diploma.collector.service.dto.GraphEntityDto;
 import com.st1580.diploma.collector.service.dto.GraphLinkDto;
-import com.st1580.diploma.collector.service.dto.entites.BetaEntityDto;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,13 +23,14 @@ public class BetaCollectorService extends AbstractCollectorService implements Be
     }
 
     @Override
-    public GraphDto collectAll(long betaId) {
-        return null;
+    public GraphDto collectLightGraph(long betaId) {
+        final Entity startEntity = new BetaEntity(betaId);
+        return getLightGraphWithPolicy(startEntity, new StartEntityPolicy(EntityType.BETA));
     }
 
     @Override
-    public List<GraphLinkDto> collectEntityNeighbors(long betaId) {
-        final GraphEntityDto startEntity = new BetaEntityDto(betaId);
-        return getEntityNeighbors(startEntity);
+    public List<GraphLinkDto> collectEntityLightNeighbors(long betaId) {
+        final Entity startEntity = new BetaEntity(betaId);
+        return getEntityLightNeighbors(startEntity);
     }
 }

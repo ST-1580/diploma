@@ -9,8 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 public interface CollectorController {
     @GetMapping("/all/{id}")
-    GraphDto collectAll(@PathVariable("id") long entityId);
+    GraphDto collectLightGraph(@PathVariable("id") long entityId);
 
     @GetMapping("/neighbors/{id}")
-    List<GraphLinkDto> collectEntityNeighbors(@PathVariable("id") long entityId);
+    List<GraphLinkDto> collectEntityLightNeighbors(@PathVariable("id") long entityId);
 }

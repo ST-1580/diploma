@@ -1,14 +1,15 @@
 package com.st1580.diploma.collector.service;
 
-import java.util.HashMap;
 import java.util.List;
 
 import com.st1580.diploma.collector.api.DeltaCollectorController;
+import com.st1580.diploma.collector.graph.Entity;
+import com.st1580.diploma.collector.graph.EntityType;
+import com.st1580.diploma.collector.graph.entities.DeltaEntity;
+import com.st1580.diploma.collector.policy.StartEntityPolicy;
 import com.st1580.diploma.collector.repository.DeltaRepository;
 import com.st1580.diploma.collector.service.dto.GraphDto;
-import com.st1580.diploma.collector.service.dto.GraphEntityDto;
 import com.st1580.diploma.collector.service.dto.GraphLinkDto;
-import com.st1580.diploma.collector.service.dto.entites.DeltaEntityDto;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,13 +23,14 @@ public class DeltaCollectorService extends AbstractCollectorService implements D
     }
 
     @Override
-    public GraphDto collectAll(long deltaId) {
-        return null;
+    public GraphDto collectLightGraph(long deltaId) {
+        final Entity startEntity = new DeltaEntity(deltaId);
+        return getLightGraphWithPolicy(startEntity, new StartEntityPolicy(EntityType.DELTA));
     }
 
     @Override
-    public List<GraphLinkDto> collectEntityNeighbors(long deltaId) {
-        final GraphEntityDto startEntity = new DeltaEntityDto(deltaId);
-        return getEntityNeighbors(startEntity);
+    public List<GraphLinkDto> collectEntityLightNeighbors(long deltaId) {
+        final Entity startEntity = new DeltaEntity(deltaId);
+        return getEntityLightNeighbors(startEntity);
     }
 }

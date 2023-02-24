@@ -1,7 +1,11 @@
 package com.st1580.diploma.collector.repository.impl;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
+import com.st1580.diploma.collector.graph.links.AlphaToBetaLink;
 import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
 import org.jooq.DSLContext;
 import org.jooq.SQLDialect;
@@ -10,26 +14,36 @@ import org.springframework.stereotype.Repository;
 
 import static com.st1580.diploma.db.Tables.ALPHA_TO_BETA;
 
-
 @Repository
 public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
     DSLContext context = DSL.using(SQLDialect.POSTGRES);
 
     @Override
-    public List<Long> getConnectedBetaEntitiesByAlpha(long alphaId) {
+    public Map<Long, List<Long>> getConnectedBetaEntitiesIdsByAlphaIds(Collection<Long> alphaIds) {
         return context
-                .select(ALPHA_TO_BETA.BETA_ID)
-                .from(ALPHA_TO_BETA)
-                .where(ALPHA_TO_BETA.ALPHA_ID.eq(alphaId))
-                .fetchInto(Long.class);
+                .selectFrom(ALPHA_TO_BETA)
+                .where(ALPHA_TO_BETA.ALPHA_ID.in(alphaIds))
+                .fetchGroups(ALPHA_TO_BETA.ALPHA_ID, ALPHA_TO_BETA.BETA_ID);
     }
 
     @Override
-    public List<Long> getConnectedAlphaEntitiesByBeta(long betaId) {
+    public Map<Long, List<AlphaToBetaLink>> getConnectedBetaEntitiesByAlphaIds(Collection<Long> alphaIds) {
         return context
-                .select(ALPHA_TO_BETA.ALPHA_ID)
-                .from(ALPHA_TO_BETA)
-                .where(ALPHA_TO_BETA.BETA_ID.eq(betaId))
-                .fetchInto(Long.class);
+                .selectFrom(ALPHA_TO_BETA)
+                .where(ALPHA_TO_BETA.ALPHA_ID.in(alphaIds))
+                .fetch()
+                .stream()
+                .map(AlphaToBetaLink::new)
+                .collect(Collectors.groupingBy(AlphaToBetaLink::getAlphaId));
+    }
+
+    @Override
+    public Map<Long, List<Long>> getConnectedAlphaEntitiesIdsByBetaIds(Collection<Long> betaIds) {
+        return null;
+    }
+
+    @Override
+    public Map<Long, List<AlphaToBetaLink>> getConnectedAlphaEntitiesByBetaIds(Collection<Long> betaIds) {
+        return null;
     }
 }

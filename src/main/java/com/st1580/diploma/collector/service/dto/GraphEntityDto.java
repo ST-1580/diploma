@@ -1,22 +1,18 @@
 package com.st1580.diploma.collector.service.dto;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import com.st1580.diploma.collector.graph.Entity;
-import com.st1580.diploma.collector.graph.EntityType;
-
-public abstract class GraphEntityDto {
+public class GraphEntityDto {
     private final GraphEntityType type;
-
     private final long id;
-    public GraphEntityDto(GraphEntityType type, long id) {
+    private final Map<String, String> payload;
+
+    public GraphEntityDto(GraphEntityType type, long id, Map<String, String> payload) {
         this.type = type;
         this.id = id;
+        this.payload = payload;
     }
-
-    public abstract Entity convertToModel();
 
     public GraphEntityType getType() {
         return type;
@@ -24,6 +20,10 @@ public abstract class GraphEntityDto {
 
     public long getId() {
         return id;
+    }
+
+    public Map<String, String> getPayload() {
+        return payload;
     }
 
     @Override
@@ -34,12 +34,12 @@ public abstract class GraphEntityDto {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        GraphEntityDto graphEntityDto = (GraphEntityDto) o;
-        return id == graphEntityDto.id && type == graphEntityDto.type;
+        GraphEntityDto that = (GraphEntityDto) o;
+        return id == that.id && type == that.type && Objects.equals(payload, that.payload);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, id);
+        return Objects.hash(type, id, payload);
     }
 }
