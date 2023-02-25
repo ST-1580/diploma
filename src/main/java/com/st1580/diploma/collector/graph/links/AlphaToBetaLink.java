@@ -1,33 +1,40 @@
 package com.st1580.diploma.collector.graph.links;
 
+import java.util.Map;
 import java.util.Objects;
 
 import com.st1580.diploma.collector.graph.AbstractLink;
-import com.st1580.diploma.collector.graph.entities.AlphaEntity;
-import com.st1580.diploma.collector.graph.entities.BetaEntity;
+import com.st1580.diploma.collector.graph.EntityType;
+import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.service.dto.GraphLinkDto;
 import com.st1580.diploma.db.tables.records.AlphaToBetaRecord;
 
 public class AlphaToBetaLink extends AbstractLink {
     private final long alphaId;
-
     private final long betaId;
-
-    public AlphaToBetaLink(long alphaId, long betaId) {
-        super(new AlphaEntity(alphaId), new BetaEntity(betaId));
+    private final String property_1;
+    public AlphaToBetaLink(long alphaId, long betaId, String property_1) {
+        super(new LightEntity(EntityType.ALPHA, alphaId), new LightEntity(EntityType.BETA, betaId));
         this.alphaId = alphaId;
         this.betaId = betaId;
+        this.property_1 = property_1;
     }
 
     public AlphaToBetaLink(AlphaToBetaRecord record) {
-        super(new AlphaEntity(record.getAlphaId()), new BetaEntity(record.getBetaId()));
+        super(new LightEntity(EntityType.ALPHA, record.getAlphaId()),
+                new LightEntity(EntityType.BETA, record.getBetaId()));
         this.alphaId = record.getAlphaId();
         this.betaId = record.getBetaId();
+        this.property_1 = record.getProperty_1();
     }
 
     @Override
     public GraphLinkDto convertToDto() {
-        return new GraphLinkDto(getFrom().convertToDto(), getTo().convertToDto(), null);
+        return new GraphLinkDto(
+                getFrom().convertToDto(),
+                getTo().convertToDto(),
+                Map.of("property_1", property_1)
+        );
     }
 
     public long getAlphaId() {
@@ -36,6 +43,10 @@ public class AlphaToBetaLink extends AbstractLink {
 
     public long getBetaId() {
         return betaId;
+    }
+
+    public String getProperty_1() {
+        return property_1;
     }
 
     @Override
@@ -50,11 +61,11 @@ public class AlphaToBetaLink extends AbstractLink {
             return false;
         }
         AlphaToBetaLink that = (AlphaToBetaLink) o;
-        return alphaId == that.alphaId && betaId == that.betaId;
+        return alphaId == that.alphaId && betaId == that.betaId && Objects.equals(property_1, that.property_1);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), alphaId, betaId);
+        return Objects.hash(super.hashCode(), alphaId, betaId, property_1);
     }
 }

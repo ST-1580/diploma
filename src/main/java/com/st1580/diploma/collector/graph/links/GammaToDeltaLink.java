@@ -1,22 +1,26 @@
 package com.st1580.diploma.collector.graph.links;
 
+import java.util.Objects;
+
 import com.st1580.diploma.collector.graph.AbstractLink;
-import com.st1580.diploma.collector.graph.entities.DeltaEntity;
-import com.st1580.diploma.collector.graph.entities.GammaEntity;
+import com.st1580.diploma.collector.graph.EntityType;
+import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.service.dto.GraphLinkDto;
 import com.st1580.diploma.db.tables.records.GammaToDeltaRecord;
 
 public class GammaToDeltaLink extends AbstractLink {
     private final long gammaId;
     private final long deltaId;
+
     public GammaToDeltaLink(long gammaId, long deltaId) {
-        super(new GammaEntity(gammaId), new DeltaEntity(deltaId));
+        super(new LightEntity(EntityType.GAMMA, gammaId), new LightEntity(EntityType.DELTA, deltaId));
         this.gammaId = gammaId;
         this.deltaId = deltaId;
     }
 
     public GammaToDeltaLink(GammaToDeltaRecord record) {
-        super(new GammaEntity(record.getGammaId()), new DeltaEntity(record.getDeltaId()));
+        super(new LightEntity(EntityType.GAMMA, record.getGammaId()),
+                new LightEntity(EntityType.DELTA, record.getDeltaId()));
         this.gammaId = record.getGammaId();
         this.deltaId = record.getDeltaId();
     }
@@ -32,5 +36,25 @@ public class GammaToDeltaLink extends AbstractLink {
     @Override
     public GraphLinkDto convertToDto() {
         return new GraphLinkDto(getFrom().convertToDto(), getTo().convertToDto(), null);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        GammaToDeltaLink that = (GammaToDeltaLink) o;
+        return gammaId == that.gammaId && deltaId == that.deltaId;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), gammaId, deltaId);
     }
 }

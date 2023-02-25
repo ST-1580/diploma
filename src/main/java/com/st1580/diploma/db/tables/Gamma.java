@@ -15,7 +15,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row2;
+import org.jooq.Row5;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Gamma extends TableImpl<GammaRecord> {
 
-    private static final long serialVersionUID = -152042332;
+    private static final long serialVersionUID = -1670993339;
 
     /**
      * The reference instance of <code>public.gamma</code>
@@ -54,7 +54,22 @@ public class Gamma extends TableImpl<GammaRecord> {
     /**
      * The column <code>public.gamma.name</code>.
      */
-    public final TableField<GammaRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'gamma-graphEntityDto'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
+    public final TableField<GammaRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'gamma'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
+
+    /**
+     * The column <code>public.gamma.property_1</code>.
+     */
+    public final TableField<GammaRecord, Long> PROPERTY_1 = createField(DSL.name("property_1"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("0", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+
+    /**
+     * The column <code>public.gamma.property_2</code>.
+     */
+    public final TableField<GammaRecord, String> PROPERTY_2 = createField(DSL.name("property_2"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'property 2'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
+
+    /**
+     * The column <code>public.gamma.property_3</code>.
+     */
+    public final TableField<GammaRecord, Boolean> PROPERTY_3 = createField(DSL.name("property_3"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaultValue(org.jooq.impl.DSL.field("true", org.jooq.impl.SQLDataType.BOOLEAN)), this, "");
 
     /**
      * Create a <code>public.gamma</code> table reference
@@ -131,11 +146,11 @@ public class Gamma extends TableImpl<GammaRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row2 type methods
+    // Row5 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row2<Long, String> fieldsRow() {
-        return (Row2) super.fieldsRow();
+    public Row5<Long, String, Long, String, Boolean> fieldsRow() {
+        return (Row5) super.fieldsRow();
     }
 }

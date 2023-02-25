@@ -15,7 +15,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row2;
+import org.jooq.Row4;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class GammaToAlpha extends TableImpl<GammaToAlphaRecord> {
 
-    private static final long serialVersionUID = 1889443105;
+    private static final long serialVersionUID = 1404965189;
 
     /**
      * The reference instance of <code>public.gamma_to_alpha</code>
@@ -55,6 +55,16 @@ public class GammaToAlpha extends TableImpl<GammaToAlphaRecord> {
      * The column <code>public.gamma_to_alpha.alpha_id</code>.
      */
     public final TableField<GammaToAlphaRecord, Long> ALPHA_ID = createField(DSL.name("alpha_id"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+
+    /**
+     * The column <code>public.gamma_to_alpha.property_1</code>.
+     */
+    public final TableField<GammaToAlphaRecord, Long> PROPERTY_1 = createField(DSL.name("property_1"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("0", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+
+    /**
+     * The column <code>public.gamma_to_alpha.property_2</code>.
+     */
+    public final TableField<GammaToAlphaRecord, String> PROPERTY_2 = createField(DSL.name("property_2"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'property_2'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * Create a <code>public.gamma_to_alpha</code> table reference
@@ -144,11 +154,11 @@ public class GammaToAlpha extends TableImpl<GammaToAlphaRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row2 type methods
+    // Row4 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row2<Long, Long> fieldsRow() {
-        return (Row2) super.fieldsRow();
+    public Row4<Long, Long, Long, String> fieldsRow() {
+        return (Row4) super.fieldsRow();
     }
 }

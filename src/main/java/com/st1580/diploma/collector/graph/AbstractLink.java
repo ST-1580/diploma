@@ -2,33 +2,34 @@ package com.st1580.diploma.collector.graph;
 
 import java.util.Objects;
 
+import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.service.dto.GraphLinkDto;
 
 public abstract class AbstractLink implements Link {
-    private final Entity from;
-    private final Entity to;
+    private final LightEntity from;
+    private final LightEntity to;
 
-    public AbstractLink(Entity from, Entity to) {
+    public AbstractLink(LightEntity from, LightEntity to) {
         this.from = from;
         this.to = to;
     }
 
-    public Entity getFrom() {
+    public LightEntity getFrom() {
         return from;
     }
 
-    public Entity getTo() {
+    public LightEntity getTo() {
         return to;
     }
 
-    public Entity getEntityWithType(EntityType type) {
+    public LightEntity getEntityWithType(EntityType type) {
         if (type.equals(from.getType())) {
             return from;
         } else if (type.equals(to.getType())) {
             return to;
         }
 
-        throw new IllegalArgumentException("Links has not end with type " + type);
+        throw new IllegalArgumentException("Link has not end with type " + type);
     }
 
     public abstract GraphLinkDto convertToDto();

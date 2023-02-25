@@ -15,7 +15,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row2;
+import org.jooq.Row3;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AlphaToBeta extends TableImpl<AlphaToBetaRecord> {
 
-    private static final long serialVersionUID = 1169488797;
+    private static final long serialVersionUID = -87734072;
 
     /**
      * The reference instance of <code>public.alpha_to_beta</code>
@@ -55,6 +55,11 @@ public class AlphaToBeta extends TableImpl<AlphaToBetaRecord> {
      * The column <code>public.alpha_to_beta.beta_id</code>.
      */
     public final TableField<AlphaToBetaRecord, Long> BETA_ID = createField(DSL.name("beta_id"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+
+    /**
+     * The column <code>public.alpha_to_beta.property_1</code>.
+     */
+    public final TableField<AlphaToBetaRecord, String> PROPERTY_1 = createField(DSL.name("property_1"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'property_1'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * Create a <code>public.alpha_to_beta</code> table reference
@@ -144,11 +149,11 @@ public class AlphaToBeta extends TableImpl<AlphaToBetaRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row2 type methods
+    // Row3 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row2<Long, Long> fieldsRow() {
-        return (Row2) super.fieldsRow();
+    public Row3<Long, Long, String> fieldsRow() {
+        return (Row3) super.fieldsRow();
     }
 }

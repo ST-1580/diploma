@@ -15,7 +15,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row2;
+import org.jooq.Row4;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Beta extends TableImpl<BetaRecord> {
 
-    private static final long serialVersionUID = -1163240107;
+    private static final long serialVersionUID = 560094303;
 
     /**
      * The reference instance of <code>public.beta</code>
@@ -54,7 +54,17 @@ public class Beta extends TableImpl<BetaRecord> {
     /**
      * The column <code>public.beta.name</code>.
      */
-    public final TableField<BetaRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'beta-graphEntityDto'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
+    public final TableField<BetaRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'beta'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
+
+    /**
+     * The column <code>public.beta.property_1</code>.
+     */
+    public final TableField<BetaRecord, Long> PROPERTY_1 = createField(DSL.name("property_1"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("0", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+
+    /**
+     * The column <code>public.beta.property_2</code>.
+     */
+    public final TableField<BetaRecord, Boolean> PROPERTY_2 = createField(DSL.name("property_2"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaultValue(org.jooq.impl.DSL.field("true", org.jooq.impl.SQLDataType.BOOLEAN)), this, "");
 
     /**
      * Create a <code>public.beta</code> table reference
@@ -131,11 +141,11 @@ public class Beta extends TableImpl<BetaRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row2 type methods
+    // Row4 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row2<Long, String> fieldsRow() {
-        return (Row2) super.fieldsRow();
+    public Row4<Long, String, Long, Boolean> fieldsRow() {
+        return (Row4) super.fieldsRow();
     }
 }

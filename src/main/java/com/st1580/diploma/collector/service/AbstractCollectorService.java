@@ -15,7 +15,6 @@ import com.st1580.diploma.collector.graph.Entity;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.Graph;
 import com.st1580.diploma.collector.graph.Link;
-import com.st1580.diploma.collector.graph.Link;
 import com.st1580.diploma.collector.policy.Policy;
 import com.st1580.diploma.collector.repository.CollectorRepository;
 import com.st1580.diploma.collector.service.dto.GraphDto;
@@ -92,7 +91,6 @@ public abstract class AbstractCollectorService {
                     queue.add(new BfsStage(nextStageType, nextStageEntitiesIds));
                 });
             }
-
         }
 
         return graph;
@@ -102,6 +100,7 @@ public abstract class AbstractCollectorService {
         Graph g = constructGraph(startEntity, policy, true);
         return g.convertToDto();
     }
+
     public GraphDto getGraphWithPolicy(Entity startEntity, Policy policy) {
         Graph g = constructGraph(startEntity, policy, false);
 
@@ -114,7 +113,8 @@ public abstract class AbstractCollectorService {
 
         Set<Entity> heavyEntities = new HashSet<>();
         for (EntityType type : lightEntities.keySet()) {
-            Map<Long, ? extends Entity> heavyEntityById = graphConstructorService.getEntitiesByIds(type, lightEntities.get(type));
+            Map<Long, ? extends Entity> heavyEntityById =
+                    graphConstructorService.getEntitiesByIds(type, lightEntities.get(type));
             heavyEntities.addAll(heavyEntityById.values());
         }
 

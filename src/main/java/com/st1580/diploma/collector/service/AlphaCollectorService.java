@@ -8,6 +8,7 @@ import com.st1580.diploma.collector.api.AlphaCollectorController;
 import com.st1580.diploma.collector.graph.Entity;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.entities.AlphaEntity;
+import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.policy.StartEntityPolicy;
 import com.st1580.diploma.collector.repository.AlphaRepository;
 import com.st1580.diploma.collector.service.dto.GraphDto;
@@ -27,13 +28,13 @@ public class AlphaCollectorService extends AbstractCollectorService implements A
 
     @Override
     public GraphDto collectLightGraph(long alphaId) {
-        final Entity startEntity = new AlphaEntity(alphaId);
+        final Entity startEntity = new LightEntity(EntityType.ALPHA, alphaId);
         return getLightGraphWithPolicy(startEntity, new StartEntityPolicy(EntityType.ALPHA));
     }
 
     @Override
     public List<GraphLinkDto> collectEntityLightNeighbors(long alphaId) {
-        final Entity startEntity = new AlphaEntity(alphaId);
+        final Entity startEntity = new LightEntity(EntityType.ALPHA, alphaId);
         return getEntityLightNeighbors(startEntity);
     }
 }
