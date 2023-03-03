@@ -1,5 +1,6 @@
 package com.st1580.diploma.collector.service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -60,13 +61,13 @@ public class GraphConstructorService {
 
 
     public Map<EntityType, Map<Long, List<Long>>> getEntitiesNeighborsIds(EntityType entitiesType,
-                                                                          List<Long> entitiesIds) {
+                                                                          Collection<Long> entitiesIds) {
         CollectorRepository collectorRepository = matchRepository(entitiesType);
         return collectorRepository.collectAllNeighborsIdsByEntities(entitiesIds);
     }
 
     public Map<EntityType, Map<Long, List<? extends Link>>> getEntitiesNeighbors(EntityType entitiesType,
-                                                                               List<Long> entitiesIds) {
+                                                                               Collection<Long> entitiesIds) {
         CollectorRepository collectorRepository = matchRepository(entitiesType);
         return collectorRepository.collectAllNeighborsByEntities(entitiesIds);
     }

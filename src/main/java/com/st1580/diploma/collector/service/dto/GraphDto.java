@@ -13,11 +13,6 @@ public class GraphDto {
         this.graphLinks = graphLinkDtos;
     }
 
-    public GraphDto(GraphEntityDto graphEntityDto) {
-        this.graphEntities = Set.of(graphEntityDto);
-        this.graphLinks = new HashSet<>();
-    }
-
     public Set<GraphEntityDto> getEntities() {
         return graphEntities;
     }

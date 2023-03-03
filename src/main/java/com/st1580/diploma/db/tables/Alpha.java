@@ -15,7 +15,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row5;
+import org.jooq.Row4;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Alpha extends TableImpl<AlphaRecord> {
 
-    private static final long serialVersionUID = 1521598949;
+    private static final long serialVersionUID = -1238009213;
 
     /**
      * The reference instance of <code>public.alpha</code>
@@ -50,11 +50,6 @@ public class Alpha extends TableImpl<AlphaRecord> {
      * The column <code>public.alpha.id</code>.
      */
     public final TableField<AlphaRecord, Long> ID = createField(DSL.name("id"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
-
-    /**
-     * The column <code>public.alpha.name</code>.
-     */
-    public final TableField<AlphaRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'alpha'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>public.alpha.property_1</code>.
@@ -146,11 +141,11 @@ public class Alpha extends TableImpl<AlphaRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row5 type methods
+    // Row4 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row5<Long, String, String, Long, Long> fieldsRow() {
-        return (Row5) super.fieldsRow();
+    public Row4<Long, String, Long, Long> fieldsRow() {
+        return (Row4) super.fieldsRow();
     }
 }

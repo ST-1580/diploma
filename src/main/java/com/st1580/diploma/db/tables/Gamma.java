@@ -15,7 +15,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row5;
+import org.jooq.Row4;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Gamma extends TableImpl<GammaRecord> {
 
-    private static final long serialVersionUID = -1670993339;
+    private static final long serialVersionUID = 920324008;
 
     /**
      * The reference instance of <code>public.gamma</code>
@@ -50,11 +50,6 @@ public class Gamma extends TableImpl<GammaRecord> {
      * The column <code>public.gamma.id</code>.
      */
     public final TableField<GammaRecord, Long> ID = createField(DSL.name("id"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
-
-    /**
-     * The column <code>public.gamma.name</code>.
-     */
-    public final TableField<GammaRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'gamma'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>public.gamma.property_1</code>.
@@ -146,11 +141,11 @@ public class Gamma extends TableImpl<GammaRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row5 type methods
+    // Row4 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row5<Long, String, Long, String, Boolean> fieldsRow() {
-        return (Row5) super.fieldsRow();
+    public Row4<Long, Long, String, Boolean> fieldsRow() {
+        return (Row4) super.fieldsRow();
     }
 }

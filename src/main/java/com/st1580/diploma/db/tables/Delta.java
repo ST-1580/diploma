@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Delta extends TableImpl<DeltaRecord> {
 
-    private static final long serialVersionUID = -1892477301;
+    private static final long serialVersionUID = 1245359154;
 
     /**
      * The reference instance of <code>public.delta</code>
@@ -52,9 +52,9 @@ public class Delta extends TableImpl<DeltaRecord> {
     public final TableField<DeltaRecord, Long> ID = createField(DSL.name("id"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>public.delta.name</code>.
+     * The column <code>public.delta.property_1</code>.
      */
-    public final TableField<DeltaRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'delta-graphEntityDto'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
+    public final TableField<DeltaRecord, String> PROPERTY_1 = createField(DSL.name("property_1"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'property 1'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * Create a <code>public.delta</code> table reference

@@ -13,6 +13,6 @@ public class StartEntityPolicy implements Policy {
 
     @Override
     public boolean canExtendFromLightEntity(Graph g, LightEntity e) {
-        return e.getType() != startedType;
+        return g.getGraphEntities().isEmpty() || e.getType() != startedType;
     }
 }

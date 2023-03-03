@@ -39,12 +39,6 @@ public class Graph {
         this.policy = new NonCyclicPolicy();
     }
 
-    public Graph(Set<Entity> graphEntities, Set<Link> graphLinks, Policy policy) {
-        this.graphEntities = graphEntities;
-        this.graphLinks = graphLinks;
-        this.policy = policy;
-    }
-
 
     public Set<Entity> getGraphEntities() {
         return graphEntities;
@@ -65,6 +59,10 @@ public class Graph {
         );
     }
 
+    public void addEntity(Entity entity) {
+        graphEntities.add(entity);
+    }
+
     public void addNeighbors(EntityType startEntityType,
                              long startEntityId,
                              Map<EntityType, List<? extends Link>> neighborsLinks) {
@@ -83,7 +81,7 @@ public class Graph {
                 .flatMap(Collection::stream)
                 .collect(Collectors.toSet());
 
-        this.graphEntities.addAll(connectedEntities);
+        this.graphEntities.add(start);
         this.graphLinks.addAll(newLinks);
     }
 
@@ -106,7 +104,7 @@ public class Graph {
                 .flatMap(entry -> createLightEntities(entry.getKey(), entry.getValue()).stream())
                 .collect(Collectors.toList());
 
-        this.graphEntities.addAll(connectedEntities);
+        this.graphEntities.add(start);
         this.graphLinks.addAll(createLightLinks(start, connectedEntities));
     }
 
@@ -121,7 +119,8 @@ public class Graph {
     }
 
     public boolean canExtendFromEntityByPolicy(EntityType type, long id) {
-        return policy.canExtendFromLightEntity(this, new LightEntity(type, id));
+        LightEntity entity = new LightEntity(type, id);
+        return policy.canExtendFromLightEntity(this, entity) && !this.graphEntities.contains(entity);
     }
 
     @Override

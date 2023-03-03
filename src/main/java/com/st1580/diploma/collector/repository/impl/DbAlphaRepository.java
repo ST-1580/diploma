@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import com.st1580.diploma.collector.graph.Entity;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.Link;
 import com.st1580.diploma.collector.graph.entities.AlphaEntity;
@@ -17,8 +16,7 @@ import com.st1580.diploma.collector.repository.AlphaRepository;
 import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
 import com.st1580.diploma.collector.repository.GammaToAlphaRepository;
 import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import static com.st1580.diploma.db.Tables.ALPHA;
@@ -26,7 +24,8 @@ import static com.st1580.diploma.db.Tables.ALPHA;
 @Repository
 public class DbAlphaRepository implements AlphaRepository {
 
-    DSLContext context = DSL.using(SQLDialect.POSTGRES);
+    @Autowired
+    private DSLContext context;
     @Inject
     AlphaToBetaRepository alphaToBetaRepository;
     @Inject

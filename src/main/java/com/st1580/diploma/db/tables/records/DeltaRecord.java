@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DeltaRecord extends UpdatableRecordImpl<DeltaRecord> implements Record2<Long, String> {
 
-    private static final long serialVersionUID = -2020611966;
+    private static final long serialVersionUID = 649871114;
 
     /**
      * Setter for <code>public.delta.id</code>.
@@ -36,16 +36,16 @@ public class DeltaRecord extends UpdatableRecordImpl<DeltaRecord> implements Rec
     }
 
     /**
-     * Setter for <code>public.delta.name</code>.
+     * Setter for <code>public.delta.property_1</code>.
      */
-    public void setName(String value) {
+    public void setProperty_1(String value) {
         set(1, value);
     }
 
     /**
-     * Getter for <code>public.delta.name</code>.
+     * Getter for <code>public.delta.property_1</code>.
      */
-    public String getName() {
+    public String getProperty_1() {
         return (String) get(1);
     }
 
@@ -79,7 +79,7 @@ public class DeltaRecord extends UpdatableRecordImpl<DeltaRecord> implements Rec
 
     @Override
     public Field<String> field2() {
-        return Delta.DELTA.NAME;
+        return Delta.DELTA.PROPERTY_1;
     }
 
     @Override
@@ -89,7 +89,7 @@ public class DeltaRecord extends UpdatableRecordImpl<DeltaRecord> implements Rec
 
     @Override
     public String component2() {
-        return getName();
+        return getProperty_1();
     }
 
     @Override
@@ -99,7 +99,7 @@ public class DeltaRecord extends UpdatableRecordImpl<DeltaRecord> implements Rec
 
     @Override
     public String value2() {
-        return getName();
+        return getProperty_1();
     }
 
     @Override
@@ -110,7 +110,7 @@ public class DeltaRecord extends UpdatableRecordImpl<DeltaRecord> implements Rec
 
     @Override
     public DeltaRecord value2(String value) {
-        setName(value);
+        setProperty_1(value);
         return this;
     }
 
@@ -135,10 +135,10 @@ public class DeltaRecord extends UpdatableRecordImpl<DeltaRecord> implements Rec
     /**
      * Create a detached, initialised DeltaRecord
      */
-    public DeltaRecord(Long id, String name) {
+    public DeltaRecord(Long id, String property_1) {
         super(Delta.DELTA);
 
         set(0, id);
-        set(1, name);
+        set(1, property_1);
     }
 }
