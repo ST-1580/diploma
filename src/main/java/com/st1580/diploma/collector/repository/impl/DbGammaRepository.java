@@ -9,17 +9,14 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import com.st1580.diploma.collector.graph.Entity;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.Link;
-import com.st1580.diploma.collector.graph.entities.DeltaEntity;
 import com.st1580.diploma.collector.graph.entities.GammaEntity;
 import com.st1580.diploma.collector.repository.GammaRepository;
 import com.st1580.diploma.collector.repository.GammaToAlphaRepository;
 import com.st1580.diploma.collector.repository.GammaToDeltaRepository;
+import com.st1580.diploma.db.tables.records.GammaRecord;
 import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -41,7 +38,7 @@ public class DbGammaRepository implements GammaRepository {
                 .where(GAMMA.ID.in(ids))
                 .fetch()
                 .stream()
-                .map(GammaEntity::new)
+                .map(this::convertToGammaEntity)
                 .collect(Collectors.toMap(
                         GammaEntity::getId,
                         Function.identity()
@@ -70,5 +67,14 @@ public class DbGammaRepository implements GammaRepository {
         });
 
         return res;
+    }
+
+    private GammaEntity convertToGammaEntity(GammaRecord record) {
+        return new GammaEntity(
+                record.getId(),
+                record.getProperty_1(),
+                record.getProperty_2(),
+                record.getProperty_3()
+        );
     }
 }

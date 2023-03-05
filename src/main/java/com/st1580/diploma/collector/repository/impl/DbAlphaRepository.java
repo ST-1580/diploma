@@ -12,9 +12,10 @@ import javax.inject.Inject;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.Link;
 import com.st1580.diploma.collector.graph.entities.AlphaEntity;
-import com.st1580.diploma.collector.repository.AlphaRepository;
 import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
+import com.st1580.diploma.collector.repository.AlphaRepository;
 import com.st1580.diploma.collector.repository.GammaToAlphaRepository;
+import com.st1580.diploma.db.tables.records.AlphaRecord;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -38,7 +39,7 @@ public class DbAlphaRepository implements AlphaRepository {
                 .where(ALPHA.ID.in(ids))
                 .fetch()
                 .stream()
-                .map(AlphaEntity::new)
+                .map(this::convertToAlphaEntity)
                 .collect(Collectors.toMap(
                         AlphaEntity::getId,
                         Function.identity()
@@ -68,4 +69,47 @@ public class DbAlphaRepository implements AlphaRepository {
 
         return res;
     }
+
+    @Override
+    public void insert(AlphaEntity entity) {
+        context.insertInto(ALPHA).set(convertToAlphaRecord(entity)).execute();
+    }
+
+    @Override
+    public void update(long id, AlphaEntity entity) {
+        context.update(ALPHA).set(convertToAlphaRecord(entity)).where(ALPHA.ID.eq(id)).execute();
+    }
+
+    @Override
+    public void delete(long id) {
+        context.deleteFrom(ALPHA).where(ALPHA.ID.eq(id)).execute();
+    }
+
+    @Override
+    public List<Long> getAllIds() {
+        return context
+                .select(ALPHA.ID)
+                .from(ALPHA)
+                .fetchInto(Long.class);
+    }
+
+    private AlphaRecord convertToAlphaRecord(AlphaEntity entity) {
+        return new AlphaRecord(
+                entity.getId(),
+                entity.getProperty_1(),
+                entity.getProperty_2(),
+                entity.getProperty_3()
+        );
+    }
+
+    private AlphaEntity convertToAlphaEntity(AlphaRecord record) {
+        return new AlphaEntity(
+                record.getId(),
+                record.getProperty_1(),
+                record.getProperty_2(),
+                record.getProperty_3()
+        );
+    }
+
+
 }

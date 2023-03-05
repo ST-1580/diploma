@@ -2,6 +2,8 @@ package com.st1580.diploma.collector.service;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import com.st1580.diploma.collector.api.BetaCollectorController;
 import com.st1580.diploma.collector.graph.Entity;
 import com.st1580.diploma.collector.graph.EntityType;
@@ -17,6 +19,7 @@ public class BetaCollectorService extends AbstractCollectorService implements Be
 
     private final BetaRepository betaRepository;
 
+    @Inject
     public BetaCollectorService(BetaRepository betaRepository) {
         super(betaRepository);
         this.betaRepository = betaRepository;

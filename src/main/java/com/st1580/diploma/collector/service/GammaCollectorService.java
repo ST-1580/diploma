@@ -2,11 +2,12 @@ package com.st1580.diploma.collector.service;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import com.st1580.diploma.collector.api.GammaCollectorController;
 import com.st1580.diploma.collector.graph.Entity;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.entities.LightEntity;
-import com.st1580.diploma.collector.policy.StartEntityPolicy;
 import com.st1580.diploma.collector.repository.GammaRepository;
 import com.st1580.diploma.collector.service.dto.GraphDto;
 import com.st1580.diploma.collector.service.dto.GraphLinkDto;
@@ -18,6 +19,7 @@ public class GammaCollectorService extends AbstractCollectorService implements G
 
     private final GammaRepository gammaRepository;
 
+    @Inject
     public GammaCollectorService(GammaRepository gammaRepository) {
         super(gammaRepository);
         this.gammaRepository = gammaRepository;

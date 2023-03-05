@@ -19,12 +19,6 @@ public class BetaEntity extends AbstractEntity {
         this.property_2 = property_2;
     }
 
-    public BetaEntity(BetaRecord record) {
-        super(EntityType.BETA, record.getId());
-        this.property_1 = record.getProperty_1();
-        this.property_2 = record.getProperty_2();
-    }
-
     public Long getProperty_1() {
         return property_1;
     }

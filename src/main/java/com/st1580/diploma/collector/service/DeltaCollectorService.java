@@ -2,6 +2,8 @@ package com.st1580.diploma.collector.service;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import com.st1580.diploma.collector.api.DeltaCollectorController;
 import com.st1580.diploma.collector.graph.Entity;
 import com.st1580.diploma.collector.graph.EntityType;
@@ -17,6 +19,7 @@ public class DeltaCollectorService extends AbstractCollectorService implements D
 
     private final DeltaRepository deltaRepository;
 
+    @Inject
     public DeltaCollectorService(DeltaRepository deltaRepository) {
         super(deltaRepository);
         this.deltaRepository = deltaRepository;

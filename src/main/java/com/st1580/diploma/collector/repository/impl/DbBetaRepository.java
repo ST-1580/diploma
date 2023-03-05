@@ -9,16 +9,13 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import com.st1580.diploma.collector.graph.Entity;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.Link;
-import com.st1580.diploma.collector.graph.entities.AlphaEntity;
 import com.st1580.diploma.collector.graph.entities.BetaEntity;
-import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
 import com.st1580.diploma.collector.repository.BetaRepository;
+import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
+import com.st1580.diploma.db.tables.records.BetaRecord;
 import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -40,12 +37,13 @@ public class DbBetaRepository implements BetaRepository {
                 .where(BETA.ID.in(ids))
                 .fetch()
                 .stream()
-                .map(BetaEntity::new)
+                .map(this::convertToBetaEntity)
                 .collect(Collectors.toMap(
                         BetaEntity::getId,
                         Function.identity()
                 ));
     }
+
     @Override
     public Map<EntityType, Map<Long, List<Long>>> collectAllNeighborsIdsByEntities(Collection<Long> ids) {
         Map<EntityType, Map<Long, List<Long>>> res = new HashMap<>();
@@ -66,5 +64,13 @@ public class DbBetaRepository implements BetaRepository {
         });
 
         return res;
+    }
+
+    private BetaEntity convertToBetaEntity(BetaRecord record) {
+        return new BetaEntity(
+                record.getId(),
+                record.getProperty_1(),
+                record.getProperty_2()
+        );
     }
 }

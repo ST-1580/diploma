@@ -18,13 +18,6 @@ public class GammaToDeltaLink extends AbstractLink {
         this.deltaId = deltaId;
     }
 
-    public GammaToDeltaLink(GammaToDeltaRecord record) {
-        super(new LightEntity(EntityType.GAMMA, record.getGammaId()),
-                new LightEntity(EntityType.DELTA, record.getDeltaId()));
-        this.gammaId = record.getGammaId();
-        this.deltaId = record.getDeltaId();
-    }
-
     public long getGammaId() {
         return gammaId;
     }

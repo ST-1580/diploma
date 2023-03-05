@@ -7,9 +7,8 @@ import java.util.stream.Collectors;
 
 import com.st1580.diploma.collector.graph.links.GammaToAlphaLink;
 import com.st1580.diploma.collector.repository.GammaToAlphaRepository;
+import com.st1580.diploma.db.tables.records.GammaToAlphaRecord;
 import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -35,7 +34,7 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
                 .where(GAMMA_TO_ALPHA.ALPHA_ID.in(alphaIds))
                 .fetch()
                 .stream()
-                .map(GammaToAlphaLink::new)
+                .map(this::convertToLink)
                 .collect(Collectors.groupingBy(GammaToAlphaLink::getAlphaId));
     }
 
@@ -54,7 +53,16 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
                 .where(GAMMA_TO_ALPHA.GAMMA_ID.in(gammaIds))
                 .fetch()
                 .stream()
-                .map(GammaToAlphaLink::new)
+                .map(this::convertToLink)
                 .collect(Collectors.groupingBy(GammaToAlphaLink::getGammaId));
+    }
+
+    private GammaToAlphaLink convertToLink(GammaToAlphaRecord record) {
+        return new GammaToAlphaLink(
+                record.getGammaId(),
+                record.getAlphaId(),
+                record.getProperty_1(),
+                record.getProperty_2()
+        );
     }
 }

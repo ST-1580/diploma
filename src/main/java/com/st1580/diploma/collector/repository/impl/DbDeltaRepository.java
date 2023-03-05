@@ -9,16 +9,13 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import com.st1580.diploma.collector.graph.Entity;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.Link;
-import com.st1580.diploma.collector.graph.entities.BetaEntity;
 import com.st1580.diploma.collector.graph.entities.DeltaEntity;
 import com.st1580.diploma.collector.repository.DeltaRepository;
 import com.st1580.diploma.collector.repository.GammaToDeltaRepository;
+import com.st1580.diploma.db.tables.records.DeltaRecord;
 import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -39,7 +36,7 @@ public class DbDeltaRepository implements DeltaRepository {
                 .where(DELTA.ID.in(ids))
                 .fetch()
                 .stream()
-                .map(DeltaEntity::new)
+                .map(this::convertToDeltaEntity)
                 .collect(Collectors.toMap(
                         DeltaEntity::getId,
                         Function.identity()
@@ -66,5 +63,12 @@ public class DbDeltaRepository implements DeltaRepository {
         });
 
         return res;
+    }
+
+    private DeltaEntity convertToDeltaEntity(DeltaRecord record) {
+        return new DeltaEntity(
+                record.getId(),
+                record.getProperty_1()
+        );
     }
 }

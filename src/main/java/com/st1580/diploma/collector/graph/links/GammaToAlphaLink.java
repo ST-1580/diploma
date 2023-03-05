@@ -23,15 +23,6 @@ public class GammaToAlphaLink extends AbstractLink {
         this.property_2 = property_2;
     }
 
-    public GammaToAlphaLink(GammaToAlphaRecord record) {
-        super(new LightEntity(EntityType.GAMMA, record.getGammaId()),
-                new LightEntity(EntityType.ALPHA, record.getAlphaId()));
-        this.alphaId = record.getAlphaId();
-        this.gammaId = record.getGammaId();
-        this.property_1 = record.getProperty_1();
-        this.property_2 = record.getProperty_2();
-    }
-
     public long getGammaId() {
         return gammaId;
     }

@@ -7,7 +7,7 @@ import com.st1580.diploma.collector.graph.AbstractLink;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.service.dto.GraphLinkDto;
-import com.st1580.diploma.db.tables.records.AlphaToBetaRecord;
+import com.st1580.diploma.external.alpha.data.ExternalAlphaToBetaLink;
 
 public class AlphaToBetaLink extends AbstractLink {
     private final long alphaId;
@@ -20,12 +20,12 @@ public class AlphaToBetaLink extends AbstractLink {
         this.property_1 = property_1;
     }
 
-    public AlphaToBetaLink(AlphaToBetaRecord record) {
-        super(new LightEntity(EntityType.ALPHA, record.getAlphaId()),
-                new LightEntity(EntityType.BETA, record.getBetaId()));
-        this.alphaId = record.getAlphaId();
-        this.betaId = record.getBetaId();
-        this.property_1 = record.getProperty_1();
+    public AlphaToBetaLink(ExternalAlphaToBetaLink externalAlphaToBetaLink) {
+        super(new LightEntity(EntityType.ALPHA, externalAlphaToBetaLink.getAlphaId()),
+                new LightEntity(EntityType.BETA, externalAlphaToBetaLink.getBetaId()));
+        this.alphaId = externalAlphaToBetaLink.getAlphaId();
+        this.betaId = externalAlphaToBetaLink.getBetaId();
+        this.property_1 = externalAlphaToBetaLink.getHash();
     }
 
     @Override

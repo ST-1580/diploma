@@ -7,9 +7,8 @@ import java.util.stream.Collectors;
 
 import com.st1580.diploma.collector.graph.links.GammaToDeltaLink;
 import com.st1580.diploma.collector.repository.GammaToDeltaRepository;
+import com.st1580.diploma.db.tables.records.GammaToDeltaRecord;
 import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -35,7 +34,7 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
                 .where(GAMMA_TO_DELTA.DELTA_ID.in(deltaIds))
                 .fetch()
                 .stream()
-                .map(GammaToDeltaLink::new)
+                .map(this::convertToLink)
                 .collect(Collectors.groupingBy(GammaToDeltaLink::getDeltaId));
     }
 
@@ -54,7 +53,14 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
                 .where(GAMMA_TO_DELTA.GAMMA_ID.in(gammaIds))
                 .fetch()
                 .stream()
-                .map(GammaToDeltaLink::new)
+                .map(this::convertToLink)
                 .collect(Collectors.groupingBy(GammaToDeltaLink::getGammaId));
+    }
+
+    private GammaToDeltaLink convertToLink(GammaToDeltaRecord record) {
+        return new GammaToDeltaLink(
+                record.getGammaId(),
+                record.getDeltaId()
+        );
     }
 }

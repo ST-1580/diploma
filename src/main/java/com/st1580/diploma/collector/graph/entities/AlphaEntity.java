@@ -1,6 +1,5 @@
 package com.st1580.diploma.collector.graph.entities;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
@@ -8,7 +7,7 @@ import com.st1580.diploma.collector.graph.AbstractEntity;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.service.dto.GraphEntityDto;
 import com.st1580.diploma.collector.service.dto.GraphEntityType;
-import com.st1580.diploma.db.tables.records.AlphaRecord;
+import com.st1580.diploma.external.alpha.data.ExternalAlphaEntity;
 
 public class AlphaEntity extends AbstractEntity {
     private final String property_1;
@@ -22,11 +21,11 @@ public class AlphaEntity extends AbstractEntity {
         this.property_3 = property_3;
     }
 
-    public AlphaEntity(AlphaRecord record) {
-        super(EntityType.ALPHA, record.getId());
-        this.property_1 = record.getProperty_1();
-        this.property_2 = record.getProperty_2();
-        this.property_3 = record.getProperty_3();
+    public AlphaEntity(ExternalAlphaEntity externalAlphaEntity) {
+        super(EntityType.ALPHA, externalAlphaEntity.getId());
+        this.property_1 = externalAlphaEntity.getName();
+        this.property_2 = externalAlphaEntity.getCreatedTs();
+        this.property_3 = externalAlphaEntity.getStat();
     }
 
     public String getProperty_1() {

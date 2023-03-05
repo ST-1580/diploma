@@ -7,9 +7,8 @@ import java.util.stream.Collectors;
 
 import com.st1580.diploma.collector.graph.links.AlphaToBetaLink;
 import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
+import com.st1580.diploma.db.tables.records.AlphaToBetaRecord;
 import org.jooq.DSLContext;
-import org.jooq.SQLDialect;
-import org.jooq.impl.DSL;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
@@ -35,7 +34,7 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
                 .where(ALPHA_TO_BETA.ALPHA_ID.in(alphaIds))
                 .fetch()
                 .stream()
-                .map(AlphaToBetaLink::new)
+                .map(this::convertToLink)
                 .collect(Collectors.groupingBy(AlphaToBetaLink::getAlphaId));
     }
 
@@ -54,7 +53,50 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
                 .where(ALPHA_TO_BETA.BETA_ID.in(betaIds))
                 .fetch()
                 .stream()
-                .map(AlphaToBetaLink::new)
+                .map(this::convertToLink)
                 .collect(Collectors.groupingBy(AlphaToBetaLink::getBetaId));
+    }
+
+    @Override
+    public void insert(AlphaToBetaLink link) {
+        context.insertInto(ALPHA_TO_BETA).set(convertToRecord(link)).execute();
+    }
+
+    @Override
+    public void update(long alphaId, long betaId, AlphaToBetaLink link) {
+        context
+                .update(ALPHA_TO_BETA)
+                .set(convertToRecord(link))
+                .where(ALPHA_TO_BETA.ALPHA_ID.eq(alphaId).and(ALPHA_TO_BETA.BETA_ID.eq(betaId)))
+                .execute();
+    }
+
+    @Override
+    public void delete(long alphaId, long betaId) {
+        context
+                .deleteFrom(ALPHA_TO_BETA)
+                .where(ALPHA_TO_BETA.ALPHA_ID.eq(alphaId).and(ALPHA_TO_BETA.BETA_ID.eq(betaId)))
+                .execute();
+    }
+
+    @Override
+    public List<AlphaToBetaLink> getAllLinks() {
+        return context.selectFrom(ALPHA_TO_BETA).fetch().map(this::convertToLink);
+    }
+
+    private AlphaToBetaRecord convertToRecord(AlphaToBetaLink link) {
+        return new AlphaToBetaRecord(
+                link.getAlphaId(),
+                link.getBetaId(),
+                link.getProperty_1()
+        );
+    }
+
+    private AlphaToBetaLink convertToLink(AlphaToBetaRecord record) {
+        return new AlphaToBetaLink(
+                record.getAlphaId(),
+                record.getBetaId(),
+                record.getProperty_1()
+        );
     }
 }

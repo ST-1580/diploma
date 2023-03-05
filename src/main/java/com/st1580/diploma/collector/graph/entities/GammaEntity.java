@@ -21,13 +21,6 @@ public class GammaEntity extends AbstractEntity {
         this.property_3 = property_3;
     }
 
-    public GammaEntity(GammaRecord record) {
-        super(EntityType.GAMMA, record.getId());
-        this.property_1 = record.getProperty_1();
-        this.property_2 = record.getProperty_2();
-        this.property_3 = record.getProperty_3();
-    }
-
     public Long getProperty_1() {
         return property_1;
     }

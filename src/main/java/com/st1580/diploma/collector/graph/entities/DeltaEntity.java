@@ -16,11 +16,6 @@ public class DeltaEntity extends AbstractEntity {
         this.property_1 = property_1;
     }
 
-    public DeltaEntity(DeltaRecord record) {
-        super(EntityType.DELTA, record.getId());
-        this.property_1 = record.getProperty_1();
-    }
-
     @Override
     public GraphEntityDto convertToDto() {
         return new GraphEntityDto(GraphEntityType.DELTA, getId(), Map.of("property_1", property_1));
