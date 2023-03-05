@@ -1,4 +1,4 @@
-package com.st1580.diploma.scheduler.caller;
+package com.st1580.diploma.updater.caller;
 
 import java.util.List;
 
