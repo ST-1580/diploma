@@ -1,4 +1,4 @@
-package com.st1580.diploma.scheduler.service;
+package com.st1580.diploma.updater.service;
 
 public interface AlphaUpdateService {
     void updateAlphaEntity(long tsFrom, long tsTo);

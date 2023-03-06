@@ -11,7 +11,7 @@ import com.st1580.diploma.external.alpha.data.AlphaBetaId;
 import org.springframework.stereotype.Service;
 
 @Service
-public class InitHelperImpl implements InitHelper {
+public class AlphaInitHelperImpl implements AlphaInitHelper {
     @Inject
     private AlphaRepository alphaRepository;
     @Inject

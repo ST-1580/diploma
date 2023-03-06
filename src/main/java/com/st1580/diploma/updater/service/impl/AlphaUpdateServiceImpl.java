@@ -1,4 +1,4 @@
-package com.st1580.diploma.scheduler.service.impl;
+package com.st1580.diploma.updater.service.impl;
 
 import java.util.Comparator;
 import java.util.List;
@@ -11,8 +11,8 @@ import com.st1580.diploma.collector.repository.AlphaRepository;
 import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
 import com.st1580.diploma.external.alpha.data.AlphaEntityEvent;
 import com.st1580.diploma.external.alpha.data.AlphaToBetaLinkEvent;
-import com.st1580.diploma.scheduler.caller.AlphaCaller;
-import com.st1580.diploma.scheduler.service.AlphaUpdateService;
+import com.st1580.diploma.updater.service.AlphaUpdateService;
+import com.st1580.diploma.updater.caller.AlphaCaller;
 import org.springframework.stereotype.Service;
 
 @Service

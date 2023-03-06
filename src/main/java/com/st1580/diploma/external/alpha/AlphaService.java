@@ -24,7 +24,7 @@ public class AlphaService implements AlphaServiceApi {
     private final Set<AlphaBetaId> linkState;
 
     @Inject
-    public AlphaService(InitHelper helper) {
+    public AlphaService(AlphaInitHelper helper) {
         this.entityEvents = new ArrayList<>();
         this.alphaToBetaLinkEvents = new ArrayList<>();
         this.idState = new HashSet<>(helper.getAllEntityIds());
@@ -32,32 +32,32 @@ public class AlphaService implements AlphaServiceApi {
     }
 
     @Override
-    public String createEntity(ExternalAlphaEntity alphaEntity) {
-        if (idState.contains(alphaEntity.getId())) {
-            return "Alpha entity with id " + alphaEntity.getId() + " is already exists";
+    public String createEntity(ExternalAlphaEntity newEntity) {
+        if (idState.contains(newEntity.getId())) {
+            return "Alpha entity with id " + newEntity.getId() + " is already exists";
         }
-        idState.add(alphaEntity.getId());
+        idState.add(newEntity.getId());
 
         entityEvents.add(
                 new AlphaEntityEvent(
                     AlphaEventType.CREATE,
-                    alphaEntity.getId(),
-                    alphaEntity
+                    newEntity.getId(),
+                    newEntity
                 ));
         return "done";
     }
 
     @Override
-    public String patchEntity(ExternalAlphaEntity newEntity) {
-        if (!idState.contains(newEntity.getId())) {
-            return "Alpha entity with id " + newEntity.getId() + " is not exists";
+    public String patchEntity(ExternalAlphaEntity alphaEntity) {
+        if (!idState.contains(alphaEntity.getId())) {
+            return "Alpha entity with id " + alphaEntity.getId() + " is not exists";
         }
 
         entityEvents.add(
                 new AlphaEntityEvent(
                         AlphaEventType.UPDATE,
-                        newEntity.getId(),
-                        newEntity
+                        alphaEntity.getId(),
+                        alphaEntity
                 ));
         return "done";
     }
@@ -79,8 +79,8 @@ public class AlphaService implements AlphaServiceApi {
     }
 
     @Override
-    public String createAlphaToBetaLink(ExternalAlphaToBetaLink alphaToBetaLink) {
-        AlphaBetaId ab = new AlphaBetaId(alphaToBetaLink.getAlphaId(), alphaToBetaLink.getBetaId());
+    public String createAlphaToBetaLink(ExternalAlphaToBetaLink newLink) {
+        AlphaBetaId ab = new AlphaBetaId(newLink.getAlphaId(), newLink.getBetaId());
         if (linkState.contains(ab)) {
             return "Link from alpha entity " + ab.getAlphaId() +
                     " to beta entity " + ab.getBetaId() + " is already exists";
@@ -90,17 +90,17 @@ public class AlphaService implements AlphaServiceApi {
         alphaToBetaLinkEvents.add(
                 new AlphaToBetaLinkEvent(
                         AlphaEventType.CREATE,
-                        alphaToBetaLink.getAlphaId(),
-                        alphaToBetaLink.getBetaId(),
-                        alphaToBetaLink
+                        newLink.getAlphaId(),
+                        newLink.getBetaId(),
+                        newLink
                 )
         );
         return "done";
     }
 
     @Override
-    public String patchAlphaToBetaLink(ExternalAlphaToBetaLink newLink) {
-        AlphaBetaId ab = new AlphaBetaId(newLink.getAlphaId(), newLink.getBetaId());
+    public String patchAlphaToBetaLink(ExternalAlphaToBetaLink alphaToBetaLink) {
+        AlphaBetaId ab = new AlphaBetaId(alphaToBetaLink.getAlphaId(), alphaToBetaLink.getBetaId());
         if (!linkState.contains(ab)) {
             return "Link from alpha entity " + ab.getAlphaId() +
                     " to beta entity " + ab.getBetaId() + " is not exists";
@@ -109,9 +109,9 @@ public class AlphaService implements AlphaServiceApi {
         alphaToBetaLinkEvents.add(
                 new AlphaToBetaLinkEvent(
                         AlphaEventType.UPDATE,
-                        newLink.getAlphaId(),
-                        newLink.getBetaId(),
-                        newLink
+                        alphaToBetaLink.getAlphaId(),
+                        alphaToBetaLink.getBetaId(),
+                        alphaToBetaLink
                 )
         );
         return "done";

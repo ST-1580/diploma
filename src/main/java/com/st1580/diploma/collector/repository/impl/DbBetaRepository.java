@@ -12,13 +12,15 @@ import javax.inject.Inject;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.Link;
 import com.st1580.diploma.collector.graph.entities.BetaEntity;
-import com.st1580.diploma.collector.repository.BetaRepository;
 import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
+import com.st1580.diploma.collector.repository.BetaRepository;
 import com.st1580.diploma.db.tables.records.BetaRecord;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import static com.st1580.diploma.db.Tables.ALPHA;
+import static com.st1580.diploma.db.Tables.ALPHA_TO_BETA;
 import static com.st1580.diploma.db.Tables.BETA;
 
 @Repository
@@ -64,6 +66,37 @@ public class DbBetaRepository implements BetaRepository {
         });
 
         return res;
+    }
+
+    @Override
+    public void insert(BetaEntity entity) {
+        context.insertInto(BETA).set(convertToBetaRecord(entity)).execute();
+    }
+
+    @Override
+    public void update(long id, BetaEntity entity) {
+        context.update(BETA).set(convertToBetaRecord(entity)).where(BETA.ID.eq(id)).execute();
+    }
+
+    @Override
+    public void delete(long id) {
+        context.transaction(ctx -> {
+            context.deleteFrom(ALPHA_TO_BETA).where(ALPHA_TO_BETA.BETA_ID.eq(id)).execute();
+            context.deleteFrom(ALPHA).where(BETA.ID.eq(id)).execute();
+        });
+    }
+
+    @Override
+    public List<Long> getAllIds() {
+        return context.select(BETA.ID).from(BETA).fetchInto(Long.class);
+    }
+
+    private BetaRecord convertToBetaRecord(BetaEntity entity) {
+        return new BetaRecord(
+                entity.getId(),
+                entity.getProperty_1(),
+                entity.getProperty_2()
+        );
     }
 
     private BetaEntity convertToBetaEntity(BetaRecord record) {

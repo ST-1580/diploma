@@ -8,6 +8,7 @@ import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.service.dto.GraphEntityDto;
 import com.st1580.diploma.collector.service.dto.GraphEntityType;
 import com.st1580.diploma.db.tables.records.BetaRecord;
+import com.st1580.diploma.external.beta.data.ExternalBetaEntity;
 
 public class BetaEntity extends AbstractEntity {
     private final Long property_1;
@@ -17,6 +18,12 @@ public class BetaEntity extends AbstractEntity {
         super(EntityType.BETA, id);
         this.property_1 = property_1;
         this.property_2 = property_2;
+    }
+
+    public BetaEntity(ExternalBetaEntity externalBetaEntity) {
+        super(EntityType.BETA, externalBetaEntity.getId());
+        this.property_1 = externalBetaEntity.getData();
+        this.property_2 = externalBetaEntity.isDeprecated();
     }
 
     public Long getProperty_1() {

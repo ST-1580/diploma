@@ -19,19 +19,19 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/external/v1/alpha")
 public interface AlphaServiceApi {
     @PostMapping("/create/entity")
-    String createEntity(@RequestBody ExternalAlphaEntity alphaEntity);
+    String createEntity(@RequestBody ExternalAlphaEntity newEntity);
 
     @PatchMapping("/patch/entity")
-    String patchEntity(@RequestBody ExternalAlphaEntity newEntity);
+    String patchEntity(@RequestBody ExternalAlphaEntity alphaEntity);
 
     @DeleteMapping("/delete/entity")
     String deleteEntity(@RequestParam("id") long entityId);
 
     @PostMapping("/create/link/beta")
-    String createAlphaToBetaLink(@RequestBody ExternalAlphaToBetaLink alphaToBetaLink);
+    String createAlphaToBetaLink(@RequestBody ExternalAlphaToBetaLink newLink);
 
     @PatchMapping("/patch/link/beta")
-    String patchAlphaToBetaLink(@RequestBody ExternalAlphaToBetaLink newLink);
+    String patchAlphaToBetaLink(@RequestBody ExternalAlphaToBetaLink alphaToBetaLink);
 
     @DeleteMapping("/delete/link/beta")
     String deleteAlphaToBetaLink(@RequestParam("alphaId") long alphaId, @RequestParam("betaId") long betaId);

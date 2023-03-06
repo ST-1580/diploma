@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import static com.st1580.diploma.db.Tables.ALPHA;
+import static com.st1580.diploma.db.Tables.ALPHA_TO_BETA;
 
 @Repository
 public class DbAlphaRepository implements AlphaRepository {
@@ -82,7 +83,10 @@ public class DbAlphaRepository implements AlphaRepository {
 
     @Override
     public void delete(long id) {
-        context.deleteFrom(ALPHA).where(ALPHA.ID.eq(id)).execute();
+        context.transaction(ctx -> {
+            context.deleteFrom(ALPHA_TO_BETA).where(ALPHA_TO_BETA.ALPHA_ID.eq(id)).execute();
+            context.deleteFrom(ALPHA).where(ALPHA.ID.eq(id)).execute();
+        });
     }
 
     @Override

@@ -25,6 +25,4 @@ public class AlphaCaller {
     public List<AlphaToBetaLinkEvent> getAlphaToBetaLinkEvents(long tsFrom, long tsTo) {
         return alphaServiceApi.getAlphaToBetaLinkEvents(tsFrom, tsTo);
     }
-
-    ;
 }
