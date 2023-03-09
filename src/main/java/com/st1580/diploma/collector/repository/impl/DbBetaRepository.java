@@ -14,29 +14,41 @@ import com.st1580.diploma.collector.graph.Link;
 import com.st1580.diploma.collector.graph.entities.BetaEntity;
 import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
 import com.st1580.diploma.collector.repository.BetaRepository;
+import com.st1580.diploma.collector.repository.types.EntityActiveType;
+import com.st1580.diploma.db.tables.Beta;
 import com.st1580.diploma.db.tables.records.BetaRecord;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import static com.st1580.diploma.db.Tables.ALPHA;
-import static com.st1580.diploma.db.Tables.ALPHA_TO_BETA;
 import static com.st1580.diploma.db.Tables.BETA;
+import static org.jooq.impl.DSL.max;
+import static org.jooq.impl.DSL.row;
 
 @Repository
 public class DbBetaRepository implements BetaRepository {
     @Autowired
     private DSLContext context;
-
     @Inject
     AlphaToBetaRepository alphaToBetaRepository;
 
-
     @Override
-    public Map<Long, BetaEntity> collectAllEntitiesByIds(Collection<Long> ids) {
+    public Map<Long, BetaEntity> collectAllEntitiesByIds(Collection<Long> ids, long ts) {
+        Beta TOP_LVL_BETA = BETA.as("top_lvl");
+        Beta LOW_LVL_BETA = BETA.as("low_lvl");
+
         return context
-                .selectFrom(BETA)
-                .where(BETA.ID.in(ids))
+                .selectFrom(TOP_LVL_BETA)
+                .whereExists(
+                        context.select(LOW_LVL_BETA.ID, max(LOW_LVL_BETA.CREATED_TS))
+                                .from(LOW_LVL_BETA)
+                                .where(LOW_LVL_BETA.ID.in(ids)
+                                        .and(LOW_LVL_BETA.IS_ACTIVE.in(EntityActiveType.trueEntityActiveTypes))
+                                        .and(LOW_LVL_BETA.CREATED_TS.lessOrEqual(ts)))
+                                .groupBy(LOW_LVL_BETA.ID)
+                                .having(LOW_LVL_BETA.ID.eq(TOP_LVL_BETA.ID)
+                                        .and(max(LOW_LVL_BETA.CREATED_TS).eq(TOP_LVL_BETA.CREATED_TS)))
+                )
                 .fetch()
                 .stream()
                 .map(this::convertToBetaEntity)
@@ -47,63 +59,31 @@ public class DbBetaRepository implements BetaRepository {
     }
 
     @Override
-    public Map<EntityType, Map<Long, List<Long>>> collectAllNeighborsIdsByEntities(Collection<Long> ids) {
+    public Map<EntityType, Map<Long, List<Long>>> collectAllNeighborsIdsByEntities(Collection<Long> ids, long ts) {
         Map<EntityType, Map<Long, List<Long>>> res = new HashMap<>();
 
         context.transaction(ctx -> {
-            res.put(EntityType.ALPHA, alphaToBetaRepository.getConnectedAlphaEntitiesIdsByBetaIds(ids));
+            res.put(EntityType.ALPHA, alphaToBetaRepository.getConnectedAlphaEntitiesIdsByBetaIds(ids, ts));
         });
 
         return res;
     }
 
     @Override
-    public Map<EntityType, Map<Long, List<? extends Link>>> collectAllNeighborsByEntities(Collection<Long> ids) {
+    public Map<EntityType, Map<Long, List<? extends Link>>> collectAllNeighborsByEntities(Collection<Long> ids, long ts) {
         Map<EntityType, Map<Long, List<? extends Link>>> res = new HashMap<>();
 
         context.transaction(ctx -> {
-            res.put(EntityType.ALPHA, new HashMap<>(alphaToBetaRepository.getConnectedAlphaEntitiesByBetaIds(ids)));
+            res.put(EntityType.ALPHA, new HashMap<>(alphaToBetaRepository.getConnectedAlphaEntitiesByBetaIds(ids, ts)));
         });
 
         return res;
-    }
-
-    @Override
-    public void insert(BetaEntity entity) {
-        context.insertInto(BETA).set(convertToBetaRecord(entity)).execute();
-    }
-
-    @Override
-    public void update(long id, BetaEntity entity) {
-        context.update(BETA).set(convertToBetaRecord(entity)).where(BETA.ID.eq(id)).execute();
-    }
-
-    @Override
-    public void delete(long id) {
-        context.transaction(ctx -> {
-            context.deleteFrom(ALPHA_TO_BETA).where(ALPHA_TO_BETA.BETA_ID.eq(id)).execute();
-            context.deleteFrom(ALPHA).where(BETA.ID.eq(id)).execute();
-        });
-    }
-
-    @Override
-    public List<Long> getAllIds() {
-        return context.select(BETA.ID).from(BETA).fetchInto(Long.class);
-    }
-
-    private BetaRecord convertToBetaRecord(BetaEntity entity) {
-        return new BetaRecord(
-                entity.getId(),
-                entity.getProperty_1(),
-                entity.getProperty_2()
-        );
     }
 
     private BetaEntity convertToBetaEntity(BetaRecord record) {
         return new BetaEntity(
                 record.getId(),
-                record.getProperty_1(),
-                record.getProperty_2()
+                record.getEpoch()
         );
     }
 }

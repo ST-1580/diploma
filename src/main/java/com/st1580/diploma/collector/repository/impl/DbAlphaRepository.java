@@ -12,20 +12,21 @@ import javax.inject.Inject;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.Link;
 import com.st1580.diploma.collector.graph.entities.AlphaEntity;
-import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
 import com.st1580.diploma.collector.repository.AlphaRepository;
+import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
 import com.st1580.diploma.collector.repository.GammaToAlphaRepository;
+import com.st1580.diploma.collector.repository.types.EntityActiveType;
+import com.st1580.diploma.db.tables.Alpha;
 import com.st1580.diploma.db.tables.records.AlphaRecord;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import static com.st1580.diploma.db.Tables.ALPHA;
-import static com.st1580.diploma.db.Tables.ALPHA_TO_BETA;
+import static org.jooq.impl.DSL.max;
 
 @Repository
 public class DbAlphaRepository implements AlphaRepository {
-
     @Autowired
     private DSLContext context;
     @Inject
@@ -34,10 +35,22 @@ public class DbAlphaRepository implements AlphaRepository {
     GammaToAlphaRepository gammaToAlphaRepository;
 
     @Override
-    public Map<Long, AlphaEntity> collectAllEntitiesByIds(Collection<Long> ids) {
+    public Map<Long, AlphaEntity> collectAllEntitiesByIds(Collection<Long> ids, long ts) {
+        Alpha TOP_LVL_ALPHA = ALPHA.as("top_lvl");
+        Alpha LOW_LVL_ALPHA = ALPHA.as("low_lvl");
+
         return context
-                .selectFrom(ALPHA)
-                .where(ALPHA.ID.in(ids))
+                .selectFrom(TOP_LVL_ALPHA)
+                .whereExists(
+                        context.select(LOW_LVL_ALPHA.ID, max(LOW_LVL_ALPHA.CREATED_TS))
+                                .from(LOW_LVL_ALPHA)
+                                .where(LOW_LVL_ALPHA.ID.in(ids)
+                                        .and(LOW_LVL_ALPHA.IS_ACTIVE.in(EntityActiveType.trueEntityActiveTypes))
+                                        .and(LOW_LVL_ALPHA.CREATED_TS.lessOrEqual(ts)))
+                                .groupBy(LOW_LVL_ALPHA.ID)
+                                .having(LOW_LVL_ALPHA.ID.eq(TOP_LVL_ALPHA.ID)
+                                        .and(max(LOW_LVL_ALPHA.CREATED_TS).eq(TOP_LVL_ALPHA.CREATED_TS)))
+                )
                 .fetch()
                 .stream()
                 .map(this::convertToAlphaEntity)
@@ -48,70 +61,35 @@ public class DbAlphaRepository implements AlphaRepository {
     }
 
     @Override
-    public Map<EntityType, Map<Long, List<Long>>> collectAllNeighborsIdsByEntities(Collection<Long> ids) {
+    public Map<EntityType, Map<Long, List<Long>>> collectAllNeighborsIdsByEntities(Collection<Long> ids, long ts) {
         Map<EntityType, Map<Long, List<Long>>> res = new HashMap<>();
 
         context.transaction(ctx -> {
-            res.put(EntityType.BETA, alphaToBetaRepository.getConnectedBetaEntitiesIdsByAlphaIds(ids));
-            res.put(EntityType.GAMMA, gammaToAlphaRepository.getConnectedGammaEntitiesIdsByAlphaIds(ids));
+            res.put(EntityType.BETA, alphaToBetaRepository.getConnectedBetaEntitiesIdsByAlphaIds(ids, ts));
+            res.put(EntityType.GAMMA, gammaToAlphaRepository.getConnectedGammaEntitiesIdsByAlphaIds(ids, ts));
         });
 
         return res;
     }
 
     @Override
-    public Map<EntityType, Map<Long, List<? extends Link>>> collectAllNeighborsByEntities(Collection<Long> ids) {
+    public Map<EntityType, Map<Long, List<? extends Link>>> collectAllNeighborsByEntities(Collection<Long> ids,
+                                                                                          long ts) {
         Map<EntityType, Map<Long, List<? extends Link>>> res = new HashMap<>();
 
         context.transaction(ctx -> {
-            res.put(EntityType.BETA, new HashMap<>(alphaToBetaRepository.getConnectedBetaEntitiesByAlphaIds(ids)));
-            res.put(EntityType.GAMMA, new HashMap<>(gammaToAlphaRepository.getConnectedGammaEntitiesByAlphaIds(ids)));
+            res.put(EntityType.BETA, new HashMap<>(alphaToBetaRepository.getConnectedBetaEntitiesByAlphaIds(ids, ts)));
+            res.put(EntityType.GAMMA, new HashMap<>(gammaToAlphaRepository.getConnectedGammaEntitiesByAlphaIds(ids,
+                    ts)));
         });
 
         return res;
-    }
-
-    @Override
-    public void insert(AlphaEntity entity) {
-        context.insertInto(ALPHA).set(convertToAlphaRecord(entity)).execute();
-    }
-
-    @Override
-    public void update(long id, AlphaEntity entity) {
-        context.update(ALPHA).set(convertToAlphaRecord(entity)).where(ALPHA.ID.eq(id)).execute();
-    }
-
-    @Override
-    public void delete(long id) {
-        context.transaction(ctx -> {
-            context.deleteFrom(ALPHA_TO_BETA).where(ALPHA_TO_BETA.ALPHA_ID.eq(id)).execute();
-            context.deleteFrom(ALPHA).where(ALPHA.ID.eq(id)).execute();
-        });
-    }
-
-    @Override
-    public List<Long> getAllIds() {
-        return context
-                .select(ALPHA.ID)
-                .from(ALPHA)
-                .fetchInto(Long.class);
-    }
-
-    private AlphaRecord convertToAlphaRecord(AlphaEntity entity) {
-        return new AlphaRecord(
-                entity.getId(),
-                entity.getProperty_1(),
-                entity.getProperty_2(),
-                entity.getProperty_3()
-        );
     }
 
     private AlphaEntity convertToAlphaEntity(AlphaRecord record) {
         return new AlphaEntity(
                 record.getId(),
-                record.getProperty_1(),
-                record.getProperty_2(),
-                record.getProperty_3()
+                record.getName()
         );
     }
 

@@ -7,31 +7,23 @@ import com.st1580.diploma.collector.graph.AbstractEntity;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.service.dto.GraphEntityDto;
 import com.st1580.diploma.collector.service.dto.GraphEntityType;
-import com.st1580.diploma.db.tables.records.BetaRecord;
 import com.st1580.diploma.external.beta.data.ExternalBetaEntity;
 
 public class BetaEntity extends AbstractEntity {
-    private final Long property_1;
-    private final Boolean property_2;
+    private final long epoch;
 
-    public BetaEntity(long id, Long property_1, Boolean property_2) {
+    public BetaEntity(long id, long epoch) {
         super(EntityType.BETA, id);
-        this.property_1 = property_1;
-        this.property_2 = property_2;
+        this.epoch = epoch;
     }
 
     public BetaEntity(ExternalBetaEntity externalBetaEntity) {
         super(EntityType.BETA, externalBetaEntity.getId());
-        this.property_1 = externalBetaEntity.getData();
-        this.property_2 = externalBetaEntity.isDeprecated();
+        this.epoch = externalBetaEntity.getCreatedTs();
     }
 
-    public Long getProperty_1() {
-        return property_1;
-    }
-
-    public Boolean getProperty_2() {
-        return property_2;
+    public long getEpoch() {
+        return epoch;
     }
 
     @Override
@@ -39,8 +31,7 @@ public class BetaEntity extends AbstractEntity {
         return new GraphEntityDto(
                 GraphEntityType.BETA,
                 getId(),
-                Map.of("property_1", property_1.toString(),
-                        "property_2", property_2.toString())
+                Map.of("epoch", Long.toString(epoch))
         );
     }
 
@@ -56,11 +47,11 @@ public class BetaEntity extends AbstractEntity {
             return false;
         }
         BetaEntity that = (BetaEntity) o;
-        return Objects.equals(property_1, that.property_1) && Objects.equals(property_2, that.property_2);
+        return epoch == that.epoch;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), property_1, property_2);
+        return Objects.hash(super.hashCode(), epoch);
     }
 }

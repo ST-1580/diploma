@@ -7,6 +7,7 @@ import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.service.dto.GraphLinkDto;
 import com.st1580.diploma.db.tables.records.GammaToDeltaRecord;
+import com.st1580.diploma.external.gamma.data.ExternalGammaToDeltaLink;
 
 public class GammaToDeltaLink extends AbstractLink {
     private final long gammaId;
@@ -16,6 +17,13 @@ public class GammaToDeltaLink extends AbstractLink {
         super(new LightEntity(EntityType.GAMMA, gammaId), new LightEntity(EntityType.DELTA, deltaId));
         this.gammaId = gammaId;
         this.deltaId = deltaId;
+    }
+
+    public GammaToDeltaLink(ExternalGammaToDeltaLink externalGammaToDeltaLink) {
+        super(new LightEntity(EntityType.GAMMA, externalGammaToDeltaLink.getGammaId()),
+                new LightEntity(EntityType.DELTA, externalGammaToDeltaLink.getDeltaId()));
+        this.gammaId = externalGammaToDeltaLink.getGammaId();
+        this.deltaId = externalGammaToDeltaLink.getDeltaId();
     }
 
     public long getGammaId() {

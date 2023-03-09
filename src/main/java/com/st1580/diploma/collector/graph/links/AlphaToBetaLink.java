@@ -12,12 +12,13 @@ import com.st1580.diploma.external.alpha.data.ExternalAlphaToBetaLink;
 public class AlphaToBetaLink extends AbstractLink {
     private final long alphaId;
     private final long betaId;
-    private final String property_1;
-    public AlphaToBetaLink(long alphaId, long betaId, String property_1) {
+    private final String hash;
+
+    public AlphaToBetaLink(long alphaId, long betaId, String hash) {
         super(new LightEntity(EntityType.ALPHA, alphaId), new LightEntity(EntityType.BETA, betaId));
         this.alphaId = alphaId;
         this.betaId = betaId;
-        this.property_1 = property_1;
+        this.hash = hash;
     }
 
     public AlphaToBetaLink(ExternalAlphaToBetaLink externalAlphaToBetaLink) {
@@ -25,7 +26,7 @@ public class AlphaToBetaLink extends AbstractLink {
                 new LightEntity(EntityType.BETA, externalAlphaToBetaLink.getBetaId()));
         this.alphaId = externalAlphaToBetaLink.getAlphaId();
         this.betaId = externalAlphaToBetaLink.getBetaId();
-        this.property_1 = externalAlphaToBetaLink.getHash();
+        this.hash = externalAlphaToBetaLink.getHash();
     }
 
     @Override
@@ -33,7 +34,7 @@ public class AlphaToBetaLink extends AbstractLink {
         return new GraphLinkDto(
                 getFrom().convertToDto(),
                 getTo().convertToDto(),
-                Map.of("property_1", property_1)
+                Map.of("hash", hash)
         );
     }
 
@@ -45,8 +46,8 @@ public class AlphaToBetaLink extends AbstractLink {
         return betaId;
     }
 
-    public String getProperty_1() {
-        return property_1;
+    public String getHash() {
+        return hash;
     }
 
     @Override
@@ -61,11 +62,11 @@ public class AlphaToBetaLink extends AbstractLink {
             return false;
         }
         AlphaToBetaLink that = (AlphaToBetaLink) o;
-        return alphaId == that.alphaId && betaId == that.betaId && Objects.equals(property_1, that.property_1);
+        return alphaId == that.alphaId && betaId == that.betaId && Objects.equals(hash, that.hash);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), alphaId, betaId, property_1);
+        return Objects.hash(super.hashCode(), alphaId, betaId, hash);
     }
 }

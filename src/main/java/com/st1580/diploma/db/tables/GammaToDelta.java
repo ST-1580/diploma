@@ -15,7 +15,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row2;
+import org.jooq.Row6;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class GammaToDelta extends TableImpl<GammaToDeltaRecord> {
 
-    private static final long serialVersionUID = 684630969;
+    private static final long serialVersionUID = 1257627937;
 
     /**
      * The reference instance of <code>public.gamma_to_delta</code>
@@ -55,6 +55,26 @@ public class GammaToDelta extends TableImpl<GammaToDeltaRecord> {
      * The column <code>public.gamma_to_delta.delta_id</code>.
      */
     public final TableField<GammaToDeltaRecord, Long> DELTA_ID = createField(DSL.name("delta_id"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
+
+    /**
+     * The column <code>public.gamma_to_delta.is_active</code>.
+     */
+    public final TableField<GammaToDeltaRecord, Boolean> IS_ACTIVE = createField(DSL.name("is_active"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+
+    /**
+     * The column <code>public.gamma_to_delta.is_active_gamma</code>.
+     */
+    public final TableField<GammaToDeltaRecord, String> IS_ACTIVE_GAMMA = createField(DSL.name("is_active_gamma"), org.jooq.impl.SQLDataType.VARCHAR(32).nullable(false), this, "");
+
+    /**
+     * The column <code>public.gamma_to_delta.is_active_delta</code>.
+     */
+    public final TableField<GammaToDeltaRecord, String> IS_ACTIVE_DELTA = createField(DSL.name("is_active_delta"), org.jooq.impl.SQLDataType.VARCHAR(32).nullable(false), this, "");
+
+    /**
+     * The column <code>public.gamma_to_delta.created_ts</code>.
+     */
+    public final TableField<GammaToDeltaRecord, Long> CREATED_TS = createField(DSL.name("created_ts"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * Create a <code>public.gamma_to_delta</code> table reference
@@ -105,19 +125,6 @@ public class GammaToDelta extends TableImpl<GammaToDeltaRecord> {
     }
 
     @Override
-    public List<ForeignKey<GammaToDeltaRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<GammaToDeltaRecord, ?>>asList(Keys.GAMMA_TO_DELTA__GAMMA_TO_DELTA__FKEY__GAMMA_ID, Keys.GAMMA_TO_DELTA__GAMMA_TO_DELTA__FKEY__DELTA_ID);
-    }
-
-    public Gamma gamma() {
-        return new Gamma(this, Keys.GAMMA_TO_DELTA__GAMMA_TO_DELTA__FKEY__GAMMA_ID);
-    }
-
-    public Delta delta() {
-        return new Delta(this, Keys.GAMMA_TO_DELTA__GAMMA_TO_DELTA__FKEY__DELTA_ID);
-    }
-
-    @Override
     public GammaToDelta as(String alias) {
         return new GammaToDelta(DSL.name(alias), this);
     }
@@ -144,11 +151,11 @@ public class GammaToDelta extends TableImpl<GammaToDeltaRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row2 type methods
+    // Row6 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row2<Long, Long> fieldsRow() {
-        return (Row2) super.fieldsRow();
+    public Row6<Long, Long, Boolean, String, String, Long> fieldsRow() {
+        return (Row6) super.fieldsRow();
     }
 }

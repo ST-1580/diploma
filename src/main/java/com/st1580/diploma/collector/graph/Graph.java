@@ -52,8 +52,9 @@ public class Graph {
         return policy;
     }
 
-    public GraphDto convertToDto() {
+    public GraphDto convertToDto(long ts) {
         return new GraphDto(
+                ts,
                 graphEntities.stream().map(Entity::convertToDto).collect(Collectors.toSet()),
                 graphLinks.stream().map(Link::convertToDto).collect(Collectors.toSet())
         );

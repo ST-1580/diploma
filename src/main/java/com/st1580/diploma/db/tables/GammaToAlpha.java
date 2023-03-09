@@ -15,7 +15,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row4;
+import org.jooq.Row7;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class GammaToAlpha extends TableImpl<GammaToAlphaRecord> {
 
-    private static final long serialVersionUID = 1404965189;
+    private static final long serialVersionUID = -589883557;
 
     /**
      * The reference instance of <code>public.gamma_to_alpha</code>
@@ -57,14 +57,29 @@ public class GammaToAlpha extends TableImpl<GammaToAlphaRecord> {
     public final TableField<GammaToAlphaRecord, Long> ALPHA_ID = createField(DSL.name("alpha_id"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>public.gamma_to_alpha.property_1</code>.
+     * The column <code>public.gamma_to_alpha.weight</code>.
      */
-    public final TableField<GammaToAlphaRecord, Long> PROPERTY_1 = createField(DSL.name("property_1"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("0", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+    public final TableField<GammaToAlphaRecord, Long> WEIGHT = createField(DSL.name("weight"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("0", org.jooq.impl.SQLDataType.BIGINT)), this, "");
 
     /**
-     * The column <code>public.gamma_to_alpha.property_2</code>.
+     * The column <code>public.gamma_to_alpha.is_active</code>.
      */
-    public final TableField<GammaToAlphaRecord, String> PROPERTY_2 = createField(DSL.name("property_2"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'property_2'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
+    public final TableField<GammaToAlphaRecord, Boolean> IS_ACTIVE = createField(DSL.name("is_active"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+
+    /**
+     * The column <code>public.gamma_to_alpha.is_active_gamma</code>.
+     */
+    public final TableField<GammaToAlphaRecord, String> IS_ACTIVE_GAMMA = createField(DSL.name("is_active_gamma"), org.jooq.impl.SQLDataType.VARCHAR(32).nullable(false), this, "");
+
+    /**
+     * The column <code>public.gamma_to_alpha.is_active_alpha</code>.
+     */
+    public final TableField<GammaToAlphaRecord, String> IS_ACTIVE_ALPHA = createField(DSL.name("is_active_alpha"), org.jooq.impl.SQLDataType.VARCHAR(32).nullable(false), this, "");
+
+    /**
+     * The column <code>public.gamma_to_alpha.created_ts</code>.
+     */
+    public final TableField<GammaToAlphaRecord, Long> CREATED_TS = createField(DSL.name("created_ts"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * Create a <code>public.gamma_to_alpha</code> table reference
@@ -115,19 +130,6 @@ public class GammaToAlpha extends TableImpl<GammaToAlphaRecord> {
     }
 
     @Override
-    public List<ForeignKey<GammaToAlphaRecord, ?>> getReferences() {
-        return Arrays.<ForeignKey<GammaToAlphaRecord, ?>>asList(Keys.GAMMA_TO_ALPHA__GAMMA_TO_ALPHA__FKEY__GAMMA_ID, Keys.GAMMA_TO_ALPHA__GAMMA_TO_ALPHA__FKEY__ALPHA_ID);
-    }
-
-    public Gamma gamma() {
-        return new Gamma(this, Keys.GAMMA_TO_ALPHA__GAMMA_TO_ALPHA__FKEY__GAMMA_ID);
-    }
-
-    public Alpha alpha() {
-        return new Alpha(this, Keys.GAMMA_TO_ALPHA__GAMMA_TO_ALPHA__FKEY__ALPHA_ID);
-    }
-
-    @Override
     public GammaToAlpha as(String alias) {
         return new GammaToAlpha(DSL.name(alias), this);
     }
@@ -154,11 +156,11 @@ public class GammaToAlpha extends TableImpl<GammaToAlphaRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row4 type methods
+    // Row7 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row4<Long, Long, Long, String> fieldsRow() {
-        return (Row4) super.fieldsRow();
+    public Row7<Long, Long, Long, Boolean, String, String, Long> fieldsRow() {
+        return (Row7) super.fieldsRow();
     }
 }

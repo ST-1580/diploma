@@ -15,7 +15,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row3;
+import org.jooq.Row4;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Beta extends TableImpl<BetaRecord> {
 
-    private static final long serialVersionUID = -1651951401;
+    private static final long serialVersionUID = -1815651929;
 
     /**
      * The reference instance of <code>public.beta</code>
@@ -52,14 +52,19 @@ public class Beta extends TableImpl<BetaRecord> {
     public final TableField<BetaRecord, Long> ID = createField(DSL.name("id"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>public.beta.property_1</code>.
+     * The column <code>public.beta.epoch</code>.
      */
-    public final TableField<BetaRecord, Long> PROPERTY_1 = createField(DSL.name("property_1"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("0", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+    public final TableField<BetaRecord, Integer> EPOCH = createField(DSL.name("epoch"), org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaultValue(org.jooq.impl.DSL.field("0", org.jooq.impl.SQLDataType.INTEGER)), this, "");
 
     /**
-     * The column <code>public.beta.property_2</code>.
+     * The column <code>public.beta.is_active</code>.
      */
-    public final TableField<BetaRecord, Boolean> PROPERTY_2 = createField(DSL.name("property_2"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaultValue(org.jooq.impl.DSL.field("true", org.jooq.impl.SQLDataType.BOOLEAN)), this, "");
+    public final TableField<BetaRecord, String> IS_ACTIVE = createField(DSL.name("is_active"), org.jooq.impl.SQLDataType.VARCHAR(24).nullable(false), this, "");
+
+    /**
+     * The column <code>public.beta.created_ts</code>.
+     */
+    public final TableField<BetaRecord, Long> CREATED_TS = createField(DSL.name("created_ts"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * Create a <code>public.beta</code> table reference
@@ -101,12 +106,12 @@ public class Beta extends TableImpl<BetaRecord> {
 
     @Override
     public UniqueKey<BetaRecord> getPrimaryKey() {
-        return Keys.BETA_PKEY;
+        return Keys.BETA__PKEY;
     }
 
     @Override
     public List<UniqueKey<BetaRecord>> getKeys() {
-        return Arrays.<UniqueKey<BetaRecord>>asList(Keys.BETA_PKEY);
+        return Arrays.<UniqueKey<BetaRecord>>asList(Keys.BETA__PKEY);
     }
 
     @Override
@@ -136,11 +141,11 @@ public class Beta extends TableImpl<BetaRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row3 type methods
+    // Row4 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row3<Long, Long, Boolean> fieldsRow() {
-        return (Row3) super.fieldsRow();
+    public Row4<Long, Integer, String, Long> fieldsRow() {
+        return (Row4) super.fieldsRow();
     }
 }

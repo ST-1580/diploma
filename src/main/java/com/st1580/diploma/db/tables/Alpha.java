@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Alpha extends TableImpl<AlphaRecord> {
 
-    private static final long serialVersionUID = -1238009213;
+    private static final long serialVersionUID = -942967645;
 
     /**
      * The reference instance of <code>public.alpha</code>
@@ -52,19 +52,19 @@ public class Alpha extends TableImpl<AlphaRecord> {
     public final TableField<AlphaRecord, Long> ID = createField(DSL.name("id"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>public.alpha.property_1</code>.
+     * The column <code>public.alpha.name</code>.
      */
-    public final TableField<AlphaRecord, String> PROPERTY_1 = createField(DSL.name("property_1"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'property 1'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
+    public final TableField<AlphaRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false), this, "");
 
     /**
-     * The column <code>public.alpha.property_2</code>.
+     * The column <code>public.alpha.is_active</code>.
      */
-    public final TableField<AlphaRecord, Long> PROPERTY_2 = createField(DSL.name("property_2"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("0", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+    public final TableField<AlphaRecord, String> IS_ACTIVE = createField(DSL.name("is_active"), org.jooq.impl.SQLDataType.VARCHAR(24).nullable(false), this, "");
 
     /**
-     * The column <code>public.alpha.property_3</code>.
+     * The column <code>public.alpha.created_ts</code>.
      */
-    public final TableField<AlphaRecord, Long> PROPERTY_3 = createField(DSL.name("property_3"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("0", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+    public final TableField<AlphaRecord, Long> CREATED_TS = createField(DSL.name("created_ts"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * Create a <code>public.alpha</code> table reference
@@ -106,12 +106,12 @@ public class Alpha extends TableImpl<AlphaRecord> {
 
     @Override
     public UniqueKey<AlphaRecord> getPrimaryKey() {
-        return Keys.ALPHA_PKEY;
+        return Keys.ALPHA__PKEY;
     }
 
     @Override
     public List<UniqueKey<AlphaRecord>> getKeys() {
-        return Arrays.<UniqueKey<AlphaRecord>>asList(Keys.ALPHA_PKEY);
+        return Arrays.<UniqueKey<AlphaRecord>>asList(Keys.ALPHA__PKEY);
     }
 
     @Override
@@ -145,7 +145,7 @@ public class Alpha extends TableImpl<AlphaRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row4<Long, String, Long, Long> fieldsRow() {
+    public Row4<Long, String, String, Long> fieldsRow() {
         return (Row4) super.fieldsRow();
     }
 }

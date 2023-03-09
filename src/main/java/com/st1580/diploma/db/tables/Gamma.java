@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Gamma extends TableImpl<GammaRecord> {
 
-    private static final long serialVersionUID = 920324008;
+    private static final long serialVersionUID = -1305324698;
 
     /**
      * The reference instance of <code>public.gamma</code>
@@ -52,19 +52,19 @@ public class Gamma extends TableImpl<GammaRecord> {
     public final TableField<GammaRecord, Long> ID = createField(DSL.name("id"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>public.gamma.property_1</code>.
+     * The column <code>public.gamma.is_master</code>.
      */
-    public final TableField<GammaRecord, Long> PROPERTY_1 = createField(DSL.name("property_1"), org.jooq.impl.SQLDataType.BIGINT.nullable(false).defaultValue(org.jooq.impl.DSL.field("0", org.jooq.impl.SQLDataType.BIGINT)), this, "");
+    public final TableField<GammaRecord, Boolean> IS_MASTER = createField(DSL.name("is_master"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaultValue(org.jooq.impl.DSL.field("false", org.jooq.impl.SQLDataType.BOOLEAN)), this, "");
 
     /**
-     * The column <code>public.gamma.property_2</code>.
+     * The column <code>public.gamma.is_active</code>.
      */
-    public final TableField<GammaRecord, String> PROPERTY_2 = createField(DSL.name("property_2"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'property 2'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
+    public final TableField<GammaRecord, String> IS_ACTIVE = createField(DSL.name("is_active"), org.jooq.impl.SQLDataType.VARCHAR(24).nullable(false), this, "");
 
     /**
-     * The column <code>public.gamma.property_3</code>.
+     * The column <code>public.gamma.created_ts</code>.
      */
-    public final TableField<GammaRecord, Boolean> PROPERTY_3 = createField(DSL.name("property_3"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaultValue(org.jooq.impl.DSL.field("true", org.jooq.impl.SQLDataType.BOOLEAN)), this, "");
+    public final TableField<GammaRecord, Long> CREATED_TS = createField(DSL.name("created_ts"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * Create a <code>public.gamma</code> table reference
@@ -106,12 +106,12 @@ public class Gamma extends TableImpl<GammaRecord> {
 
     @Override
     public UniqueKey<GammaRecord> getPrimaryKey() {
-        return Keys.GAMMA_PKEY;
+        return Keys.GAMMA__PKEY;
     }
 
     @Override
     public List<UniqueKey<GammaRecord>> getKeys() {
-        return Arrays.<UniqueKey<GammaRecord>>asList(Keys.GAMMA_PKEY);
+        return Arrays.<UniqueKey<GammaRecord>>asList(Keys.GAMMA__PKEY);
     }
 
     @Override
@@ -145,7 +145,7 @@ public class Gamma extends TableImpl<GammaRecord> {
     // -------------------------------------------------------------------------
 
     @Override
-    public Row4<Long, Long, String, Boolean> fieldsRow() {
+    public Row4<Long, Boolean, String, Long> fieldsRow() {
         return (Row4) super.fieldsRow();
     }
 }

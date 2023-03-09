@@ -54,22 +54,24 @@ public class GraphConstructorService {
         throw new IllegalArgumentException("Wrong type parameter " + type);
     }
 
-    public Map<Long, ? extends Entity> getEntitiesByIds(EntityType entitiesType, Set<Long> entitiesIds) {
+    public Map<Long, ? extends Entity> getEntitiesByIds(EntityType entitiesType, Set<Long> entitiesIds, long ts) {
         CollectorRepository collectorRepository = matchRepository(entitiesType);
-        return collectorRepository.collectAllEntitiesByIds(entitiesIds);
+        return collectorRepository.collectAllEntitiesByIds(entitiesIds, ts);
     }
 
 
     public Map<EntityType, Map<Long, List<Long>>> getEntitiesNeighborsIds(EntityType entitiesType,
-                                                                          Collection<Long> entitiesIds) {
+                                                                          Collection<Long> entitiesIds,
+                                                                          long ts) {
         CollectorRepository collectorRepository = matchRepository(entitiesType);
-        return collectorRepository.collectAllNeighborsIdsByEntities(entitiesIds);
+        return collectorRepository.collectAllNeighborsIdsByEntities(entitiesIds, ts);
     }
 
     public Map<EntityType, Map<Long, List<? extends Link>>> getEntitiesNeighbors(EntityType entitiesType,
-                                                                               Collection<Long> entitiesIds) {
+                                                                                 Collection<Long> entitiesIds,
+                                                                                 long ts) {
         CollectorRepository collectorRepository = matchRepository(entitiesType);
-        return collectorRepository.collectAllNeighborsByEntities(entitiesIds);
+        return collectorRepository.collectAllNeighborsByEntities(entitiesIds, ts);
     }
 
 

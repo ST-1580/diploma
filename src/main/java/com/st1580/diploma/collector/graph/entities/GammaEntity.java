@@ -7,30 +7,23 @@ import com.st1580.diploma.collector.graph.AbstractEntity;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.service.dto.GraphEntityDto;
 import com.st1580.diploma.collector.service.dto.GraphEntityType;
-import com.st1580.diploma.db.tables.records.GammaRecord;
+import com.st1580.diploma.external.gamma.data.ExternalGammaEntity;
 
 public class GammaEntity extends AbstractEntity {
-    private final Long property_1;
-    private final String property_2;
-    private final Boolean property_3;
+    private final boolean isMaster;
 
-    public GammaEntity(long id, Long property_1, String property_2, Boolean property_3) {
+    public GammaEntity(long id, boolean isMaster) {
         super(EntityType.GAMMA, id);
-        this.property_1 = property_1;
-        this.property_2 = property_2;
-        this.property_3 = property_3;
+        this.isMaster = isMaster;
     }
 
-    public Long getProperty_1() {
-        return property_1;
+    public GammaEntity(ExternalGammaEntity externalGammaEntity) {
+        super(EntityType.GAMMA, externalGammaEntity.getId());
+        this.isMaster = externalGammaEntity.isMaster();
     }
 
-    public String getProperty_2() {
-        return property_2;
-    }
-
-    public Boolean getProperty_3() {
-        return property_3;
+    public boolean getMaster() {
+        return isMaster;
     }
 
     @Override
@@ -38,9 +31,7 @@ public class GammaEntity extends AbstractEntity {
         return new GraphEntityDto(
                 GraphEntityType.DELTA,
                 getId(),
-                Map.of("property_1", property_1.toString(),
-                        "property_2", property_2,
-                        "property_3", property_3.toString())
+                Map.of("isMaster", Boolean.toString(isMaster))
         );
     }
 
@@ -56,11 +47,11 @@ public class GammaEntity extends AbstractEntity {
             return false;
         }
         GammaEntity that = (GammaEntity) o;
-        return Objects.equals(property_1, that.property_1) && Objects.equals(property_2, that.property_2) && Objects.equals(property_3, that.property_3);
+        return isMaster == that.isMaster;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), property_1, property_2, property_3);
+        return Objects.hash(super.hashCode(), isMaster);
     }
 }

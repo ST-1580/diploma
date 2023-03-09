@@ -37,17 +37,19 @@ public abstract class AbstractCollectorService {
 
     public GraphDto getGraphByPolicy(Entity startEntity, PolicyType policyType,
                                      boolean isLinksLight, boolean isEntitiesLight) {
-        if (!isEntityExists(startEntity)) {
-            return new GraphDto(new HashSet<>(), new HashSet<>());
+        long constructedTs = 10;
+        if (!isEntityExist(startEntity, constructedTs)) {
+            return new GraphDto(constructedTs, new HashSet<>(), new HashSet<>());
         }
 
         Policy policy = createPolicy(policyType, startEntity);
-        Graph g = constructGraph(startEntity, policy, isLinksLight);
-        return isEntitiesLight ? g.convertToDto() : constructHeavyGraph(g).convertToDto();
+        Graph g = constructGraph(startEntity, policy, constructedTs, isLinksLight);
+        return isEntitiesLight ? g.convertToDto(constructedTs) : constructHeavyGraph(g, constructedTs).convertToDto(constructedTs);
     }
 
     private Graph constructGraph(Entity startEntity,
                                  Policy policy,
+                                 long ts,
                                  boolean isLinksLight) {
         Graph graph = new Graph(policy);
         Queue<BfsStage> queue = new ArrayDeque<>();
@@ -66,7 +68,7 @@ public abstract class AbstractCollectorService {
 
             if (isLinksLight) {
                 Map<EntityType, Map<Long, List<Long>>> currStageNeighbors =
-                        graphConstructorService.getEntitiesNeighborsIds(currStage.getType(), notFinishEntitiesIds);
+                        graphConstructorService.getEntitiesNeighborsIds(currStage.getType(), notFinishEntitiesIds, ts);
 
                 currStageNeighbors.forEach((nextStageType, linkedEntitiesIds) -> {
                     Set<Long> nextStageEntitiesIds = new HashSet<>();
@@ -89,7 +91,7 @@ public abstract class AbstractCollectorService {
                 });
             } else {
                 Map<EntityType, Map<Long, List<? extends Link>>> currStageNeighbors =
-                        graphConstructorService.getEntitiesNeighbors(currStage.getType(), notFinishEntitiesIds);
+                        graphConstructorService.getEntitiesNeighbors(currStage.getType(), notFinishEntitiesIds, ts);
 
                 currStageNeighbors.forEach((nextStageType, links) -> {
                     Set<Long> nextStageEntitiesIds = new HashSet<>();
@@ -119,7 +121,7 @@ public abstract class AbstractCollectorService {
         return graph;
     }
 
-    private Graph constructHeavyGraph(Graph lightGraph) {
+    private Graph constructHeavyGraph(Graph lightGraph, long ts) {
         Map<EntityType, Set<Long>> lightEntities = lightGraph.getGraphEntities()
                 .stream()
                 .collect(Collectors.groupingBy(
@@ -130,7 +132,7 @@ public abstract class AbstractCollectorService {
         Set<Entity> heavyEntities = new HashSet<>();
         for (EntityType type : lightEntities.keySet()) {
             Map<Long, ? extends Entity> heavyEntityById =
-                    graphConstructorService.getEntitiesByIds(type, lightEntities.get(type));
+                    graphConstructorService.getEntitiesByIds(type, lightEntities.get(type), ts);
             heavyEntities.addAll(heavyEntityById.values());
         }
 
@@ -151,26 +153,27 @@ public abstract class AbstractCollectorService {
     }
 
     public List<GraphLinkDto> getEntityNeighbors(Entity startEntity, boolean isLinksLight) {
-        if (!isEntityExists(startEntity)) {
+        long constructedTs = 10;
+        if (!isEntityExist(startEntity, constructedTs)) {
             return new ArrayList<>();
         }
 
         Graph g = new Graph();
 
         if (isLinksLight) {
-            Map<EntityType, List<Long>> neighbors = collectorRepository.collectAllNeighborsIds(startEntity.getId());
+            Map<EntityType, List<Long>> neighbors = collectorRepository.collectAllNeighborsIds(startEntity.getId(), constructedTs);
             g.addLightNeighbors(startEntity.convertToLight(), neighbors);
         } else {
             Map<EntityType, List<? extends Link>> neighbors =
-                    collectorRepository.collectAllNeighbors(startEntity.getId());
+                    collectorRepository.collectAllNeighbors(startEntity.getId(), constructedTs);
             g.addNeighbors(startEntity.convertToLight(), neighbors);
         }
 
         return g.getGraphLinks().stream().map(Link::convertToDto).collect(Collectors.toList());
     }
 
-    private boolean isEntityExists(Entity entity) {
-        return !collectorRepository.collectAllEntitiesByIds(List.of(entity.getId())).isEmpty();
+    private boolean isEntityExist(Entity entity, long ts) {
+        return !collectorRepository.collectAllEntitiesByIds(List.of(entity.getId()), ts).isEmpty();
     }
 
 }

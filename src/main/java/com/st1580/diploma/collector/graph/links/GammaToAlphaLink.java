@@ -8,19 +8,26 @@ import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.service.dto.GraphLinkDto;
 import com.st1580.diploma.db.tables.records.GammaToAlphaRecord;
+import com.st1580.diploma.external.gamma.data.ExternalGammaToAlphaLink;
 
 public class GammaToAlphaLink extends AbstractLink {
     private final long gammaId;
     private final long alphaId;
-    private final Long property_1;
-    private final String property_2;
+    private final long weight;
 
-    public GammaToAlphaLink(long gammaId, long alphaId, Long property_1, String property_2) {
+    public GammaToAlphaLink(long gammaId, long alphaId, long weight) {
         super(new LightEntity(EntityType.GAMMA, gammaId), new LightEntity(EntityType.ALPHA, alphaId));
         this.alphaId = alphaId;
         this.gammaId = gammaId;
-        this.property_1 = property_1;
-        this.property_2 = property_2;
+        this.weight = weight;
+    }
+
+    public GammaToAlphaLink(ExternalGammaToAlphaLink externalGammaToAlphaLink) {
+        super(new LightEntity(EntityType.GAMMA, externalGammaToAlphaLink.getGammaId()),
+                new LightEntity(EntityType.ALPHA, externalGammaToAlphaLink.getAlphaId()));
+        this.alphaId = externalGammaToAlphaLink.getAlphaId();
+        this.gammaId = externalGammaToAlphaLink.getGammaId();
+        this.weight = externalGammaToAlphaLink.getWeight();
     }
 
     public long getGammaId() {
@@ -31,22 +38,8 @@ public class GammaToAlphaLink extends AbstractLink {
         return alphaId;
     }
 
-    public Long getProperty_1() {
-        return property_1;
-    }
-
-    public String getProperty_2() {
-        return property_2;
-    }
-
-    @Override
-    public GraphLinkDto convertToDto() {
-        return new GraphLinkDto(
-                getFrom().convertToDto(),
-                getTo().convertToDto(),
-                Map.of("property_1", property_1.toString(),
-                        "property_2", property_2)
-        );
+    public long getWeight() {
+        return weight;
     }
 
     @Override
@@ -61,11 +54,21 @@ public class GammaToAlphaLink extends AbstractLink {
             return false;
         }
         GammaToAlphaLink that = (GammaToAlphaLink) o;
-        return gammaId == that.gammaId && alphaId == that.alphaId && Objects.equals(property_1, that.property_1) && Objects.equals(property_2, that.property_2);
+        return gammaId == that.gammaId && alphaId == that.alphaId && weight == that.weight;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), gammaId, alphaId, property_1, property_2);
+        return Objects.hash(super.hashCode(), gammaId, alphaId, weight);
     }
+
+    @Override
+    public GraphLinkDto convertToDto() {
+        return new GraphLinkDto(
+                getFrom().convertToDto(),
+                getTo().convertToDto(),
+                Map.of("weight", Long.toString(weight))
+        );
+    }
+
 }

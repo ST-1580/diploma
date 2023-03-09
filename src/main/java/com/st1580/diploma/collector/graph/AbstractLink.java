@@ -42,8 +42,8 @@ public abstract class AbstractLink implements Link {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        AbstractLink link = (AbstractLink) o;
-        return Objects.equals(from, link.from) && Objects.equals(to, link.to);
+        AbstractLink that = (AbstractLink) o;
+        return Objects.equals(from, that.from) && Objects.equals(to, that.to);
     }
 
     @Override

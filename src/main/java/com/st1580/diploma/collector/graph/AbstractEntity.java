@@ -7,7 +7,6 @@ import com.st1580.diploma.collector.service.dto.GraphEntityDto;
 
 public abstract class AbstractEntity implements Entity {
     private final EntityType type;
-
     private final long id;
 
     public AbstractEntity(EntityType type, long id) {
@@ -37,8 +36,8 @@ public abstract class AbstractEntity implements Entity {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        AbstractEntity entity = (AbstractEntity) o;
-        return id == entity.id && type == entity.type;
+        AbstractEntity that = (AbstractEntity) o;
+        return id == that.id && type == that.type;
     }
 
     @Override

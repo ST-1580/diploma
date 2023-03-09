@@ -15,7 +15,7 @@ import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row2;
+import org.jooq.Row4;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -31,7 +31,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Delta extends TableImpl<DeltaRecord> {
 
-    private static final long serialVersionUID = 1245359154;
+    private static final long serialVersionUID = 345142675;
 
     /**
      * The reference instance of <code>public.delta</code>
@@ -52,9 +52,19 @@ public class Delta extends TableImpl<DeltaRecord> {
     public final TableField<DeltaRecord, Long> ID = createField(DSL.name("id"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
-     * The column <code>public.delta.property_1</code>.
+     * The column <code>public.delta.name</code>.
      */
-    public final TableField<DeltaRecord, String> PROPERTY_1 = createField(DSL.name("property_1"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false).defaultValue(org.jooq.impl.DSL.field("'property 1'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
+    public final TableField<DeltaRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false), this, "");
+
+    /**
+     * The column <code>public.delta.is_active</code>.
+     */
+    public final TableField<DeltaRecord, String> IS_ACTIVE = createField(DSL.name("is_active"), org.jooq.impl.SQLDataType.VARCHAR(24).nullable(false), this, "");
+
+    /**
+     * The column <code>public.delta.created_ts</code>.
+     */
+    public final TableField<DeltaRecord, Long> CREATED_TS = createField(DSL.name("created_ts"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
 
     /**
      * Create a <code>public.delta</code> table reference
@@ -96,12 +106,12 @@ public class Delta extends TableImpl<DeltaRecord> {
 
     @Override
     public UniqueKey<DeltaRecord> getPrimaryKey() {
-        return Keys.DELTA_PKEY;
+        return Keys.DELTA__PKEY;
     }
 
     @Override
     public List<UniqueKey<DeltaRecord>> getKeys() {
-        return Arrays.<UniqueKey<DeltaRecord>>asList(Keys.DELTA_PKEY);
+        return Arrays.<UniqueKey<DeltaRecord>>asList(Keys.DELTA__PKEY);
     }
 
     @Override
@@ -131,11 +141,11 @@ public class Delta extends TableImpl<DeltaRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row2 type methods
+    // Row4 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row2<Long, String> fieldsRow() {
-        return (Row2) super.fieldsRow();
+    public Row4<Long, String, String, Long> fieldsRow() {
+        return (Row4) super.fieldsRow();
     }
 }

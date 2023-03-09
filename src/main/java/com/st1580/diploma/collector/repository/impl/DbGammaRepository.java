@@ -11,16 +11,24 @@ import javax.inject.Inject;
 
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.Link;
+import com.st1580.diploma.collector.graph.entities.DeltaEntity;
 import com.st1580.diploma.collector.graph.entities.GammaEntity;
 import com.st1580.diploma.collector.repository.GammaRepository;
 import com.st1580.diploma.collector.repository.GammaToAlphaRepository;
 import com.st1580.diploma.collector.repository.GammaToDeltaRepository;
+import com.st1580.diploma.collector.repository.types.EntityActiveType;
+import com.st1580.diploma.db.tables.Delta;
+import com.st1580.diploma.db.tables.Gamma;
 import com.st1580.diploma.db.tables.records.GammaRecord;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import static com.st1580.diploma.db.Tables.DELTA;
 import static com.st1580.diploma.db.Tables.GAMMA;
+import static com.st1580.diploma.db.Tables.GAMMA_TO_ALPHA;
+import static com.st1580.diploma.db.Tables.GAMMA_TO_DELTA;
+import static org.jooq.impl.DSL.max;
 
 @Repository
 public class DbGammaRepository implements GammaRepository {
@@ -32,10 +40,22 @@ public class DbGammaRepository implements GammaRepository {
     GammaToDeltaRepository gammaToDeltaRepository;
 
     @Override
-    public Map<Long, GammaEntity> collectAllEntitiesByIds(Collection<Long> ids) {
+    public Map<Long, GammaEntity> collectAllEntitiesByIds(Collection<Long> ids, long ts) {
+        Gamma TOP_LVL_GAMMA = GAMMA.as("top_lvl");
+        Gamma LOW_LVL_GAMMA = GAMMA.as("low_lvl");
+
         return context
-                .selectFrom(GAMMA)
-                .where(GAMMA.ID.in(ids))
+                .selectFrom(TOP_LVL_GAMMA)
+                .whereExists(
+                        context.select(LOW_LVL_GAMMA.ID, max(LOW_LVL_GAMMA.CREATED_TS))
+                                .from(LOW_LVL_GAMMA)
+                                .where(LOW_LVL_GAMMA.ID.in(ids)
+                                        .and(LOW_LVL_GAMMA.IS_ACTIVE.in(EntityActiveType.trueEntityActiveTypes))
+                                        .and(LOW_LVL_GAMMA.CREATED_TS.lessOrEqual(ts)))
+                                .groupBy(LOW_LVL_GAMMA.ID)
+                                .having(LOW_LVL_GAMMA.ID.eq(TOP_LVL_GAMMA.ID)
+                                        .and(max(LOW_LVL_GAMMA.CREATED_TS).eq(TOP_LVL_GAMMA.CREATED_TS)))
+                )
                 .fetch()
                 .stream()
                 .map(this::convertToGammaEntity)
@@ -46,24 +66,24 @@ public class DbGammaRepository implements GammaRepository {
     }
 
     @Override
-    public Map<EntityType, Map<Long, List<Long>>> collectAllNeighborsIdsByEntities(Collection<Long> ids) {
+    public Map<EntityType, Map<Long, List<Long>>> collectAllNeighborsIdsByEntities(Collection<Long> ids, long ts) {
         Map<EntityType, Map<Long, List<Long>>> res = new HashMap<>();
 
         context.transaction(ctx -> {
-            res.put(EntityType.ALPHA, gammaToAlphaRepository.getConnectedAlphaEntitiesIdsByGammaIds(ids));
-            res.put(EntityType.DELTA, gammaToDeltaRepository.getConnectedDeltaEntitiesIdsByGammaIds(ids));
+            res.put(EntityType.ALPHA, gammaToAlphaRepository.getConnectedAlphaEntitiesIdsByGammaIds(ids, ts));
+            res.put(EntityType.DELTA, gammaToDeltaRepository.getConnectedDeltaEntitiesIdsByGammaIds(ids, ts));
         });
 
         return res;
     }
 
     @Override
-    public Map<EntityType, Map<Long, List<? extends Link>>> collectAllNeighborsByEntities(Collection<Long> ids) {
+    public Map<EntityType, Map<Long, List<? extends Link>>> collectAllNeighborsByEntities(Collection<Long> ids, long ts) {
         Map<EntityType, Map<Long, List<? extends Link>>> res = new HashMap<>();
 
         context.transaction(ctx -> {
-            res.put(EntityType.ALPHA, new HashMap<>(gammaToAlphaRepository.getConnectedAlphaEntitiesByGammaIds(ids)));
-            res.put(EntityType.DELTA, new HashMap<>(gammaToDeltaRepository.getConnectedDeltaEntitiesByGammaIds(ids)));
+            res.put(EntityType.ALPHA, new HashMap<>(gammaToAlphaRepository.getConnectedAlphaEntitiesByGammaIds(ids, ts)));
+            res.put(EntityType.DELTA, new HashMap<>(gammaToDeltaRepository.getConnectedDeltaEntitiesByGammaIds(ids, ts)));
         });
 
         return res;
@@ -72,9 +92,7 @@ public class DbGammaRepository implements GammaRepository {
     private GammaEntity convertToGammaEntity(GammaRecord record) {
         return new GammaEntity(
                 record.getId(),
-                record.getProperty_1(),
-                record.getProperty_2(),
-                record.getProperty_3()
+                record.getIsMaster()
         );
     }
 }
