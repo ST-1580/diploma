@@ -4,6 +4,7 @@
 package com.st1580.diploma.db.tables;
 
 
+import com.st1580.diploma.db.Indexes;
 import com.st1580.diploma.db.Keys;
 import com.st1580.diploma.db.Public;
 import com.st1580.diploma.db.tables.records.AlphaToBetaRecord;
@@ -13,9 +14,10 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row7;
+import org.jooq.Row8;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -31,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AlphaToBeta extends TableImpl<AlphaToBetaRecord> {
 
-    private static final long serialVersionUID = 2062995660;
+    private static final long serialVersionUID = 510416586;
 
     /**
      * The reference instance of <code>public.alpha_to_beta</code>
@@ -77,6 +79,11 @@ public class AlphaToBeta extends TableImpl<AlphaToBetaRecord> {
     public final TableField<AlphaToBetaRecord, String> IS_ACTIVE_BETA = createField(DSL.name("is_active_beta"), org.jooq.impl.SQLDataType.VARCHAR(32).nullable(false), this, "");
 
     /**
+     * The column <code>public.alpha_to_beta.can_use</code>.
+     */
+    public final TableField<AlphaToBetaRecord, Boolean> CAN_USE = createField(DSL.name("can_use"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+
+    /**
      * The column <code>public.alpha_to_beta.created_ts</code>.
      */
     public final TableField<AlphaToBetaRecord, Long> CREATED_TS = createField(DSL.name("created_ts"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
@@ -120,6 +127,11 @@ public class AlphaToBeta extends TableImpl<AlphaToBetaRecord> {
     }
 
     @Override
+    public List<Index> getIndexes() {
+        return Arrays.<Index>asList(Indexes.AB_ALPHA_CAN_USE__INDEX, Indexes.AB_BETA_CAN_USE__INDEX);
+    }
+
+    @Override
     public UniqueKey<AlphaToBetaRecord> getPrimaryKey() {
         return Keys.ALPHA_TO_BETA__PKEY;
     }
@@ -156,11 +168,11 @@ public class AlphaToBeta extends TableImpl<AlphaToBetaRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row7 type methods
+    // Row8 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row7<Long, Long, String, Boolean, String, String, Long> fieldsRow() {
-        return (Row7) super.fieldsRow();
+    public Row8<Long, Long, String, Boolean, String, String, Boolean, Long> fieldsRow() {
+        return (Row8) super.fieldsRow();
     }
 }

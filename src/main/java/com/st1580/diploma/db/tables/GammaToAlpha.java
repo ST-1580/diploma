@@ -4,6 +4,7 @@
 package com.st1580.diploma.db.tables;
 
 
+import com.st1580.diploma.db.Indexes;
 import com.st1580.diploma.db.Keys;
 import com.st1580.diploma.db.Public;
 import com.st1580.diploma.db.tables.records.GammaToAlphaRecord;
@@ -13,9 +14,10 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row7;
+import org.jooq.Row8;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -31,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class GammaToAlpha extends TableImpl<GammaToAlphaRecord> {
 
-    private static final long serialVersionUID = -589883557;
+    private static final long serialVersionUID = 1290647302;
 
     /**
      * The reference instance of <code>public.gamma_to_alpha</code>
@@ -77,6 +79,11 @@ public class GammaToAlpha extends TableImpl<GammaToAlphaRecord> {
     public final TableField<GammaToAlphaRecord, String> IS_ACTIVE_ALPHA = createField(DSL.name("is_active_alpha"), org.jooq.impl.SQLDataType.VARCHAR(32).nullable(false), this, "");
 
     /**
+     * The column <code>public.gamma_to_alpha.can_use</code>.
+     */
+    public final TableField<GammaToAlphaRecord, Boolean> CAN_USE = createField(DSL.name("can_use"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
+
+    /**
      * The column <code>public.gamma_to_alpha.created_ts</code>.
      */
     public final TableField<GammaToAlphaRecord, Long> CREATED_TS = createField(DSL.name("created_ts"), org.jooq.impl.SQLDataType.BIGINT.nullable(false), this, "");
@@ -120,6 +127,11 @@ public class GammaToAlpha extends TableImpl<GammaToAlphaRecord> {
     }
 
     @Override
+    public List<Index> getIndexes() {
+        return Arrays.<Index>asList(Indexes.GA_ALPHA_CAN_USE__INDEX, Indexes.GA_GAMMA_CAN_USE__INDEX);
+    }
+
+    @Override
     public UniqueKey<GammaToAlphaRecord> getPrimaryKey() {
         return Keys.GAMMA_TO_ALPHA__PKEY;
     }
@@ -156,11 +168,11 @@ public class GammaToAlpha extends TableImpl<GammaToAlphaRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row7 type methods
+    // Row8 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row7<Long, Long, Long, Boolean, String, String, Long> fieldsRow() {
-        return (Row7) super.fieldsRow();
+    public Row8<Long, Long, Long, Boolean, String, String, Boolean, Long> fieldsRow() {
+        return (Row8) super.fieldsRow();
     }
 }

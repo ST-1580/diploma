@@ -4,6 +4,7 @@
 package com.st1580.diploma.db.tables;
 
 
+import com.st1580.diploma.db.Indexes;
 import com.st1580.diploma.db.Keys;
 import com.st1580.diploma.db.Public;
 import com.st1580.diploma.db.tables.records.GammaToDeltaRecord;
@@ -13,9 +14,10 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Row6;
+import org.jooq.Row7;
 import org.jooq.Schema;
 import org.jooq.Table;
 import org.jooq.TableField;
@@ -31,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class GammaToDelta extends TableImpl<GammaToDeltaRecord> {
 
-    private static final long serialVersionUID = 1257627937;
+    private static final long serialVersionUID = -1586229490;
 
     /**
      * The reference instance of <code>public.gamma_to_delta</code>
@@ -70,6 +72,11 @@ public class GammaToDelta extends TableImpl<GammaToDeltaRecord> {
      * The column <code>public.gamma_to_delta.is_active_delta</code>.
      */
     public final TableField<GammaToDeltaRecord, String> IS_ACTIVE_DELTA = createField(DSL.name("is_active_delta"), org.jooq.impl.SQLDataType.VARCHAR(32).nullable(false), this, "");
+
+    /**
+     * The column <code>public.gamma_to_delta.can_use</code>.
+     */
+    public final TableField<GammaToDeltaRecord, Boolean> CAN_USE = createField(DSL.name("can_use"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false), this, "");
 
     /**
      * The column <code>public.gamma_to_delta.created_ts</code>.
@@ -115,6 +122,11 @@ public class GammaToDelta extends TableImpl<GammaToDeltaRecord> {
     }
 
     @Override
+    public List<Index> getIndexes() {
+        return Arrays.<Index>asList(Indexes.GD_DELTA_CAN_USE__INDEX, Indexes.GD_GAMMA_CAN_USE__INDEX);
+    }
+
+    @Override
     public UniqueKey<GammaToDeltaRecord> getPrimaryKey() {
         return Keys.GAMMA_TO_DELTA__PKEY;
     }
@@ -151,11 +163,11 @@ public class GammaToDelta extends TableImpl<GammaToDeltaRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row6 type methods
+    // Row7 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row6<Long, Long, Boolean, String, String, Long> fieldsRow() {
-        return (Row6) super.fieldsRow();
+    public Row7<Long, Long, Boolean, String, String, Boolean, Long> fieldsRow() {
+        return (Row7) super.fieldsRow();
     }
 }

@@ -27,9 +27,7 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
                 .select(GAMMA_TO_DELTA.GAMMA_ID, GAMMA_TO_DELTA.DELTA_ID, max(GAMMA_TO_DELTA.CREATED_TS))
                 .from(GAMMA_TO_DELTA)
                 .where(GAMMA_TO_DELTA.DELTA_ID.in(deltaIds)
-                        .and(GAMMA_TO_DELTA.IS_ACTIVE)
-                        .and(GAMMA_TO_DELTA.IS_ACTIVE_GAMMA.eq("TRUE"))
-                        .and(GAMMA_TO_DELTA.IS_ACTIVE_DELTA.eq("TRUE"))
+                        .and(GAMMA_TO_DELTA.CAN_USE)
                         .and(GAMMA_TO_DELTA.CREATED_TS.lessOrEqual(ts)))
                 .groupBy(GAMMA_TO_DELTA.GAMMA_ID, GAMMA_TO_DELTA.DELTA_ID)
                 .fetchGroups(GAMMA_TO_DELTA.DELTA_ID, GAMMA_TO_DELTA.GAMMA_ID);
@@ -45,9 +43,7 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
                 .whereExists(context
                         .select(LOW_LVL_GD.GAMMA_ID, LOW_LVL_GD.DELTA_ID, max(LOW_LVL_GD.CREATED_TS))
                         .where(LOW_LVL_GD.DELTA_ID.in(deltaIds)
-                                .and(LOW_LVL_GD.IS_ACTIVE)
-                                .and(LOW_LVL_GD.IS_ACTIVE_GAMMA.eq("TRUE"))
-                                .and(LOW_LVL_GD.IS_ACTIVE_DELTA.eq("TRUE"))
+                                .and(LOW_LVL_GD.CAN_USE)
                                 .and(LOW_LVL_GD.CREATED_TS.lessOrEqual(ts)))
                         .groupBy(LOW_LVL_GD.GAMMA_ID, LOW_LVL_GD.DELTA_ID)
                         .having(LOW_LVL_GD.GAMMA_ID.eq(TOP_LVL_GD.GAMMA_ID)
@@ -66,9 +62,7 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
                 .select(GAMMA_TO_DELTA.GAMMA_ID, GAMMA_TO_DELTA.DELTA_ID, max(GAMMA_TO_DELTA.CREATED_TS))
                 .from(GAMMA_TO_DELTA)
                 .where(GAMMA_TO_DELTA.GAMMA_ID.in(gammaIds)
-                        .and(GAMMA_TO_DELTA.IS_ACTIVE)
-                        .and(GAMMA_TO_DELTA.IS_ACTIVE_GAMMA.eq("TRUE"))
-                        .and(GAMMA_TO_DELTA.IS_ACTIVE_DELTA.eq("TRUE"))
+                        .and(GAMMA_TO_DELTA.CAN_USE)
                         .and(GAMMA_TO_DELTA.CREATED_TS.lessOrEqual(ts)))
                 .groupBy(GAMMA_TO_DELTA.GAMMA_ID, GAMMA_TO_DELTA.DELTA_ID)
                 .fetchGroups(GAMMA_TO_DELTA.GAMMA_ID, GAMMA_TO_DELTA.DELTA_ID);
@@ -84,9 +78,7 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
                 .whereExists(context
                         .select(LOW_LVL_GD.GAMMA_ID, LOW_LVL_GD.DELTA_ID, max(LOW_LVL_GD.CREATED_TS))
                         .where(LOW_LVL_GD.GAMMA_ID.in(gammaIds)
-                                .and(LOW_LVL_GD.IS_ACTIVE)
-                                .and(LOW_LVL_GD.IS_ACTIVE_GAMMA.eq("TRUE"))
-                                .and(LOW_LVL_GD.IS_ACTIVE_DELTA.eq("TRUE"))
+                                .and(LOW_LVL_GD.CAN_USE)
                                 .and(LOW_LVL_GD.CREATED_TS.lessOrEqual(ts)))
                         .groupBy(LOW_LVL_GD.GAMMA_ID, LOW_LVL_GD.DELTA_ID)
                         .having(LOW_LVL_GD.GAMMA_ID.eq(TOP_LVL_GD.GAMMA_ID)

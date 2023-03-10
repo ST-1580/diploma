@@ -29,9 +29,7 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
                 .select(ALPHA_TO_BETA.ALPHA_ID, ALPHA_TO_BETA.BETA_ID, max(ALPHA_TO_BETA.CREATED_TS))
                 .from(ALPHA_TO_BETA)
                 .where(ALPHA_TO_BETA.ALPHA_ID.in(alphaIds)
-                        .and(ALPHA_TO_BETA.IS_ACTIVE)
-                        .and(ALPHA_TO_BETA.IS_ACTIVE_ALPHA.eq("TRUE"))
-                        .and(ALPHA_TO_BETA.IS_ACTIVE_BETA.eq("TRUE"))
+                        .and(ALPHA_TO_BETA.CAN_USE)
                         .and(ALPHA_TO_BETA.CREATED_TS.lessOrEqual(ts)))
                 .groupBy(ALPHA_TO_BETA.ALPHA_ID, ALPHA_TO_BETA.BETA_ID)
                 .fetchGroups(ALPHA_TO_BETA.ALPHA_ID, ALPHA_TO_BETA.BETA_ID);
@@ -47,9 +45,7 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
                 .whereExists(context
                         .select(LOW_LVL_AB.ALPHA_ID, LOW_LVL_AB.BETA_ID, max(LOW_LVL_AB.CREATED_TS))
                         .where(LOW_LVL_AB.ALPHA_ID.in(alphaIds)
-                                .and(LOW_LVL_AB.IS_ACTIVE)
-                                .and(LOW_LVL_AB.IS_ACTIVE_ALPHA.eq("TRUE"))
-                                .and(LOW_LVL_AB.IS_ACTIVE_BETA.eq("TRUE"))
+                                .and(LOW_LVL_AB.CAN_USE)
                                 .and(LOW_LVL_AB.CREATED_TS.lessOrEqual(ts)))
                         .groupBy(LOW_LVL_AB.ALPHA_ID, LOW_LVL_AB.BETA_ID)
                         .having(LOW_LVL_AB.ALPHA_ID.eq(TOP_LVL_AB.ALPHA_ID)
@@ -68,9 +64,7 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
                 .select(ALPHA_TO_BETA.ALPHA_ID, ALPHA_TO_BETA.BETA_ID, max(ALPHA_TO_BETA.CREATED_TS))
                 .from(ALPHA_TO_BETA)
                 .where(ALPHA_TO_BETA.BETA_ID.in(betaIds)
-                        .and(ALPHA_TO_BETA.IS_ACTIVE)
-                        .and(ALPHA_TO_BETA.IS_ACTIVE_ALPHA.eq("TRUE"))
-                        .and(ALPHA_TO_BETA.IS_ACTIVE_BETA.eq("TRUE"))
+                        .and(ALPHA_TO_BETA.CAN_USE)
                         .and(ALPHA_TO_BETA.CREATED_TS.lessOrEqual(ts)))
                 .groupBy(ALPHA_TO_BETA.ALPHA_ID, ALPHA_TO_BETA.BETA_ID)
                 .fetchGroups(ALPHA_TO_BETA.BETA_ID, ALPHA_TO_BETA.ALPHA_ID);
@@ -86,9 +80,7 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
                 .whereExists(context
                         .select(LOW_LVL_AB.ALPHA_ID, LOW_LVL_AB.BETA_ID, max(LOW_LVL_AB.CREATED_TS))
                         .where(LOW_LVL_AB.BETA_ID.in(betaIds)
-                                .and(LOW_LVL_AB.IS_ACTIVE)
-                                .and(LOW_LVL_AB.IS_ACTIVE_ALPHA.eq("TRUE"))
-                                .and(LOW_LVL_AB.IS_ACTIVE_BETA.eq("TRUE"))
+                                .and(LOW_LVL_AB.CAN_USE)
                                 .and(LOW_LVL_AB.CREATED_TS.lessOrEqual(ts)))
                         .groupBy(LOW_LVL_AB.ALPHA_ID, LOW_LVL_AB.BETA_ID)
                         .having(LOW_LVL_AB.ALPHA_ID.eq(TOP_LVL_AB.ALPHA_ID)

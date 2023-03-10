@@ -4,6 +4,7 @@
 package com.st1580.diploma.db.tables;
 
 
+import com.st1580.diploma.db.Indexes;
 import com.st1580.diploma.db.Keys;
 import com.st1580.diploma.db.Public;
 import com.st1580.diploma.db.tables.records.DeltaRecord;
@@ -13,6 +14,7 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row4;
@@ -31,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Delta extends TableImpl<DeltaRecord> {
 
-    private static final long serialVersionUID = 345142675;
+    private static final long serialVersionUID = 228786371;
 
     /**
      * The reference instance of <code>public.delta</code>
@@ -102,6 +104,11 @@ public class Delta extends TableImpl<DeltaRecord> {
     @Override
     public Schema getSchema() {
         return Public.PUBLIC;
+    }
+
+    @Override
+    public List<Index> getIndexes() {
+        return Arrays.<Index>asList(Indexes.DELTA_ACTIVE__INDEX);
     }
 
     @Override

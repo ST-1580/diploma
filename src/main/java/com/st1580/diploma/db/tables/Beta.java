@@ -4,6 +4,7 @@
 package com.st1580.diploma.db.tables;
 
 
+import com.st1580.diploma.db.Indexes;
 import com.st1580.diploma.db.Keys;
 import com.st1580.diploma.db.Public;
 import com.st1580.diploma.db.tables.records.BetaRecord;
@@ -13,6 +14,7 @@ import java.util.List;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Row4;
@@ -31,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Beta extends TableImpl<BetaRecord> {
 
-    private static final long serialVersionUID = -1815651929;
+    private static final long serialVersionUID = -1976529061;
 
     /**
      * The reference instance of <code>public.beta</code>
@@ -102,6 +104,11 @@ public class Beta extends TableImpl<BetaRecord> {
     @Override
     public Schema getSchema() {
         return Public.PUBLIC;
+    }
+
+    @Override
+    public List<Index> getIndexes() {
+        return Arrays.<Index>asList(Indexes.BETA_ACTIVE__INDEX);
     }
 
     @Override

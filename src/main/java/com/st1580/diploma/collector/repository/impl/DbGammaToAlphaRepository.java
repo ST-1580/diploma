@@ -27,9 +27,7 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
                 .select(GAMMA_TO_ALPHA.GAMMA_ID, GAMMA_TO_ALPHA.ALPHA_ID, max(GAMMA_TO_ALPHA.CREATED_TS))
                 .from(GAMMA_TO_ALPHA)
                 .where(GAMMA_TO_ALPHA.ALPHA_ID.in(alphaIds)
-                        .and(GAMMA_TO_ALPHA.IS_ACTIVE)
-                        .and(GAMMA_TO_ALPHA.IS_ACTIVE_GAMMA.eq("TRUE"))
-                        .and(GAMMA_TO_ALPHA.IS_ACTIVE_ALPHA.eq("TRUE"))
+                        .and(GAMMA_TO_ALPHA.CAN_USE)
                         .and(GAMMA_TO_ALPHA.CREATED_TS.lessOrEqual(ts)))
                 .groupBy(GAMMA_TO_ALPHA.GAMMA_ID, GAMMA_TO_ALPHA.ALPHA_ID)
                 .fetchGroups(GAMMA_TO_ALPHA.ALPHA_ID, GAMMA_TO_ALPHA.GAMMA_ID);
@@ -45,9 +43,7 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
                 .whereExists(context
                         .select(LOW_LVL_GA.GAMMA_ID, LOW_LVL_GA.ALPHA_ID, max(LOW_LVL_GA.CREATED_TS))
                         .where(LOW_LVL_GA.ALPHA_ID.in(alphaIds)
-                                .and(LOW_LVL_GA.IS_ACTIVE)
-                                .and(LOW_LVL_GA.IS_ACTIVE_GAMMA.eq("TRUE"))
-                                .and(LOW_LVL_GA.IS_ACTIVE_ALPHA.eq("TRUE"))
+                                .and(LOW_LVL_GA.CAN_USE)
                                 .and(LOW_LVL_GA.CREATED_TS.lessOrEqual(ts)))
                         .groupBy(LOW_LVL_GA.GAMMA_ID, LOW_LVL_GA.ALPHA_ID)
                         .having(LOW_LVL_GA.GAMMA_ID.eq(TOP_LVL_GA.GAMMA_ID)
@@ -66,9 +62,7 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
                 .select(GAMMA_TO_ALPHA.GAMMA_ID, GAMMA_TO_ALPHA.ALPHA_ID, max(GAMMA_TO_ALPHA.CREATED_TS))
                 .from(GAMMA_TO_ALPHA)
                 .where(GAMMA_TO_ALPHA.GAMMA_ID.in(gammaIds)
-                        .and(GAMMA_TO_ALPHA.IS_ACTIVE)
-                        .and(GAMMA_TO_ALPHA.IS_ACTIVE_GAMMA.eq("TRUE"))
-                        .and(GAMMA_TO_ALPHA.IS_ACTIVE_ALPHA.eq("TRUE"))
+                        .and(GAMMA_TO_ALPHA.CAN_USE)
                         .and(GAMMA_TO_ALPHA.CREATED_TS.lessOrEqual(ts)))
                 .groupBy(GAMMA_TO_ALPHA.GAMMA_ID, GAMMA_TO_ALPHA.ALPHA_ID)
                 .fetchGroups(GAMMA_TO_ALPHA.GAMMA_ID, GAMMA_TO_ALPHA.ALPHA_ID);
@@ -84,9 +78,7 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
                 .whereExists(context
                         .select(LOW_LVL_GA.GAMMA_ID, LOW_LVL_GA.ALPHA_ID, max(LOW_LVL_GA.CREATED_TS))
                         .where(LOW_LVL_GA.GAMMA_ID.in(gammaIds)
-                                .and(LOW_LVL_GA.IS_ACTIVE)
-                                .and(LOW_LVL_GA.IS_ACTIVE_GAMMA.eq("TRUE"))
-                                .and(LOW_LVL_GA.IS_ACTIVE_ALPHA.eq("TRUE"))
+                                .and(LOW_LVL_GA.CAN_USE)
                                 .and(LOW_LVL_GA.CREATED_TS.lessOrEqual(ts)))
                         .groupBy(LOW_LVL_GA.GAMMA_ID, LOW_LVL_GA.ALPHA_ID)
                         .having(LOW_LVL_GA.GAMMA_ID.eq(TOP_LVL_GA.GAMMA_ID)

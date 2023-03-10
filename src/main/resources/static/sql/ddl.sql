@@ -1,58 +1,58 @@
-insert into alpha (id, property_1, property_2, property_3)
+insert into alpha (id, name, is_active, created_ts)
 values
-    (1, 'hello', 1, 2),
-    (2, 'goodbye', 134, 32),
-    (3, 'gg', 11, 222),
-    (4, 'test', -1, -1),
-    (5, 'prod', 123, -766),
-    (6, 'alone(', 654, 54);
+    (1, 'hello', 'TRUE', 0),
+    (2, 'goodbye', 'TRUE', 1),
+    (3, 'gg', 'TRUE', 1),
+    (4, 'test', 'TRUE', 2),
+    (5, 'prod', 'TRUE', 3),
+    (6, 'alone(', 'TRUE', 8);
 
-insert into beta (id, property_1, property_2)
+insert into beta (id, epoch, is_active, created_ts)
 values
-    (83, 0, true),
-    (85, 12, true),
-    (88, 1, false),
-    (90, 33, true),
-    (91, -64, false);
+    (83, 0, 'TRUE', 1),
+    (85, 12, 'TRUE', 4),
+    (88, 1, 'TRUE', 5),
+    (90, 33, 'TRUE', 2),
+    (91, -64, 'TRUE', 8);
 
-insert into gamma (id, property_1, property_2, property_3)
+insert into gamma (id, is_master, is_active, created_ts)
 values
-    (70, 0, 'gamma', true),
-    (72, 1344, 'alone(', false),
-    (77, 213, 'fake', false),
-    (80, 1, 'abcdefg', true),
-    (83, -563, 'negative', true);
+    (70, true, 'TRUE', 0),
+    (72, false, 'TRUE', 8),
+    (77, false, 'TRUE', 5),
+    (80, true, 'TRUE', 4),
+    (83, true, 'TRUE', 3);
 
-insert into delta (id, property_1)
+insert into delta (id, name, is_active, created_ts)
 values
-    (10, 'solo'),
-    (11, 'top'),
-    (12, 'hi');
+    (10, 'solo', 'TRUE', 7),
+    (11, 'top', 'TRUE', 2),
+    (12, 'hi', 'TRUE', 1);
 
-insert into alpha_to_beta (alpha_id, beta_id, property_1)
+insert into alpha_to_beta (alpha_id, beta_id, hash, is_active, is_active_alpha, is_active_beta, created_ts)
 values
-    (1, 85, '1_85'),
-    (2, 88, '2_88'),
-    (3, 90, '3_90'),
-    (4, 83, '4_83'),
-    (5, 83, '5_83'),
-    (5, 85, '5_85'),
-    (6, 91, '6_91');
+    (1, 85, '1_85', true, 'TRUE', 'TRUE', 5),
+    (2, 88, '2_88', true, 'TRUE', 'TRUE', 4),
+    (3, 90, '3_90', true, 'TRUE', 'TRUE', 2),
+    (4, 83, '4_83', true, 'TRUE', 'TRUE', 1),
+    (5, 83, '5_83', true, 'TRUE', 'TRUE', 0),
+    (5, 85, '5_85', true, 'TRUE', 'TRUE', 0),
+    (6, 91, '6_91', true, 'TRUE', 'TRUE', 9);
 
-insert into gamma_to_alpha (gamma_id, alpha_id, property_1, property_2)
+insert into gamma_to_alpha (gamma_id, alpha_id, weight, is_active, is_active_gamma, is_active_alpha, created_ts)
 values
-    (70, 1, 100, '70_1'),
-    (70, 2, 228, '70_2'),
-    (77, 2, 0, '77_2'),
-    (83, 3, -1, '83_3'),
-    (80, 4, 111, '80_4'),
-    (80, 5, 1431, '80_5'),
-    (72, 6, 651, '72_6');
+    (70, 1, 100, true, 'TRUE', 'TRUE', 1),
+    (70, 2, 228, true, 'TRUE', 'TRUE', 5),
+    (77, 2, 0, true, 'TRUE', 'TRUE', 4),
+    (83, 3, -1, true, 'TRUE', 'TRUE', 2),
+    (80, 4, 111, true, 'TRUE', 'TRUE', 2),
+    (80, 5, 1431, true, 'TRUE', 'TRUE', 3),
+    (72, 6, 651, true, 'TRUE', 'TRUE', 9);
 
-insert into gamma_to_delta (gamma_id, delta_id)
+insert into gamma_to_delta (gamma_id, delta_id, is_active, is_active_gamma, is_active_delta, created_ts)
 values
-    (72, 10),
-    (83, 11),
-    (80, 11),
-    (77, 12),
-    (70, 12);
+    (72, 10, true, 'TRUE', 'TRUE', 10),
+    (83, 11, true, 'TRUE', 'TRUE', 1),
+    (80, 11, true, 'TRUE', 'TRUE', 2),
+    (77, 12, true, 'TRUE', 'TRUE', 3),
+    (70, 12, true, 'TRUE', 'TRUE', 5);
