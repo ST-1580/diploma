@@ -4,9 +4,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import com.st1580.diploma.external.alpha.data.AlphaEntityEvent;
+import com.st1580.diploma.external.alpha.data.entity.ExternalAlphaEntityEvent;
 import com.st1580.diploma.external.alpha.AlphaServiceApi;
-import com.st1580.diploma.external.alpha.data.AlphaToBetaLinkEvent;
+import com.st1580.diploma.external.alpha.data.link.ExternalAlphaToBetaLinkEvent;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,11 +18,11 @@ public class AlphaCaller {
         this.alphaServiceApi = alphaServiceApi;
     }
 
-    public List<AlphaEntityEvent> getAlphaEntityEvents(long tsFrom, long tsTo) {
+    public List<ExternalAlphaEntityEvent> getAlphaEntityEvents(long tsFrom, long tsTo) {
         return alphaServiceApi.getAlphaEntityEvents(tsFrom, tsTo);
     }
 
-    public List<AlphaToBetaLinkEvent> getAlphaToBetaLinkEvents(long tsFrom, long tsTo) {
+    public List<ExternalAlphaToBetaLinkEvent> getAlphaToBetaLinkEvents(long tsFrom, long tsTo) {
         return alphaServiceApi.getAlphaToBetaLinkEvents(tsFrom, tsTo);
     }
 }

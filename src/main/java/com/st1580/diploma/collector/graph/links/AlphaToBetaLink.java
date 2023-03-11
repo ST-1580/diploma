@@ -7,7 +7,7 @@ import com.st1580.diploma.collector.graph.AbstractLink;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.service.dto.GraphLinkDto;
-import com.st1580.diploma.external.alpha.data.ExternalAlphaToBetaLink;
+import com.st1580.diploma.external.alpha.data.link.ExternalAlphaToBetaLink;
 
 public class AlphaToBetaLink extends AbstractLink {
     private final long alphaId;

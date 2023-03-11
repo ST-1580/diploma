@@ -1,5 +1,6 @@
 package com.st1580.diploma.collector.repository.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import com.st1580.diploma.collector.repository.GammaToAlphaRepository;
 import com.st1580.diploma.collector.repository.types.EntityActiveType;
 import com.st1580.diploma.db.tables.Alpha;
 import com.st1580.diploma.db.tables.records.AlphaRecord;
+import com.st1580.diploma.updater.events.AlphaEvent;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
@@ -84,6 +86,24 @@ public class DbAlphaRepository implements AlphaRepository {
         });
 
         return res;
+    }
+
+    @Override
+    public void batchInsertNewEvents(List<AlphaEvent> events) {
+        List<AlphaRecord> records = events.stream().map(this::covertToAlphaRecord).collect(Collectors.toList());
+        context.insertInto(ALPHA, ALPHA.ID, ALPHA.NAME, ALPHA.IS_ACTIVE, ALPHA.CREATED_TS)
+                .valuesOfRecords(records)
+                .onDuplicateKeyIgnore()
+                .execute();
+    }
+
+    private AlphaRecord covertToAlphaRecord(AlphaEvent event) {
+        return new AlphaRecord(
+                event.getId(),
+                event.getName(),
+                event.getType().name(),
+                event.getCreatedTs()
+        );
     }
 
     private AlphaEntity convertToAlphaEntity(AlphaRecord record) {

@@ -11,23 +11,19 @@ import javax.inject.Inject;
 
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.Link;
-import com.st1580.diploma.collector.graph.entities.DeltaEntity;
 import com.st1580.diploma.collector.graph.entities.GammaEntity;
 import com.st1580.diploma.collector.repository.GammaRepository;
 import com.st1580.diploma.collector.repository.GammaToAlphaRepository;
 import com.st1580.diploma.collector.repository.GammaToDeltaRepository;
 import com.st1580.diploma.collector.repository.types.EntityActiveType;
-import com.st1580.diploma.db.tables.Delta;
 import com.st1580.diploma.db.tables.Gamma;
 import com.st1580.diploma.db.tables.records.GammaRecord;
+import com.st1580.diploma.updater.events.GammaEvent;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import static com.st1580.diploma.db.Tables.DELTA;
 import static com.st1580.diploma.db.Tables.GAMMA;
-import static com.st1580.diploma.db.Tables.GAMMA_TO_ALPHA;
-import static com.st1580.diploma.db.Tables.GAMMA_TO_DELTA;
 import static org.jooq.impl.DSL.max;
 
 @Repository
@@ -78,15 +74,36 @@ public class DbGammaRepository implements GammaRepository {
     }
 
     @Override
-    public Map<EntityType, Map<Long, List<? extends Link>>> collectAllNeighborsByEntities(Collection<Long> ids, long ts) {
+    public Map<EntityType, Map<Long, List<? extends Link>>> collectAllNeighborsByEntities(Collection<Long> ids,
+                                                                                          long ts) {
         Map<EntityType, Map<Long, List<? extends Link>>> res = new HashMap<>();
 
         context.transaction(ctx -> {
-            res.put(EntityType.ALPHA, new HashMap<>(gammaToAlphaRepository.getConnectedAlphaEntitiesByGammaIds(ids, ts)));
-            res.put(EntityType.DELTA, new HashMap<>(gammaToDeltaRepository.getConnectedDeltaEntitiesByGammaIds(ids, ts)));
+            res.put(EntityType.ALPHA, new HashMap<>(gammaToAlphaRepository.getConnectedAlphaEntitiesByGammaIds(ids,
+                    ts)));
+            res.put(EntityType.DELTA, new HashMap<>(gammaToDeltaRepository.getConnectedDeltaEntitiesByGammaIds(ids,
+                    ts)));
         });
 
         return res;
+    }
+
+    @Override
+    public void batchInsertNewEvents(List<GammaEvent> events) {
+        List<GammaRecord> records = events.stream().map(this::convertToGammaRecord).collect(Collectors.toList());
+        context.insertInto(GAMMA, GAMMA.ID, GAMMA.IS_MASTER, GAMMA.IS_ACTIVE, GAMMA.CREATED_TS)
+                .valuesOfRecords(records)
+                .onDuplicateKeyIgnore()
+                .execute();
+    }
+
+    private GammaRecord convertToGammaRecord(GammaEvent event) {
+        return new GammaRecord(
+                event.getId(),
+                event.isMaster(),
+                event.getType().name(),
+                event.getCreatedTs()
+        );
     }
 
     private GammaEntity convertToGammaEntity(GammaRecord record) {

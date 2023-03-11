@@ -9,14 +9,15 @@ import com.st1580.diploma.collector.graph.links.AlphaToBetaLink;
 import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
 import com.st1580.diploma.db.tables.AlphaToBeta;
 import com.st1580.diploma.db.tables.records.AlphaToBetaRecord;
+import com.st1580.diploma.updater.events.AlphaToBetaEvent;
 import org.jooq.DSLContext;
-import org.jooq.Record3;
-import org.jooq.SelectHavingStep;
+import org.jooq.Row5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import static com.st1580.diploma.db.Tables.ALPHA_TO_BETA;
 import static org.jooq.impl.DSL.max;
+import static org.jooq.impl.DSL.row;
 
 @Repository
 public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
@@ -44,6 +45,7 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
                 .selectFrom(TOP_LVL_AB)
                 .whereExists(context
                         .select(LOW_LVL_AB.ALPHA_ID, LOW_LVL_AB.BETA_ID, max(LOW_LVL_AB.CREATED_TS))
+                        .from(LOW_LVL_AB)
                         .where(LOW_LVL_AB.ALPHA_ID.in(alphaIds)
                                 .and(LOW_LVL_AB.CAN_USE)
                                 .and(LOW_LVL_AB.CREATED_TS.lessOrEqual(ts)))
@@ -79,6 +81,7 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
                 .selectFrom(TOP_LVL_AB)
                 .whereExists(context
                         .select(LOW_LVL_AB.ALPHA_ID, LOW_LVL_AB.BETA_ID, max(LOW_LVL_AB.CREATED_TS))
+                        .from(LOW_LVL_AB)
                         .where(LOW_LVL_AB.BETA_ID.in(betaIds)
                                 .and(LOW_LVL_AB.CAN_USE)
                                 .and(LOW_LVL_AB.CREATED_TS.lessOrEqual(ts)))
@@ -91,6 +94,21 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
                 .stream()
                 .map(this::convertToLink)
                 .collect(Collectors.groupingBy(AlphaToBetaLink::getBetaId));
+    }
+
+    @Override
+    public void batchInsertNewEvents(List<AlphaToBetaEvent> events) {
+        List<Row5<Long, Long, String, Boolean, Long>> rows =
+                events.stream().map(this::covertToRow).collect(Collectors.toList());
+        context.insertInto(ALPHA_TO_BETA, ALPHA_TO_BETA.ALPHA_ID, ALPHA_TO_BETA.BETA_ID,
+                        ALPHA_TO_BETA.HASH, ALPHA_TO_BETA.IS_ACTIVE, ALPHA_TO_BETA.CREATED_TS)
+                .valuesOfRows(rows)
+                .onDuplicateKeyIgnore()
+                .execute();
+    }
+
+    private Row5<Long, Long, String, Boolean, Long> covertToRow(AlphaToBetaEvent event) {
+        return row(event.getAlphaId(), event.getBetaId(), event.getHash(), event.isActive(), event.getCreatedTs());
     }
 
     private AlphaToBetaLink convertToLink(AlphaToBetaRecord record) {

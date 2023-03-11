@@ -33,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AlphaToBeta extends TableImpl<AlphaToBetaRecord> {
 
-    private static final long serialVersionUID = 510416586;
+    private static final long serialVersionUID = 1397388746;
 
     /**
      * The reference instance of <code>public.alpha_to_beta</code>
@@ -71,12 +71,12 @@ public class AlphaToBeta extends TableImpl<AlphaToBetaRecord> {
     /**
      * The column <code>public.alpha_to_beta.is_active_alpha</code>.
      */
-    public final TableField<AlphaToBetaRecord, String> IS_ACTIVE_ALPHA = createField(DSL.name("is_active_alpha"), org.jooq.impl.SQLDataType.VARCHAR(32).nullable(false), this, "");
+    public final TableField<AlphaToBetaRecord, String> IS_ACTIVE_ALPHA = createField(DSL.name("is_active_alpha"), org.jooq.impl.SQLDataType.VARCHAR(32).nullable(false).defaultValue(org.jooq.impl.DSL.field("'UNDEFINED'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>public.alpha_to_beta.is_active_beta</code>.
      */
-    public final TableField<AlphaToBetaRecord, String> IS_ACTIVE_BETA = createField(DSL.name("is_active_beta"), org.jooq.impl.SQLDataType.VARCHAR(32).nullable(false), this, "");
+    public final TableField<AlphaToBetaRecord, String> IS_ACTIVE_BETA = createField(DSL.name("is_active_beta"), org.jooq.impl.SQLDataType.VARCHAR(32).nullable(false).defaultValue(org.jooq.impl.DSL.field("'UNDEFINED'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>public.alpha_to_beta.can_use</code>.

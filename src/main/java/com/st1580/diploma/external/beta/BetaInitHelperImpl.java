@@ -1,5 +1,6 @@
 package com.st1580.diploma.external.beta;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -13,6 +14,7 @@ public class BetaInitHelperImpl implements BetaInitHelper {
     private BetaRepository betaRepository;
     @Override
     public List<Long> getAllEntityIds() {
-        return betaRepository.getAllIds();
+        return new ArrayList<>();
+//        return betaRepository.getAllIds();
     }
 }

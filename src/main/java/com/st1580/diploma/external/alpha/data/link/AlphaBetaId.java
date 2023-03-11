@@ -1,4 +1,4 @@
-package com.st1580.diploma.external.alpha.data;
+package com.st1580.diploma.external.alpha.data.link;
 
 import java.util.Objects;
 
@@ -36,4 +36,3 @@ public class AlphaBetaId {
         return Objects.hash(alphaId, betaId);
     }
 }
-

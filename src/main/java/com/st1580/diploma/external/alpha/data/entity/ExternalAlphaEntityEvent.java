@@ -1,26 +1,21 @@
-package com.st1580.diploma.external.alpha.data;
+package com.st1580.diploma.external.alpha.data.entity;
 
 import java.util.Objects;
 
+import com.st1580.diploma.external.alpha.data.AlphaEventType;
 import jakarta.annotation.Nullable;
 
 import static java.lang.System.currentTimeMillis;
 
-public class AlphaEntityEvent {
+public class ExternalAlphaEntityEvent {
     private final AlphaEventType type;
-
     private final long eventTs;
-
-    @Nullable
-    private final Long entityId;
-
     @Nullable
     private final ExternalAlphaEntity entity;
 
-    public AlphaEntityEvent(AlphaEventType type, Long entityId, ExternalAlphaEntity entity) {
+    public ExternalAlphaEntityEvent(AlphaEventType type, ExternalAlphaEntity entity) {
         this.type = type;
         this.eventTs = currentTimeMillis();
-        this.entityId = entityId;
         this.entity = entity;
     }
 
@@ -30,10 +25,6 @@ public class AlphaEntityEvent {
 
     public long getEventTs() {
         return eventTs;
-    }
-
-    public Long getEntityId() {
-        return entityId;
     }
 
     public ExternalAlphaEntity getEntity() {
@@ -48,13 +39,12 @@ public class AlphaEntityEvent {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        AlphaEntityEvent that = (AlphaEntityEvent) o;
-        return eventTs == that.eventTs && type == that.type && Objects.equals(entityId, that.entityId) && Objects.equals(entity,
-                that.entity);
+        ExternalAlphaEntityEvent that = (ExternalAlphaEntityEvent) o;
+        return eventTs == that.eventTs && type == that.type && Objects.equals(entity, that.entity);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, eventTs, entityId, entity);
+        return Objects.hash(type, eventTs, entity);
     }
 }

@@ -7,8 +7,7 @@ import com.st1580.diploma.collector.graph.AbstractLink;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.service.dto.GraphLinkDto;
-import com.st1580.diploma.db.tables.records.GammaToAlphaRecord;
-import com.st1580.diploma.external.gamma.data.ExternalGammaToAlphaLink;
+import com.st1580.diploma.external.gamma.data.links.ga.ExternalGammaToAlphaLink;
 
 public class GammaToAlphaLink extends AbstractLink {
     private final long gammaId;

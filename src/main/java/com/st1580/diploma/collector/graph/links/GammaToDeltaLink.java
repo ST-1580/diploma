@@ -6,8 +6,7 @@ import com.st1580.diploma.collector.graph.AbstractLink;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.service.dto.GraphLinkDto;
-import com.st1580.diploma.db.tables.records.GammaToDeltaRecord;
-import com.st1580.diploma.external.gamma.data.ExternalGammaToDeltaLink;
+import com.st1580.diploma.external.gamma.data.links.gd.ExternalGammaToDeltaLink;
 
 public class GammaToDeltaLink extends AbstractLink {
     private final long gammaId;

@@ -2,8 +2,8 @@ create table Gamma_to_Delta (
         gamma_id         bigint          not null,
         delta_id         bigint          not null,
         is_active        bool            not null,
-        is_active_gamma  varchar(32)     not null,
-        is_active_delta  varchar(32)     not null,
+        is_active_gamma  varchar(32)     not null     default 'UNDEFINED',
+        is_active_delta  varchar(32)     not null     default 'UNDEFINED',
         can_use          bool            not null,
         created_ts       bigint          not null
 );

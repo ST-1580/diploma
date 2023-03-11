@@ -9,12 +9,15 @@ import com.st1580.diploma.collector.graph.links.GammaToDeltaLink;
 import com.st1580.diploma.collector.repository.GammaToDeltaRepository;
 import com.st1580.diploma.db.tables.GammaToDelta;
 import com.st1580.diploma.db.tables.records.GammaToDeltaRecord;
+import com.st1580.diploma.updater.events.GammaToDeltaEvent;
 import org.jooq.DSLContext;
+import org.jooq.Row4;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import static com.st1580.diploma.db.Tables.GAMMA_TO_DELTA;
 import static org.jooq.impl.DSL.max;
+import static org.jooq.impl.DSL.row;
 
 @Repository
 public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
@@ -42,6 +45,7 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
                 .selectFrom(TOP_LVL_GD)
                 .whereExists(context
                         .select(LOW_LVL_GD.GAMMA_ID, LOW_LVL_GD.DELTA_ID, max(LOW_LVL_GD.CREATED_TS))
+                        .from(LOW_LVL_GD)
                         .where(LOW_LVL_GD.DELTA_ID.in(deltaIds)
                                 .and(LOW_LVL_GD.CAN_USE)
                                 .and(LOW_LVL_GD.CREATED_TS.lessOrEqual(ts)))
@@ -77,6 +81,7 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
                 .selectFrom(TOP_LVL_GD)
                 .whereExists(context
                         .select(LOW_LVL_GD.GAMMA_ID, LOW_LVL_GD.DELTA_ID, max(LOW_LVL_GD.CREATED_TS))
+                        .from(LOW_LVL_GD)
                         .where(LOW_LVL_GD.GAMMA_ID.in(gammaIds)
                                 .and(LOW_LVL_GD.CAN_USE)
                                 .and(LOW_LVL_GD.CREATED_TS.lessOrEqual(ts)))
@@ -89,6 +94,21 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
                 .stream()
                 .map(this::convertToLink)
                 .collect(Collectors.groupingBy(GammaToDeltaLink::getGammaId));
+    }
+
+    @Override
+    public void batchInsertNewEvents(List<GammaToDeltaEvent> events) {
+        List<Row4<Long, Long, Boolean, Long>> rows =
+                events.stream().map(this::covertToRow).collect(Collectors.toList());
+        context.insertInto(GAMMA_TO_DELTA, GAMMA_TO_DELTA.GAMMA_ID, GAMMA_TO_DELTA.DELTA_ID,
+                        GAMMA_TO_DELTA.IS_ACTIVE, GAMMA_TO_DELTA.CREATED_TS)
+                .valuesOfRows(rows)
+                .onDuplicateKeyIgnore()
+                .execute();
+    }
+
+    private Row4<Long, Long, Boolean, Long> covertToRow(GammaToDeltaEvent event) {
+        return row(event.getGammaId(), event.getDeltaId(), event.isActive(), event.getCreatedTs());
     }
 
     private GammaToDeltaLink convertToLink(GammaToDeltaRecord record) {

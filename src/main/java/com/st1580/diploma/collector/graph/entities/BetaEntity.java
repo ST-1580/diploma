@@ -17,11 +17,6 @@ public class BetaEntity extends AbstractEntity {
         this.epoch = epoch;
     }
 
-    public BetaEntity(ExternalBetaEntity externalBetaEntity) {
-        super(EntityType.BETA, externalBetaEntity.getId());
-        this.epoch = externalBetaEntity.getCreatedTs();
-    }
-
     public long getEpoch() {
         return epoch;
     }

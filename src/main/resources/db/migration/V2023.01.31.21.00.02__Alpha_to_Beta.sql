@@ -3,8 +3,8 @@ create table Alpha_to_Beta (
     beta_id          bigint          not null,
     hash             varchar(100)    not null    default 'hash',
     is_active        bool            not null,
-    is_active_alpha  varchar(32)     not null,
-    is_active_beta   varchar(32)     not null,
+    is_active_alpha  varchar(32)     not null    default 'UNDEFINED',
+    is_active_beta   varchar(32)     not null    default 'UNDEFINED',
     can_use          bool            not null,
     created_ts       bigint          not null
 );

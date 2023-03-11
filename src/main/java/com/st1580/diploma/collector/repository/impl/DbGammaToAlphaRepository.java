@@ -9,12 +9,15 @@ import com.st1580.diploma.collector.graph.links.GammaToAlphaLink;
 import com.st1580.diploma.collector.repository.GammaToAlphaRepository;
 import com.st1580.diploma.db.tables.GammaToAlpha;
 import com.st1580.diploma.db.tables.records.GammaToAlphaRecord;
+import com.st1580.diploma.updater.events.GammaToAlphaEvent;
 import org.jooq.DSLContext;
+import org.jooq.Row5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import static com.st1580.diploma.db.Tables.GAMMA_TO_ALPHA;
 import static org.jooq.impl.DSL.max;
+import static org.jooq.impl.DSL.row;
 
 @Repository
 public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
@@ -42,6 +45,7 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
                 .selectFrom(TOP_LVL_GA)
                 .whereExists(context
                         .select(LOW_LVL_GA.GAMMA_ID, LOW_LVL_GA.ALPHA_ID, max(LOW_LVL_GA.CREATED_TS))
+                        .from(LOW_LVL_GA)
                         .where(LOW_LVL_GA.ALPHA_ID.in(alphaIds)
                                 .and(LOW_LVL_GA.CAN_USE)
                                 .and(LOW_LVL_GA.CREATED_TS.lessOrEqual(ts)))
@@ -77,6 +81,7 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
                 .selectFrom(TOP_LVL_GA)
                 .whereExists(context
                         .select(LOW_LVL_GA.GAMMA_ID, LOW_LVL_GA.ALPHA_ID, max(LOW_LVL_GA.CREATED_TS))
+                        .from(LOW_LVL_GA)
                         .where(LOW_LVL_GA.GAMMA_ID.in(gammaIds)
                                 .and(LOW_LVL_GA.CAN_USE)
                                 .and(LOW_LVL_GA.CREATED_TS.lessOrEqual(ts)))
@@ -89,6 +94,21 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
                 .stream()
                 .map(this::convertToLink)
                 .collect(Collectors.groupingBy(GammaToAlphaLink::getGammaId));
+    }
+
+    @Override
+    public void batchInsertNewEvents(List<GammaToAlphaEvent> events) {
+        List<Row5<Long, Long, Long, Boolean, Long>> rows =
+                events.stream().map(this::covertToRow).collect(Collectors.toList());
+        context.insertInto(GAMMA_TO_ALPHA, GAMMA_TO_ALPHA.GAMMA_ID, GAMMA_TO_ALPHA.ALPHA_ID,
+                        GAMMA_TO_ALPHA.WEIGHT, GAMMA_TO_ALPHA.IS_ACTIVE, GAMMA_TO_ALPHA.CREATED_TS)
+                .valuesOfRows(rows)
+                .onDuplicateKeyIgnore()
+                .execute();
+    }
+
+    private Row5<Long, Long, Long, Boolean, Long> covertToRow(GammaToAlphaEvent event) {
+        return row(event.getGammaId(), event.getAlphaId(), event.getWeight(), event.isActive(), event.getCreatedTs());
     }
 
     private GammaToAlphaLink convertToLink(GammaToAlphaRecord record) {

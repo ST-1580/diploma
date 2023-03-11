@@ -7,7 +7,6 @@ import com.st1580.diploma.collector.graph.AbstractEntity;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.service.dto.GraphEntityDto;
 import com.st1580.diploma.collector.service.dto.GraphEntityType;
-import com.st1580.diploma.external.alpha.data.ExternalAlphaEntity;
 
 public class AlphaEntity extends AbstractEntity {
     private final String name;
@@ -15,11 +14,6 @@ public class AlphaEntity extends AbstractEntity {
     public AlphaEntity(long id, String name) {
         super(EntityType.ALPHA, id);
         this.name = name;
-    }
-
-    public AlphaEntity(ExternalAlphaEntity externalAlphaEntity) {
-        super(EntityType.ALPHA, externalAlphaEntity.getId());
-        this.name = externalAlphaEntity.getName();
     }
 
     public String getName() {

@@ -33,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class GammaToAlpha extends TableImpl<GammaToAlphaRecord> {
 
-    private static final long serialVersionUID = 1290647302;
+    private static final long serialVersionUID = -1082766364;
 
     /**
      * The reference instance of <code>public.gamma_to_alpha</code>
@@ -71,12 +71,12 @@ public class GammaToAlpha extends TableImpl<GammaToAlphaRecord> {
     /**
      * The column <code>public.gamma_to_alpha.is_active_gamma</code>.
      */
-    public final TableField<GammaToAlphaRecord, String> IS_ACTIVE_GAMMA = createField(DSL.name("is_active_gamma"), org.jooq.impl.SQLDataType.VARCHAR(32).nullable(false), this, "");
+    public final TableField<GammaToAlphaRecord, String> IS_ACTIVE_GAMMA = createField(DSL.name("is_active_gamma"), org.jooq.impl.SQLDataType.VARCHAR(32).nullable(false).defaultValue(org.jooq.impl.DSL.field("'UNDEFINED'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>public.gamma_to_alpha.is_active_alpha</code>.
      */
-    public final TableField<GammaToAlphaRecord, String> IS_ACTIVE_ALPHA = createField(DSL.name("is_active_alpha"), org.jooq.impl.SQLDataType.VARCHAR(32).nullable(false), this, "");
+    public final TableField<GammaToAlphaRecord, String> IS_ACTIVE_ALPHA = createField(DSL.name("is_active_alpha"), org.jooq.impl.SQLDataType.VARCHAR(32).nullable(false).defaultValue(org.jooq.impl.DSL.field("'UNDEFINED'::character varying", org.jooq.impl.SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>public.gamma_to_alpha.can_use</code>.

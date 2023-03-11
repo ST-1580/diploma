@@ -1,6 +1,7 @@
 package com.st1580.diploma.external.beta;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,7 +27,7 @@ public class BetaService implements BetaServiceApi {
     @Override
     public String createEntity(ExternalBetaEntity newEntity) {
         if (idState.contains(newEntity.getId())) {
-            return "Beta entity with id " + newEntity.getId() + " is already exists";
+            return "Beta entity with id " + newEntity.getId() + " is already exist";
         }
         idState.add(newEntity.getId());
 
@@ -42,7 +43,7 @@ public class BetaService implements BetaServiceApi {
     @Override
     public String patchEntity(ExternalBetaEntity betaEntity) {
         if (!idState.contains(betaEntity.getId())) {
-            return "Beta entity with id " + betaEntity.getId() + " is not exists";
+            return "Beta entity with id " + betaEntity.getId() + " does not exist";
         }
 
         entityEvents.add(
@@ -57,7 +58,7 @@ public class BetaService implements BetaServiceApi {
     @Override
     public String deleteEntity(long entityId) {
         if (!idState.contains(entityId)) {
-            return "Beta entity with id " + entityId + " is not exists";
+            return "Beta entity with id " + entityId + " does not exist";
         }
         idState.remove(entityId);
 
@@ -74,6 +75,7 @@ public class BetaService implements BetaServiceApi {
     public List<BetaEntityEvent> getBetaEntityEvents(long tsFrom, long tsTo) {
         return entityEvents.stream()
                 .filter(event -> tsFrom <= event.getEventTs() && event.getEventTs() < tsTo)
+                .sorted(Comparator.comparingLong(BetaEntityEvent::getEventTs))
                 .collect(Collectors.toList());
     }
 }
