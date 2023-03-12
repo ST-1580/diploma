@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class DeltaRecord extends UpdatableRecordImpl<DeltaRecord> implements Record4<Long, String, String, Long> {
 
-    private static final long serialVersionUID = -157140227;
+    private static final long serialVersionUID = -522102427;
 
     /**
      * Setter for <code>public.delta.id</code>.
@@ -50,16 +50,16 @@ public class DeltaRecord extends UpdatableRecordImpl<DeltaRecord> implements Rec
     }
 
     /**
-     * Setter for <code>public.delta.is_active</code>.
+     * Setter for <code>public.delta.active_status</code>.
      */
-    public void setIsActive(String value) {
+    public void setActiveStatus(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>public.delta.is_active</code>.
+     * Getter for <code>public.delta.active_status</code>.
      */
-    public String getIsActive() {
+    public String getActiveStatus() {
         return (String) get(2);
     }
 
@@ -112,7 +112,7 @@ public class DeltaRecord extends UpdatableRecordImpl<DeltaRecord> implements Rec
 
     @Override
     public Field<String> field3() {
-        return Delta.DELTA.IS_ACTIVE;
+        return Delta.DELTA.ACTIVE_STATUS;
     }
 
     @Override
@@ -132,7 +132,7 @@ public class DeltaRecord extends UpdatableRecordImpl<DeltaRecord> implements Rec
 
     @Override
     public String component3() {
-        return getIsActive();
+        return getActiveStatus();
     }
 
     @Override
@@ -152,7 +152,7 @@ public class DeltaRecord extends UpdatableRecordImpl<DeltaRecord> implements Rec
 
     @Override
     public String value3() {
-        return getIsActive();
+        return getActiveStatus();
     }
 
     @Override
@@ -174,7 +174,7 @@ public class DeltaRecord extends UpdatableRecordImpl<DeltaRecord> implements Rec
 
     @Override
     public DeltaRecord value3(String value) {
-        setIsActive(value);
+        setActiveStatus(value);
         return this;
     }
 
@@ -207,12 +207,12 @@ public class DeltaRecord extends UpdatableRecordImpl<DeltaRecord> implements Rec
     /**
      * Create a detached, initialised DeltaRecord
      */
-    public DeltaRecord(Long id, String name, String isActive, Long createdTs) {
+    public DeltaRecord(Long id, String name, String activeStatus, Long createdTs) {
         super(Delta.DELTA);
 
         set(0, id);
         set(1, name);
-        set(2, isActive);
+        set(2, activeStatus);
         set(3, createdTs);
     }
 }

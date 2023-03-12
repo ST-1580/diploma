@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class GammaRecord extends UpdatableRecordImpl<GammaRecord> implements Record4<Long, Boolean, String, Long> {
 
-    private static final long serialVersionUID = 101842608;
+    private static final long serialVersionUID = -1974730104;
 
     /**
      * Setter for <code>public.gamma.id</code>.
@@ -50,16 +50,16 @@ public class GammaRecord extends UpdatableRecordImpl<GammaRecord> implements Rec
     }
 
     /**
-     * Setter for <code>public.gamma.is_active</code>.
+     * Setter for <code>public.gamma.active_status</code>.
      */
-    public void setIsActive(String value) {
+    public void setActiveStatus(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>public.gamma.is_active</code>.
+     * Getter for <code>public.gamma.active_status</code>.
      */
-    public String getIsActive() {
+    public String getActiveStatus() {
         return (String) get(2);
     }
 
@@ -112,7 +112,7 @@ public class GammaRecord extends UpdatableRecordImpl<GammaRecord> implements Rec
 
     @Override
     public Field<String> field3() {
-        return Gamma.GAMMA.IS_ACTIVE;
+        return Gamma.GAMMA.ACTIVE_STATUS;
     }
 
     @Override
@@ -132,7 +132,7 @@ public class GammaRecord extends UpdatableRecordImpl<GammaRecord> implements Rec
 
     @Override
     public String component3() {
-        return getIsActive();
+        return getActiveStatus();
     }
 
     @Override
@@ -152,7 +152,7 @@ public class GammaRecord extends UpdatableRecordImpl<GammaRecord> implements Rec
 
     @Override
     public String value3() {
-        return getIsActive();
+        return getActiveStatus();
     }
 
     @Override
@@ -174,7 +174,7 @@ public class GammaRecord extends UpdatableRecordImpl<GammaRecord> implements Rec
 
     @Override
     public GammaRecord value3(String value) {
-        setIsActive(value);
+        setActiveStatus(value);
         return this;
     }
 
@@ -207,12 +207,12 @@ public class GammaRecord extends UpdatableRecordImpl<GammaRecord> implements Rec
     /**
      * Create a detached, initialised GammaRecord
      */
-    public GammaRecord(Long id, Boolean isMaster, String isActive, Long createdTs) {
+    public GammaRecord(Long id, Boolean isMaster, String activeStatus, Long createdTs) {
         super(Gamma.GAMMA);
 
         set(0, id);
         set(1, isMaster);
-        set(2, isActive);
+        set(2, activeStatus);
         set(3, createdTs);
     }
 }

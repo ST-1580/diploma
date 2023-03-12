@@ -6,7 +6,7 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import com.st1580.diploma.external.delta.DeltaServiceApi;
-import com.st1580.diploma.external.delta.data.DeltaEntityEvent;
+import com.st1580.diploma.external.delta.data.ExternalDeltaEntityEvent;
 import com.st1580.diploma.external.delta.data.DeltaEventType;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ public class DeltaCaller {
     @Inject
     private DeltaServiceApi deltaServiceApi;
 
-    public Map<DeltaEventType, List<DeltaEntityEvent>> getAllDeltaEvents(long fromTs, long toTs) {
-        return deltaServiceApi.getDeltaEntityEvents(fromTs, toTs);
+    public List<ExternalDeltaEntityEvent> getAllDeltaEvents(long tsFrom, long tsTo) {
+        return deltaServiceApi.getDeltaEntityEvents(tsFrom, tsTo);
     }
 }

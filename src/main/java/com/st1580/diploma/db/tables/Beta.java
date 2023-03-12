@@ -33,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Beta extends TableImpl<BetaRecord> {
 
-    private static final long serialVersionUID = -1976529061;
+    private static final long serialVersionUID = 706588843;
 
     /**
      * The reference instance of <code>public.beta</code>
@@ -59,9 +59,9 @@ public class Beta extends TableImpl<BetaRecord> {
     public final TableField<BetaRecord, Integer> EPOCH = createField(DSL.name("epoch"), org.jooq.impl.SQLDataType.INTEGER.nullable(false).defaultValue(org.jooq.impl.DSL.field("0", org.jooq.impl.SQLDataType.INTEGER)), this, "");
 
     /**
-     * The column <code>public.beta.is_active</code>.
+     * The column <code>public.beta.active_status</code>.
      */
-    public final TableField<BetaRecord, String> IS_ACTIVE = createField(DSL.name("is_active"), org.jooq.impl.SQLDataType.VARCHAR(24).nullable(false), this, "");
+    public final TableField<BetaRecord, String> ACTIVE_STATUS = createField(DSL.name("active_status"), org.jooq.impl.SQLDataType.VARCHAR(24).nullable(false), this, "");
 
     /**
      * The column <code>public.beta.created_ts</code>.

@@ -4,16 +4,14 @@ import java.util.Objects;
 
 import static java.lang.System.currentTimeMillis;
 
-public class BetaEntityEvent {
+public class ExternalBetaEntityEvent {
     private final char type;
     private final long eventTs;
-    private final long entityId;
     private final ExternalBetaEntity entity;
 
-    public BetaEntityEvent(char type, long entityId, ExternalBetaEntity entity) {
+    public ExternalBetaEntityEvent(char type, ExternalBetaEntity entity) {
         this.type = type;
         this.eventTs = currentTimeMillis();
-        this.entityId = entityId;
         this.entity = entity;
     }
 
@@ -23,10 +21,6 @@ public class BetaEntityEvent {
 
     public long getEventTs() {
         return eventTs;
-    }
-
-    public long getEntityId() {
-        return entityId;
     }
 
     public ExternalBetaEntity getEntity() {
@@ -41,13 +35,12 @@ public class BetaEntityEvent {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        BetaEntityEvent that = (BetaEntityEvent) o;
-        return type == that.type && eventTs == that.eventTs && entityId == that.entityId && Objects.equals(entity,
-                that.entity);
+        ExternalBetaEntityEvent that = (ExternalBetaEntityEvent) o;
+        return type == that.type && eventTs == that.eventTs && Objects.equals(entity, that.entity);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(type, eventTs, entityId, entity);
+        return Objects.hash(type, eventTs, entity);
     }
 }

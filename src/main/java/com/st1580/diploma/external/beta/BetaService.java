@@ -2,80 +2,95 @@ package com.st1580.diploma.external.beta;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import com.st1580.diploma.external.beta.data.BetaEntityEvent;
+import com.st1580.diploma.external.beta.data.ExternalBetaEntityEvent;
 import com.st1580.diploma.external.beta.data.ExternalBetaEntity;
+import com.st1580.diploma.external.delta.data.DeltaEventType;
+import com.st1580.diploma.external.delta.data.ExternalDeltaEntity;
+import com.st1580.diploma.external.delta.data.ExternalDeltaEntityEvent;
+import com.st1580.diploma.external.repository.ExternalServicesRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class BetaService implements BetaServiceApi {
-    private final List<BetaEntityEvent> entityEvents;
-    private final Set<Long> idState;
+    private final List<ExternalBetaEntityEvent> entityEvents;
+    private final Set<Long> activeBetaEntities;
+    private final Map<Long, Integer> lastEpoch;
 
     @Inject
-    public BetaService(BetaInitHelper helper) {
+    public BetaService(ExternalServicesRepository externalServicesRepository) {
         this.entityEvents = new ArrayList<>();
-        this.idState = new HashSet<>(helper.getAllEntityIds());
+
+        List<ExternalBetaEntity> entities = externalServicesRepository.getAllBetaEntities();
+        this.activeBetaEntities = entities.stream()
+                .map(ExternalBetaEntity::getId)
+                .collect(Collectors.toSet());
+        this.lastEpoch = entities.stream().collect(Collectors.toMap(
+                ExternalBetaEntity::getId,
+                ExternalBetaEntity::getEpoch
+        ));
     }
 
     @Override
     public String createEntity(ExternalBetaEntity newEntity) {
-        if (idState.contains(newEntity.getId())) {
-            return "Beta entity with id " + newEntity.getId() + " is already exist";
+        long newEntityId = newEntity.getId();
+        if (activeBetaEntities.contains(newEntityId)) {
+            return "Beta entity id " + newEntityId + " is already exist";
         }
-        idState.add(newEntity.getId());
+        activeBetaEntities.add(newEntityId);
+        lastEpoch.put(newEntityId, newEntity.getEpoch());
 
         entityEvents.add(
-                new BetaEntityEvent(
+                new ExternalBetaEntityEvent(
                         'c',
-                        newEntity.getId(),
-                        newEntity
+                        new ExternalBetaEntity(newEntityId, newEntity.getEpoch())
                 ));
         return "done";
     }
 
     @Override
     public String patchEntity(ExternalBetaEntity betaEntity) {
-        if (!idState.contains(betaEntity.getId())) {
+        if (!activeBetaEntities.contains(betaEntity.getId())) {
             return "Beta entity with id " + betaEntity.getId() + " does not exist";
         }
+        lastEpoch.put(betaEntity.getId(), betaEntity.getEpoch());
 
         entityEvents.add(
-                new BetaEntityEvent(
+                new ExternalBetaEntityEvent(
                         'u',
-                        betaEntity.getId(),
-                        betaEntity
+                        new ExternalBetaEntity(betaEntity.getId(), betaEntity.getEpoch())
                 ));
         return "done";
     }
 
     @Override
     public String deleteEntity(long entityId) {
-        if (!idState.contains(entityId)) {
+        if (!activeBetaEntities.contains(entityId)) {
             return "Beta entity with id " + entityId + " does not exist";
         }
-        idState.remove(entityId);
+        activeBetaEntities.remove(entityId);
 
         entityEvents.add(
-                new BetaEntityEvent(
+                new ExternalBetaEntityEvent(
                         'd',
-                        entityId,
-                        null
+                        new ExternalBetaEntity(entityId, lastEpoch.get(entityId))
                 ));
+        lastEpoch.remove(entityId);
+
         return "done";
     }
 
     @Override
-    public List<BetaEntityEvent> getBetaEntityEvents(long tsFrom, long tsTo) {
+    public List<ExternalBetaEntityEvent> getBetaEntityEvents(long tsFrom, long tsTo) {
         return entityEvents.stream()
                 .filter(event -> tsFrom <= event.getEventTs() && event.getEventTs() < tsTo)
-                .sorted(Comparator.comparingLong(BetaEntityEvent::getEventTs))
+                .sorted(Comparator.comparingLong(ExternalBetaEntityEvent::getEventTs))
                 .collect(Collectors.toList());
     }
 }

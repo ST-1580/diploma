@@ -1,4 +1,4 @@
-insert into alpha (id, name, is_active, created_ts)
+insert into alpha (id, name, active_status, created_ts)
 values
     (1, 'hello', 'TRUE', 0),
     (2, 'goodbye', 'TRUE', 1),
@@ -7,7 +7,7 @@ values
     (5, 'prod', 'TRUE', 3),
     (6, 'alone(', 'TRUE', 8);
 
-insert into beta (id, epoch, is_active, created_ts)
+insert into beta (id, epoch, active_status, created_ts)
 values
     (83, 0, 'TRUE', 1),
     (85, 12, 'TRUE', 4),
@@ -15,7 +15,7 @@ values
     (90, 33, 'TRUE', 2),
     (91, -64, 'TRUE', 8);
 
-insert into gamma (id, is_master, is_active, created_ts)
+insert into gamma (id, is_master, active_status, created_ts)
 values
     (70, true, 'TRUE', 0),
     (72, false, 'TRUE', 8),
@@ -23,7 +23,7 @@ values
     (80, true, 'TRUE', 4),
     (83, true, 'TRUE', 3);
 
-insert into delta (id, name, is_active, created_ts)
+insert into delta (id, name, active_status, created_ts)
 values
     (10, 'solo', 'TRUE', 7),
     (11, 'top', 'TRUE', 2),

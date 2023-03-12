@@ -2,7 +2,7 @@ package com.st1580.diploma.external.beta;
 
 import java.util.List;
 
-import com.st1580.diploma.external.beta.data.BetaEntityEvent;
+import com.st1580.diploma.external.beta.data.ExternalBetaEntityEvent;
 import com.st1580.diploma.external.beta.data.ExternalBetaEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,6 +26,6 @@ public interface BetaServiceApi {
     String deleteEntity(@RequestParam("id") long entityId);
 
     @GetMapping("/events/entity")
-    List<BetaEntityEvent> getBetaEntityEvents(@RequestParam("from") long tsFrom,
-                                              @RequestParam("to") long tsTo);
+    List<ExternalBetaEntityEvent> getBetaEntityEvents(@RequestParam("from") long tsFrom,
+                                                      @RequestParam("to") long tsTo);
 }

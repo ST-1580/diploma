@@ -1,16 +1,13 @@
 package com.st1580.diploma.external.gamma;
 
 import java.util.List;
-import java.util.Map;
 
-import com.st1580.diploma.external.gamma.data.GammaEventType;
 import com.st1580.diploma.external.gamma.data.entity.ExternalGammaEntityDto;
 import com.st1580.diploma.external.gamma.data.entity.ExternalGammaEntityEvent;
 import com.st1580.diploma.external.gamma.data.links.ga.ExternalGammaToAlphaLinkDto;
 import com.st1580.diploma.external.gamma.data.links.ga.ExternalGammaToAlphaLinkEvent;
 import com.st1580.diploma.external.gamma.data.links.gd.ExternalGammaToDeltaLinkDto;
 import com.st1580.diploma.external.gamma.data.links.gd.ExternalGammaToDeltaLinkEvent;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -51,13 +48,13 @@ public interface GammaServiceApi {
 
     @GetMapping("/events/entity")
     List<ExternalGammaEntityEvent> getGammaEntityEvents(@RequestParam("from") long tsFrom,
-                                                                             @RequestParam("to") long tsTo);
+                                                        @RequestParam("to") long tsTo);
 
     @GetMapping("/events/link/alpha")
     List<ExternalGammaToAlphaLinkEvent> getGammaToAlphaLinkEvents(@RequestParam("from") long tsFrom,
-                                                                                       @RequestParam("to") long tsTo);
+                                                                  @RequestParam("to") long tsTo);
 
     @GetMapping("/events/link/delta")
     List<ExternalGammaToDeltaLinkEvent> getGammaToDeltaLinkEvents(@RequestParam("from") long tsFrom,
-                                                                                       @RequestParam("to") long tsTo);
+                                                                  @RequestParam("to") long tsTo);
 }

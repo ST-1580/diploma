@@ -17,11 +17,14 @@ import com.st1580.diploma.collector.repository.BetaRepository;
 import com.st1580.diploma.collector.repository.types.EntityActiveType;
 import com.st1580.diploma.db.tables.Beta;
 import com.st1580.diploma.db.tables.records.BetaRecord;
+import com.st1580.diploma.db.tables.records.DeltaRecord;
+import com.st1580.diploma.updater.events.BetaEvent;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import static com.st1580.diploma.db.Tables.BETA;
+import static com.st1580.diploma.db.Tables.DELTA;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.row;
 
@@ -43,7 +46,7 @@ public class DbBetaRepository implements BetaRepository {
                         context.select(LOW_LVL_BETA.ID, max(LOW_LVL_BETA.CREATED_TS))
                                 .from(LOW_LVL_BETA)
                                 .where(LOW_LVL_BETA.ID.in(ids)
-                                        .and(LOW_LVL_BETA.IS_ACTIVE.in(EntityActiveType.trueEntityActiveTypes))
+                                        .and(LOW_LVL_BETA.ACTIVE_STATUS.in(EntityActiveType.trueEntityActiveTypes))
                                         .and(LOW_LVL_BETA.CREATED_TS.lessOrEqual(ts)))
                                 .groupBy(LOW_LVL_BETA.ID)
                                 .having(LOW_LVL_BETA.ID.eq(TOP_LVL_BETA.ID)
@@ -78,6 +81,24 @@ public class DbBetaRepository implements BetaRepository {
         });
 
         return res;
+    }
+
+    @Override
+    public void batchInsertNewEvents(List<BetaEvent> events) {
+        List<BetaRecord> records = events.stream().map(this::covertToBetaRecord).collect(Collectors.toList());
+        context.insertInto(BETA, BETA.ID, BETA.EPOCH, BETA.ACTIVE_STATUS, BETA.CREATED_TS)
+                .valuesOfRecords(records)
+                .onDuplicateKeyIgnore()
+                .execute();
+    }
+
+    private BetaRecord covertToBetaRecord(BetaEvent event) {
+        return new BetaRecord(
+                event.getId(),
+                event.getEpoch(),
+                event.getType().name(),
+                event.getCreatedTs()
+        );
     }
 
     private BetaEntity convertToBetaEntity(BetaRecord record) {

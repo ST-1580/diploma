@@ -33,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Gamma extends TableImpl<GammaRecord> {
 
-    private static final long serialVersionUID = -1227120531;
+    private static final long serialVersionUID = 2036244317;
 
     /**
      * The reference instance of <code>public.gamma</code>
@@ -59,9 +59,9 @@ public class Gamma extends TableImpl<GammaRecord> {
     public final TableField<GammaRecord, Boolean> IS_MASTER = createField(DSL.name("is_master"), org.jooq.impl.SQLDataType.BOOLEAN.nullable(false).defaultValue(org.jooq.impl.DSL.field("false", org.jooq.impl.SQLDataType.BOOLEAN)), this, "");
 
     /**
-     * The column <code>public.gamma.is_active</code>.
+     * The column <code>public.gamma.active_status</code>.
      */
-    public final TableField<GammaRecord, String> IS_ACTIVE = createField(DSL.name("is_active"), org.jooq.impl.SQLDataType.VARCHAR(24).nullable(false), this, "");
+    public final TableField<GammaRecord, String> ACTIVE_STATUS = createField(DSL.name("active_status"), org.jooq.impl.SQLDataType.VARCHAR(24).nullable(false), this, "");
 
     /**
      * The column <code>public.gamma.created_ts</code>.

@@ -46,7 +46,7 @@ public class DbGammaRepository implements GammaRepository {
                         context.select(LOW_LVL_GAMMA.ID, max(LOW_LVL_GAMMA.CREATED_TS))
                                 .from(LOW_LVL_GAMMA)
                                 .where(LOW_LVL_GAMMA.ID.in(ids)
-                                        .and(LOW_LVL_GAMMA.IS_ACTIVE.in(EntityActiveType.trueEntityActiveTypes))
+                                        .and(LOW_LVL_GAMMA.ACTIVE_STATUS.in(EntityActiveType.trueEntityActiveTypes))
                                         .and(LOW_LVL_GAMMA.CREATED_TS.lessOrEqual(ts)))
                                 .groupBy(LOW_LVL_GAMMA.ID)
                                 .having(LOW_LVL_GAMMA.ID.eq(TOP_LVL_GAMMA.ID)
@@ -91,7 +91,7 @@ public class DbGammaRepository implements GammaRepository {
     @Override
     public void batchInsertNewEvents(List<GammaEvent> events) {
         List<GammaRecord> records = events.stream().map(this::convertToGammaRecord).collect(Collectors.toList());
-        context.insertInto(GAMMA, GAMMA.ID, GAMMA.IS_MASTER, GAMMA.IS_ACTIVE, GAMMA.CREATED_TS)
+        context.insertInto(GAMMA, GAMMA.ID, GAMMA.IS_MASTER, GAMMA.ACTIVE_STATUS, GAMMA.CREATED_TS)
                 .valuesOfRecords(records)
                 .onDuplicateKeyIgnore()
                 .execute();

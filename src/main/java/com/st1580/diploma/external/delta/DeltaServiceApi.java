@@ -1,13 +1,9 @@
 package com.st1580.diploma.external.delta;
 
 import java.util.List;
-import java.util.Map;
 
-import com.st1580.diploma.external.beta.data.BetaEntityEvent;
-import com.st1580.diploma.external.beta.data.ExternalBetaEntity;
-import com.st1580.diploma.external.delta.data.DeltaEntityEvent;
-import com.st1580.diploma.external.delta.data.DeltaEventType;
 import com.st1580.diploma.external.delta.data.ExternalDeltaEntity;
+import com.st1580.diploma.external.delta.data.ExternalDeltaEntityEvent;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -30,6 +26,6 @@ public interface DeltaServiceApi {
     String deleteEntity(@RequestParam("id") long entityId);
 
     @GetMapping("/events/entity")
-    Map<DeltaEventType, List<DeltaEntityEvent>> getDeltaEntityEvents(@RequestParam("from") long tsFrom,
-                                                                     @RequestParam("to") long tsTo);
+    List<ExternalDeltaEntityEvent> getDeltaEntityEvents(@RequestParam("from") long tsFrom,
+                                                        @RequestParam("to") long tsTo);
 }

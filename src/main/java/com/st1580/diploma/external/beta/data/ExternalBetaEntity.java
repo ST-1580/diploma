@@ -8,19 +8,19 @@ import static java.lang.System.currentTimeMillis;
 
 public class ExternalBetaEntity {
     private final long id;
-    private final long createdTs;
+    private final int epoch;
 
-    public ExternalBetaEntity(@JsonProperty("id") long id) {
+    public ExternalBetaEntity(@JsonProperty("id") long id, @JsonProperty("epoch") int epoch) {
         this.id = id;
-        this.createdTs = currentTimeMillis();
+        this.epoch = epoch;
     }
 
     public long getId() {
         return id;
     }
 
-    public long getCreatedTs() {
-        return createdTs;
+    public int getEpoch() {
+        return epoch;
     }
 
     @Override
@@ -32,11 +32,11 @@ public class ExternalBetaEntity {
             return false;
         }
         ExternalBetaEntity that = (ExternalBetaEntity) o;
-        return id == that.id && createdTs == that.createdTs;
+        return id == that.id && epoch == that.epoch;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, createdTs);
+        return Objects.hash(id, epoch);
     }
 }

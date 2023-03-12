@@ -47,7 +47,7 @@ public class DbAlphaRepository implements AlphaRepository {
                         context.select(LOW_LVL_ALPHA.ID, max(LOW_LVL_ALPHA.CREATED_TS))
                                 .from(LOW_LVL_ALPHA)
                                 .where(LOW_LVL_ALPHA.ID.in(ids)
-                                        .and(LOW_LVL_ALPHA.IS_ACTIVE.in(EntityActiveType.trueEntityActiveTypes))
+                                        .and(LOW_LVL_ALPHA.ACTIVE_STATUS.in(EntityActiveType.trueEntityActiveTypes))
                                         .and(LOW_LVL_ALPHA.CREATED_TS.lessOrEqual(ts)))
                                 .groupBy(LOW_LVL_ALPHA.ID)
                                 .having(LOW_LVL_ALPHA.ID.eq(TOP_LVL_ALPHA.ID)
@@ -91,7 +91,7 @@ public class DbAlphaRepository implements AlphaRepository {
     @Override
     public void batchInsertNewEvents(List<AlphaEvent> events) {
         List<AlphaRecord> records = events.stream().map(this::covertToAlphaRecord).collect(Collectors.toList());
-        context.insertInto(ALPHA, ALPHA.ID, ALPHA.NAME, ALPHA.IS_ACTIVE, ALPHA.CREATED_TS)
+        context.insertInto(ALPHA, ALPHA.ID, ALPHA.NAME, ALPHA.ACTIVE_STATUS, ALPHA.CREATED_TS)
                 .valuesOfRecords(records)
                 .onDuplicateKeyIgnore()
                 .execute();

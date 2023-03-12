@@ -33,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Delta extends TableImpl<DeltaRecord> {
 
-    private static final long serialVersionUID = 228786371;
+    private static final long serialVersionUID = -977601581;
 
     /**
      * The reference instance of <code>public.delta</code>
@@ -59,9 +59,9 @@ public class Delta extends TableImpl<DeltaRecord> {
     public final TableField<DeltaRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false), this, "");
 
     /**
-     * The column <code>public.delta.is_active</code>.
+     * The column <code>public.delta.active_status</code>.
      */
-    public final TableField<DeltaRecord, String> IS_ACTIVE = createField(DSL.name("is_active"), org.jooq.impl.SQLDataType.VARCHAR(24).nullable(false), this, "");
+    public final TableField<DeltaRecord, String> ACTIVE_STATUS = createField(DSL.name("active_status"), org.jooq.impl.SQLDataType.VARCHAR(24).nullable(false), this, "");
 
     /**
      * The column <code>public.delta.created_ts</code>.

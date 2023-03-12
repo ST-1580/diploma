@@ -19,7 +19,7 @@ import org.jooq.impl.UpdatableRecordImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class BetaRecord extends UpdatableRecordImpl<BetaRecord> implements Record4<Long, Integer, String, Long> {
 
-    private static final long serialVersionUID = -1126283769;
+    private static final long serialVersionUID = 1418672239;
 
     /**
      * Setter for <code>public.beta.id</code>.
@@ -50,16 +50,16 @@ public class BetaRecord extends UpdatableRecordImpl<BetaRecord> implements Recor
     }
 
     /**
-     * Setter for <code>public.beta.is_active</code>.
+     * Setter for <code>public.beta.active_status</code>.
      */
-    public void setIsActive(String value) {
+    public void setActiveStatus(String value) {
         set(2, value);
     }
 
     /**
-     * Getter for <code>public.beta.is_active</code>.
+     * Getter for <code>public.beta.active_status</code>.
      */
-    public String getIsActive() {
+    public String getActiveStatus() {
         return (String) get(2);
     }
 
@@ -112,7 +112,7 @@ public class BetaRecord extends UpdatableRecordImpl<BetaRecord> implements Recor
 
     @Override
     public Field<String> field3() {
-        return Beta.BETA.IS_ACTIVE;
+        return Beta.BETA.ACTIVE_STATUS;
     }
 
     @Override
@@ -132,7 +132,7 @@ public class BetaRecord extends UpdatableRecordImpl<BetaRecord> implements Recor
 
     @Override
     public String component3() {
-        return getIsActive();
+        return getActiveStatus();
     }
 
     @Override
@@ -152,7 +152,7 @@ public class BetaRecord extends UpdatableRecordImpl<BetaRecord> implements Recor
 
     @Override
     public String value3() {
-        return getIsActive();
+        return getActiveStatus();
     }
 
     @Override
@@ -174,7 +174,7 @@ public class BetaRecord extends UpdatableRecordImpl<BetaRecord> implements Recor
 
     @Override
     public BetaRecord value3(String value) {
-        setIsActive(value);
+        setActiveStatus(value);
         return this;
     }
 
@@ -207,12 +207,12 @@ public class BetaRecord extends UpdatableRecordImpl<BetaRecord> implements Recor
     /**
      * Create a detached, initialised BetaRecord
      */
-    public BetaRecord(Long id, Integer epoch, String isActive, Long createdTs) {
+    public BetaRecord(Long id, Integer epoch, String activeStatus, Long createdTs) {
         super(Beta.BETA);
 
         set(0, id);
         set(1, epoch);
-        set(2, isActive);
+        set(2, activeStatus);
         set(3, createdTs);
     }
 }

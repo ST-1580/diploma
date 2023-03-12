@@ -33,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Alpha extends TableImpl<AlphaRecord> {
 
-    private static final long serialVersionUID = -144057967;
+    private static final long serialVersionUID = 1121680033;
 
     /**
      * The reference instance of <code>public.alpha</code>
@@ -59,9 +59,9 @@ public class Alpha extends TableImpl<AlphaRecord> {
     public final TableField<AlphaRecord, String> NAME = createField(DSL.name("name"), org.jooq.impl.SQLDataType.VARCHAR(100).nullable(false), this, "");
 
     /**
-     * The column <code>public.alpha.is_active</code>.
+     * The column <code>public.alpha.active_status</code>.
      */
-    public final TableField<AlphaRecord, String> IS_ACTIVE = createField(DSL.name("is_active"), org.jooq.impl.SQLDataType.VARCHAR(24).nullable(false), this, "");
+    public final TableField<AlphaRecord, String> ACTIVE_STATUS = createField(DSL.name("active_status"), org.jooq.impl.SQLDataType.VARCHAR(24).nullable(false), this, "");
 
     /**
      * The column <code>public.alpha.created_ts</code>.

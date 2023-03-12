@@ -6,11 +6,15 @@ import java.util.stream.Collectors;
 import com.st1580.diploma.collector.repository.types.EntityActiveType;
 import com.st1580.diploma.db.tables.Alpha;
 import com.st1580.diploma.db.tables.AlphaToBeta;
+import com.st1580.diploma.db.tables.Beta;
+import com.st1580.diploma.db.tables.Delta;
 import com.st1580.diploma.db.tables.Gamma;
 import com.st1580.diploma.db.tables.GammaToAlpha;
 import com.st1580.diploma.db.tables.GammaToDelta;
 import com.st1580.diploma.external.alpha.data.entity.ExternalAlphaEntity;
 import com.st1580.diploma.external.alpha.data.link.ExternalAlphaToBetaLink;
+import com.st1580.diploma.external.beta.data.ExternalBetaEntity;
+import com.st1580.diploma.external.delta.data.ExternalDeltaEntity;
 import com.st1580.diploma.external.gamma.data.entity.ExternalGammaEntity;
 import com.st1580.diploma.external.gamma.data.links.ga.ExternalGammaToAlphaLink;
 import com.st1580.diploma.external.gamma.data.links.gd.ExternalGammaToDeltaLink;
@@ -20,6 +24,8 @@ import org.springframework.stereotype.Repository;
 
 import static com.st1580.diploma.db.Tables.ALPHA;
 import static com.st1580.diploma.db.Tables.ALPHA_TO_BETA;
+import static com.st1580.diploma.db.Tables.BETA;
+import static com.st1580.diploma.db.Tables.DELTA;
 import static com.st1580.diploma.db.Tables.GAMMA;
 import static com.st1580.diploma.db.Tables.GAMMA_TO_ALPHA;
 import static com.st1580.diploma.db.Tables.GAMMA_TO_DELTA;
@@ -40,7 +46,7 @@ public class DbExternalServicesRepository implements ExternalServicesRepository 
                 .whereExists(
                         context.select(LOW_LVL_ALPHA.ID, max(LOW_LVL_ALPHA.CREATED_TS))
                                 .from(LOW_LVL_ALPHA)
-                                .where(LOW_LVL_ALPHA.IS_ACTIVE.in(EntityActiveType.trueEntityActiveTypes))
+                                .where(LOW_LVL_ALPHA.ACTIVE_STATUS.in(EntityActiveType.trueEntityActiveTypes))
                                 .groupBy(LOW_LVL_ALPHA.ID)
                                 .having(LOW_LVL_ALPHA.ID.eq(TOP_LVL_ALPHA.ID)
                                         .and(max(LOW_LVL_ALPHA.CREATED_TS).eq(TOP_LVL_ALPHA.CREATED_TS)))
@@ -50,7 +56,7 @@ public class DbExternalServicesRepository implements ExternalServicesRepository 
                 .map(record -> new ExternalAlphaEntity(
                         record.getId(),
                         record.getName(),
-                        record.getIsActive().endsWith("TRUE")
+                        record.getActiveStatus().endsWith("TRUE")
                 ))
                 .collect(Collectors.toList());
     }
@@ -83,6 +89,30 @@ public class DbExternalServicesRepository implements ExternalServicesRepository 
     }
 
     @Override
+    public List<ExternalBetaEntity> getAllBetaEntities() {
+        Beta TOP_LVL_BETA = BETA.as("top_lvl");
+        Beta LOW_LVL_BETA = BETA.as("low_lvl");
+
+        return context
+                .selectFrom(TOP_LVL_BETA)
+                .whereExists(
+                        context.select(LOW_LVL_BETA.ID, max(LOW_LVL_BETA.CREATED_TS))
+                                .from(LOW_LVL_BETA)
+                                .where(LOW_LVL_BETA.ACTIVE_STATUS.in(EntityActiveType.trueEntityActiveTypes))
+                                .groupBy(LOW_LVL_BETA.ID)
+                                .having(LOW_LVL_BETA.ID.eq(TOP_LVL_BETA.ID)
+                                        .and(max(LOW_LVL_BETA.CREATED_TS).eq(TOP_LVL_BETA.CREATED_TS)))
+                )
+                .fetch()
+                .stream()
+                .map(record -> new ExternalBetaEntity(
+                        record.getId(),
+                        record.getEpoch()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
     public List<ExternalGammaEntity> getAllGammaEntities() {
         Gamma TOP_LVL_GAMMA = GAMMA.as("top_lvl");
         Gamma LOW_LVL_GAMMA = GAMMA.as("low_lvl");
@@ -92,7 +122,7 @@ public class DbExternalServicesRepository implements ExternalServicesRepository 
                 .whereExists(
                         context.select(LOW_LVL_GAMMA.ID, max(LOW_LVL_GAMMA.CREATED_TS))
                                 .from(LOW_LVL_GAMMA)
-                                .where(LOW_LVL_GAMMA.IS_ACTIVE.in(EntityActiveType.trueEntityActiveTypes))
+                                .where(LOW_LVL_GAMMA.ACTIVE_STATUS.in(EntityActiveType.trueEntityActiveTypes))
                                 .groupBy(LOW_LVL_GAMMA.ID)
                                 .having(LOW_LVL_GAMMA.ID.eq(TOP_LVL_GAMMA.ID)
                                         .and(max(LOW_LVL_GAMMA.CREATED_TS).eq(TOP_LVL_GAMMA.CREATED_TS)))
@@ -103,7 +133,7 @@ public class DbExternalServicesRepository implements ExternalServicesRepository 
                         record.getId(),
                         record.getIsMaster(),
                         "random string number" + (int) (Math.random() * 10),
-                        record.getIsActive().endsWith("TRUE")
+                        record.getActiveStatus().endsWith("TRUE")
                 ))
                 .collect(Collectors.toList());
     }
@@ -157,6 +187,30 @@ public class DbExternalServicesRepository implements ExternalServicesRepository 
                         record.getGammaId(),
                         record.getDeltaId(),
                         record.getIsActive()
+                ))
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ExternalDeltaEntity> getAllDeltaEntities() {
+        Delta TOP_LVL_DELTA = DELTA.as("top_lvl");
+        Delta LOW_LVL_DELTA = DELTA.as("low_lvl");
+
+        return context
+                .selectFrom(TOP_LVL_DELTA)
+                .whereExists(
+                        context.select(LOW_LVL_DELTA.ID, max(LOW_LVL_DELTA.CREATED_TS))
+                                .from(LOW_LVL_DELTA)
+                                .where(LOW_LVL_DELTA.ACTIVE_STATUS.in(EntityActiveType.trueEntityActiveTypes))
+                                .groupBy(LOW_LVL_DELTA.ID)
+                                .having(LOW_LVL_DELTA.ID.eq(TOP_LVL_DELTA.ID)
+                                        .and(max(LOW_LVL_DELTA.CREATED_TS).eq(TOP_LVL_DELTA.CREATED_TS)))
+                )
+                .fetch()
+                .stream()
+                .map(record -> new ExternalDeltaEntity(
+                        record.getId(),
+                        record.getName()
                 ))
                 .collect(Collectors.toList());
     }

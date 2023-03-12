@@ -1,9 +1,16 @@
 package com.st1580.diploma.updater.service.impl;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import javax.inject.Inject;
 
 import com.st1580.diploma.collector.repository.BetaRepository;
+import com.st1580.diploma.external.beta.data.ExternalBetaEntityEvent;
+import com.st1580.diploma.external.delta.data.ExternalDeltaEntityEvent;
 import com.st1580.diploma.updater.caller.BetaCaller;
+import com.st1580.diploma.updater.events.BetaEvent;
+import com.st1580.diploma.updater.events.DeltaEvent;
 import com.st1580.diploma.updater.service.BetaUpdateService;
 import org.springframework.stereotype.Service;
 
@@ -16,22 +23,9 @@ public class BetaUpdateServiceImpl implements BetaUpdateService {
 
     @Override
     public void updateBetaEntity(long tsFrom, long tsTo) {
-//        List<BetaEntityEvent> events = betaCaller.getBetaEntityEvents(tsFrom, tsTo);
-//
-//        for (BetaEntityEvent event : events) {
-//            switch (event.getType()) {
-//                case 'c':
-//                    betaRepository.insert(new BetaEntity(event.getEntity()));
-//                    break;
-//                case 'u':
-//                    betaRepository.update(new BetaEntity(event.getEntity()));
-//                    break;
-//                case 'd':
-//                    betaRepository.delete(event.getEntityId());
-//                    break;
-//                default:
-//                    throw new IllegalArgumentException("Beta event type must be 'c', 'u' or 'd'");
-//            }
-//        }
+        List<ExternalBetaEntityEvent> events = betaCaller.getBetaEntityEvents(tsFrom, tsTo);
+        List<BetaEvent> parsedBetaEvents = events.stream().map(BetaEvent::new).collect(Collectors.toList());
+
+        betaRepository.batchInsertNewEvents(parsedBetaEvents);
     }
 }
