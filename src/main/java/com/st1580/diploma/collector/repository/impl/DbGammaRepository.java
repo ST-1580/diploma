@@ -1,5 +1,6 @@
 package com.st1580.diploma.collector.repository.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -46,8 +47,8 @@ public class DbGammaRepository implements GammaRepository {
                         context.select(LOW_LVL_GAMMA.ID, max(LOW_LVL_GAMMA.CREATED_TS))
                                 .from(LOW_LVL_GAMMA)
                                 .where(LOW_LVL_GAMMA.ID.in(ids)
-                                        .and(LOW_LVL_GAMMA.ACTIVE_STATUS.in(EntityActiveType.trueEntityActiveTypes))
-                                        .and(LOW_LVL_GAMMA.CREATED_TS.lessOrEqual(ts)))
+                                        .and(LOW_LVL_GAMMA.CREATED_TS.lessOrEqual(ts))
+                                        .and(LOW_LVL_GAMMA.ACTIVE_STATUS.in(EntityActiveType.trueEntityActiveTypes)))
                                 .groupBy(LOW_LVL_GAMMA.ID)
                                 .having(LOW_LVL_GAMMA.ID.eq(TOP_LVL_GAMMA.ID)
                                         .and(max(LOW_LVL_GAMMA.CREATED_TS).eq(TOP_LVL_GAMMA.CREATED_TS)))
@@ -97,9 +98,19 @@ public class DbGammaRepository implements GammaRepository {
                 .execute();
     }
 
+    @Override
+    public List<List<GammaEvent>> getActiveStatusChangedEventsInRange(long tsFrom, long tsTo) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public void correctDependentLinks(long tsFrom, long tsTo) {
+
+    }
+
     private GammaRecord convertToGammaRecord(GammaEvent event) {
         return new GammaRecord(
-                event.getId(),
+                event.getGammaId(),
                 event.isMaster(),
                 event.getType().name(),
                 event.getCreatedTs()

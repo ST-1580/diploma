@@ -7,20 +7,20 @@ import com.st1580.diploma.external.gamma.data.GammaEventType;
 import com.st1580.diploma.external.gamma.data.entity.ExternalGammaEntityEvent;
 
 public class GammaEvent {
-    private final long id;
+    private final long gammaId;
     private final boolean isMaster;
     private final EntityActiveType type;
     private final long createdTs;
 
-    public GammaEvent(long id, boolean isMaster, EntityActiveType type, long createdTs) {
-        this.id = id;
+    public GammaEvent(long gammaId, boolean isMaster, EntityActiveType type, long createdTs) {
+        this.gammaId = gammaId;
         this.isMaster = isMaster;
         this.type = type;
         this.createdTs = createdTs;
     }
 
     public GammaEvent(ExternalGammaEntityEvent event) {
-        this.id = event.getEntity().getId();
+        this.gammaId = event.getEntity().getId();
         this.isMaster = event.getEntity().isMaster();
         this.type = parseTypeFromExternalEvent(event.getType());
         this.createdTs = event.getEventTs();
@@ -40,8 +40,8 @@ public class GammaEvent {
         throw new IllegalArgumentException("Wrong GammaEventType");
     }
 
-    public long getId() {
-        return id;
+    public long getGammaId() {
+        return gammaId;
     }
 
     public boolean isMaster() {
@@ -65,11 +65,11 @@ public class GammaEvent {
             return false;
         }
         GammaEvent that = (GammaEvent) o;
-        return id == that.id && isMaster == that.isMaster && createdTs == that.createdTs && type == that.type;
+        return gammaId == that.gammaId && isMaster == that.isMaster && createdTs == that.createdTs && type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, isMaster, type, createdTs);
+        return Objects.hash(gammaId, isMaster, type, createdTs);
     }
 }

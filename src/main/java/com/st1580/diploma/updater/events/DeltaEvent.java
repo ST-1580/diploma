@@ -7,20 +7,20 @@ import com.st1580.diploma.external.delta.data.DeltaEventType;
 import com.st1580.diploma.external.delta.data.ExternalDeltaEntityEvent;
 
 public class DeltaEvent {
-    private final long id;
+    private final long deltaId;
     private final String name;
     private final EntityActiveType type;
     private final long createdTs;
 
-    public DeltaEvent(long id, String name, EntityActiveType type, long createdTs) {
-        this.id = id;
+    public DeltaEvent(long deltaId, String name, EntityActiveType type, long createdTs) {
+        this.deltaId = deltaId;
         this.name = name;
         this.type = type;
         this.createdTs = createdTs;
     }
 
     public DeltaEvent(ExternalDeltaEntityEvent event) {
-        this.id = event.getEntity().getId();
+        this.deltaId = event.getEntity().getId();
         this.name = event.getEntity().getName();
         this.type = parseTypeFromExternalEvent(event.getType());
         this.createdTs = event.getEventTs();
@@ -39,8 +39,8 @@ public class DeltaEvent {
     }
 
 
-    public long getId() {
-        return id;
+    public long getDeltaId() {
+        return deltaId;
     }
 
     public String getName() {
@@ -64,11 +64,11 @@ public class DeltaEvent {
             return false;
         }
         DeltaEvent that = (DeltaEvent) o;
-        return id == that.id && createdTs == that.createdTs && Objects.equals(name, that.name) && type == that.type;
+        return deltaId == that.deltaId && createdTs == that.createdTs && Objects.equals(name, that.name) && type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, type, createdTs);
+        return Objects.hash(deltaId, name, type, createdTs);
     }
 }

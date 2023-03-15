@@ -7,4 +7,4 @@ create table Alpha (
 
 alter table Alpha add constraint "alpha__pkey" primary key (id, created_ts);
 
-create unique index if not exists "alpha_active__index" on Alpha (id, active_status, created_ts);
+create unique index if not exists "alpha_active__index" on Alpha (id, created_ts, active_status);

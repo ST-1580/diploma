@@ -1,5 +1,6 @@
 package com.st1580.diploma.collector.repository.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -16,14 +17,12 @@ import com.st1580.diploma.collector.repository.DeltaRepository;
 import com.st1580.diploma.collector.repository.GammaToDeltaRepository;
 import com.st1580.diploma.collector.repository.types.EntityActiveType;
 import com.st1580.diploma.db.tables.Delta;
-import com.st1580.diploma.db.tables.records.AlphaRecord;
 import com.st1580.diploma.db.tables.records.DeltaRecord;
 import com.st1580.diploma.updater.events.DeltaEvent;
 import org.jooq.DSLContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import static com.st1580.diploma.db.Tables.ALPHA;
 import static com.st1580.diploma.db.Tables.DELTA;
 import static org.jooq.impl.DSL.max;
 
@@ -46,8 +45,8 @@ public class DbDeltaRepository implements DeltaRepository {
                         context.select(LOW_LVL_DELTA.ID, max(LOW_LVL_DELTA.CREATED_TS))
                                 .from(LOW_LVL_DELTA)
                                 .where(LOW_LVL_DELTA.ID.in(ids)
-                                        .and(LOW_LVL_DELTA.ACTIVE_STATUS.in(EntityActiveType.trueEntityActiveTypes))
-                                        .and(LOW_LVL_DELTA.CREATED_TS.lessOrEqual(ts)))
+                                        .and(LOW_LVL_DELTA.CREATED_TS.lessOrEqual(ts))
+                                        .and(LOW_LVL_DELTA.ACTIVE_STATUS.in(EntityActiveType.trueEntityActiveTypes)))
                                 .groupBy(LOW_LVL_DELTA.ID)
                                 .having(LOW_LVL_DELTA.ID.eq(TOP_LVL_DELTA.ID)
                                         .and(max(LOW_LVL_DELTA.CREATED_TS).eq(TOP_LVL_DELTA.CREATED_TS)))
@@ -94,9 +93,19 @@ public class DbDeltaRepository implements DeltaRepository {
                 .execute();
     }
 
+    @Override
+    public List<List<DeltaEvent>> getActiveStatusChangedEventsInRange(long tsFrom, long tsTo) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public void correctDependentLinks(long tsFrom, long tsTo) {
+
+    }
+
     private DeltaRecord covertToDeltaRecord(DeltaEvent event) {
         return new DeltaRecord(
-                event.getId(),
+                event.getDeltaId(),
                 event.getName(),
                 event.getType().name(),
                 event.getCreatedTs()

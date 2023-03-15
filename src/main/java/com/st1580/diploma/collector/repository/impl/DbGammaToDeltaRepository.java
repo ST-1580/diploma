@@ -9,6 +9,8 @@ import com.st1580.diploma.collector.graph.links.GammaToDeltaLink;
 import com.st1580.diploma.collector.repository.GammaToDeltaRepository;
 import com.st1580.diploma.db.tables.GammaToDelta;
 import com.st1580.diploma.db.tables.records.GammaToDeltaRecord;
+import com.st1580.diploma.updater.events.DeltaEvent;
+import com.st1580.diploma.updater.events.GammaEvent;
 import com.st1580.diploma.updater.events.GammaToDeltaEvent;
 import org.jooq.DSLContext;
 import org.jooq.Row4;
@@ -30,8 +32,8 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
                 .select(GAMMA_TO_DELTA.GAMMA_ID, GAMMA_TO_DELTA.DELTA_ID, max(GAMMA_TO_DELTA.CREATED_TS))
                 .from(GAMMA_TO_DELTA)
                 .where(GAMMA_TO_DELTA.DELTA_ID.in(deltaIds)
-                        .and(GAMMA_TO_DELTA.CAN_USE)
-                        .and(GAMMA_TO_DELTA.CREATED_TS.lessOrEqual(ts)))
+                        .and(GAMMA_TO_DELTA.CREATED_TS.lessOrEqual(ts))
+                        .and(GAMMA_TO_DELTA.CAN_USE))
                 .groupBy(GAMMA_TO_DELTA.GAMMA_ID, GAMMA_TO_DELTA.DELTA_ID)
                 .fetchGroups(GAMMA_TO_DELTA.DELTA_ID, GAMMA_TO_DELTA.GAMMA_ID);
     }
@@ -47,8 +49,8 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
                         .select(LOW_LVL_GD.GAMMA_ID, LOW_LVL_GD.DELTA_ID, max(LOW_LVL_GD.CREATED_TS))
                         .from(LOW_LVL_GD)
                         .where(LOW_LVL_GD.DELTA_ID.in(deltaIds)
-                                .and(LOW_LVL_GD.CAN_USE)
-                                .and(LOW_LVL_GD.CREATED_TS.lessOrEqual(ts)))
+                                .and(LOW_LVL_GD.CREATED_TS.lessOrEqual(ts))
+                                .and(LOW_LVL_GD.CAN_USE))
                         .groupBy(LOW_LVL_GD.GAMMA_ID, LOW_LVL_GD.DELTA_ID)
                         .having(LOW_LVL_GD.GAMMA_ID.eq(TOP_LVL_GD.GAMMA_ID)
                                 .and(LOW_LVL_GD.DELTA_ID.eq(TOP_LVL_GD.DELTA_ID))
@@ -66,8 +68,8 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
                 .select(GAMMA_TO_DELTA.GAMMA_ID, GAMMA_TO_DELTA.DELTA_ID, max(GAMMA_TO_DELTA.CREATED_TS))
                 .from(GAMMA_TO_DELTA)
                 .where(GAMMA_TO_DELTA.GAMMA_ID.in(gammaIds)
-                        .and(GAMMA_TO_DELTA.CAN_USE)
-                        .and(GAMMA_TO_DELTA.CREATED_TS.lessOrEqual(ts)))
+                        .and(GAMMA_TO_DELTA.CREATED_TS.lessOrEqual(ts))
+                        .and(GAMMA_TO_DELTA.CAN_USE))
                 .groupBy(GAMMA_TO_DELTA.GAMMA_ID, GAMMA_TO_DELTA.DELTA_ID)
                 .fetchGroups(GAMMA_TO_DELTA.GAMMA_ID, GAMMA_TO_DELTA.DELTA_ID);
     }
@@ -83,8 +85,8 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
                         .select(LOW_LVL_GD.GAMMA_ID, LOW_LVL_GD.DELTA_ID, max(LOW_LVL_GD.CREATED_TS))
                         .from(LOW_LVL_GD)
                         .where(LOW_LVL_GD.GAMMA_ID.in(gammaIds)
-                                .and(LOW_LVL_GD.CAN_USE)
-                                .and(LOW_LVL_GD.CREATED_TS.lessOrEqual(ts)))
+                                .and(LOW_LVL_GD.CREATED_TS.lessOrEqual(ts))
+                                .and(LOW_LVL_GD.CAN_USE))
                         .groupBy(LOW_LVL_GD.GAMMA_ID, LOW_LVL_GD.DELTA_ID)
                         .having(LOW_LVL_GD.GAMMA_ID.eq(TOP_LVL_GD.GAMMA_ID)
                                 .and(LOW_LVL_GD.DELTA_ID.eq(TOP_LVL_GD.DELTA_ID))
@@ -105,6 +107,11 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
                 .valuesOfRows(rows)
                 .onDuplicateKeyIgnore()
                 .execute();
+    }
+
+    @Override
+    public void addLinkEventsTriggeredByEntitiesUpdate(List<List<GammaEvent>> gammaEvents, List<List<DeltaEvent>> deltaEvents) {
+
     }
 
     private Row4<Long, Long, Boolean, Long> covertToRow(GammaToDeltaEvent event) {

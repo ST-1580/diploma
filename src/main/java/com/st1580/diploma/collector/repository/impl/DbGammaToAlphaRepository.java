@@ -1,5 +1,6 @@
 package com.st1580.diploma.collector.repository.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,9 @@ import com.st1580.diploma.collector.graph.links.GammaToAlphaLink;
 import com.st1580.diploma.collector.repository.GammaToAlphaRepository;
 import com.st1580.diploma.db.tables.GammaToAlpha;
 import com.st1580.diploma.db.tables.records.GammaToAlphaRecord;
+import com.st1580.diploma.updater.events.AlphaEvent;
+import com.st1580.diploma.updater.events.EntityEvent;
+import com.st1580.diploma.updater.events.GammaEvent;
 import com.st1580.diploma.updater.events.GammaToAlphaEvent;
 import org.jooq.DSLContext;
 import org.jooq.Row5;
@@ -30,8 +34,8 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
                 .select(GAMMA_TO_ALPHA.GAMMA_ID, GAMMA_TO_ALPHA.ALPHA_ID, max(GAMMA_TO_ALPHA.CREATED_TS))
                 .from(GAMMA_TO_ALPHA)
                 .where(GAMMA_TO_ALPHA.ALPHA_ID.in(alphaIds)
-                        .and(GAMMA_TO_ALPHA.CAN_USE)
-                        .and(GAMMA_TO_ALPHA.CREATED_TS.lessOrEqual(ts)))
+                        .and(GAMMA_TO_ALPHA.CREATED_TS.lessOrEqual(ts))
+                        .and(GAMMA_TO_ALPHA.CAN_USE))
                 .groupBy(GAMMA_TO_ALPHA.GAMMA_ID, GAMMA_TO_ALPHA.ALPHA_ID)
                 .fetchGroups(GAMMA_TO_ALPHA.ALPHA_ID, GAMMA_TO_ALPHA.GAMMA_ID);
     }
@@ -47,8 +51,8 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
                         .select(LOW_LVL_GA.GAMMA_ID, LOW_LVL_GA.ALPHA_ID, max(LOW_LVL_GA.CREATED_TS))
                         .from(LOW_LVL_GA)
                         .where(LOW_LVL_GA.ALPHA_ID.in(alphaIds)
-                                .and(LOW_LVL_GA.CAN_USE)
-                                .and(LOW_LVL_GA.CREATED_TS.lessOrEqual(ts)))
+                                .and(LOW_LVL_GA.CREATED_TS.lessOrEqual(ts))
+                                .and(LOW_LVL_GA.CAN_USE))
                         .groupBy(LOW_LVL_GA.GAMMA_ID, LOW_LVL_GA.ALPHA_ID)
                         .having(LOW_LVL_GA.GAMMA_ID.eq(TOP_LVL_GA.GAMMA_ID)
                                 .and(LOW_LVL_GA.ALPHA_ID.eq(TOP_LVL_GA.ALPHA_ID))
@@ -66,8 +70,8 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
                 .select(GAMMA_TO_ALPHA.GAMMA_ID, GAMMA_TO_ALPHA.ALPHA_ID, max(GAMMA_TO_ALPHA.CREATED_TS))
                 .from(GAMMA_TO_ALPHA)
                 .where(GAMMA_TO_ALPHA.GAMMA_ID.in(gammaIds)
-                        .and(GAMMA_TO_ALPHA.CAN_USE)
-                        .and(GAMMA_TO_ALPHA.CREATED_TS.lessOrEqual(ts)))
+                        .and(GAMMA_TO_ALPHA.CREATED_TS.lessOrEqual(ts))
+                        .and(GAMMA_TO_ALPHA.CAN_USE))
                 .groupBy(GAMMA_TO_ALPHA.GAMMA_ID, GAMMA_TO_ALPHA.ALPHA_ID)
                 .fetchGroups(GAMMA_TO_ALPHA.GAMMA_ID, GAMMA_TO_ALPHA.ALPHA_ID);
     }
@@ -83,8 +87,8 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
                         .select(LOW_LVL_GA.GAMMA_ID, LOW_LVL_GA.ALPHA_ID, max(LOW_LVL_GA.CREATED_TS))
                         .from(LOW_LVL_GA)
                         .where(LOW_LVL_GA.GAMMA_ID.in(gammaIds)
-                                .and(LOW_LVL_GA.CAN_USE)
-                                .and(LOW_LVL_GA.CREATED_TS.lessOrEqual(ts)))
+                                .and(LOW_LVL_GA.CREATED_TS.lessOrEqual(ts))
+                                .and(LOW_LVL_GA.CAN_USE))
                         .groupBy(LOW_LVL_GA.GAMMA_ID, LOW_LVL_GA.ALPHA_ID)
                         .having(LOW_LVL_GA.GAMMA_ID.eq(TOP_LVL_GA.GAMMA_ID)
                                 .and(LOW_LVL_GA.ALPHA_ID.eq(TOP_LVL_GA.ALPHA_ID))
@@ -105,6 +109,21 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
                 .valuesOfRows(rows)
                 .onDuplicateKeyIgnore()
                 .execute();
+    }
+
+    @Override
+    public void addLinkEventsTriggeredByEntitiesUpdate(List<List<GammaEvent>> gammaEvents, List<List<AlphaEvent>> alphaEvents) {
+
+    }
+
+    @Override
+    public List<EntityEvent> getUndefinedAlphaStateInRange(long tsFrom, long tsTo) {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public void batchUpdateLinksDependentOnAlpha(Map<EntityEvent, Boolean> alphaActiveStatusByEvent) {
+
     }
 
     private Row5<Long, Long, Long, Boolean, Long> covertToRow(GammaToAlphaEvent event) {

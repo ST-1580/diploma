@@ -7,4 +7,4 @@ create table Gamma (
 
 alter table Gamma add constraint "gamma__pkey" primary key (id, created_ts);
 
-create unique index if not exists "gamma_active__index" on Gamma (id, active_status, created_ts);
+create unique index if not exists "gamma_active__index" on Gamma (id, created_ts, active_status);

@@ -10,9 +10,13 @@ create table Gamma_to_Delta (
 
 alter table Gamma_to_Delta add constraint "gamma_to_delta__pkey" primary key (gamma_id, delta_id, created_ts);
 
-create index if not exists "gd_gamma_can_use__index" on Gamma_to_Delta (gamma_id, can_use, created_ts);
+create index if not exists "gd_gamma_can_use__index" on Gamma_to_Delta (gamma_id, created_ts, can_use);
 
-create index if not exists "gd_delta_can_use__index" on Gamma_to_Delta (delta_id, can_use, created_ts);
+create index if not exists "gd_delta_can_use__index" on Gamma_to_Delta (delta_id, created_ts, can_use);
+
+create index if not exists "gd_gamma_is_active__index" on Gamma_to_Delta (created_ts, is_active_gamma);
+
+create index if not exists "gd_delta_is_active__index" on Gamma_to_Delta (created_ts, is_active_delta);
 
 
 create or replace function fill_gd_can_use ()

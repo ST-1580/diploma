@@ -33,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class AlphaToBeta extends TableImpl<AlphaToBetaRecord> {
 
-    private static final long serialVersionUID = 1397388746;
+    private static final long serialVersionUID = 603787596;
 
     /**
      * The reference instance of <code>public.alpha_to_beta</code>
@@ -128,7 +128,7 @@ public class AlphaToBeta extends TableImpl<AlphaToBetaRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.AB_ALPHA_CAN_USE__INDEX, Indexes.AB_BETA_CAN_USE__INDEX);
+        return Arrays.<Index>asList(Indexes.AB_ALPHA_CAN_USE__INDEX, Indexes.AB_ALPHA_IS_ACTIVE__INDEX, Indexes.AB_BETA_CAN_USE__INDEX, Indexes.AB_BETA_IS_ACTIVE__INDEX);
     }
 
     @Override

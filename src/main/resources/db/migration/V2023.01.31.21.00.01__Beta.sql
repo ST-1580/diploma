@@ -7,4 +7,4 @@ create table Beta (
 
 alter table Beta add constraint "beta__pkey" primary key (id, created_ts);
 
-create unique index if not exists "beta_active__index" on Beta (id, active_status, created_ts);
+create unique index if not exists "beta_active__index" on Beta (id, created_ts, active_status);

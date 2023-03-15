@@ -33,7 +33,7 @@ import org.jooq.impl.TableImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class GammaToDelta extends TableImpl<GammaToDeltaRecord> {
 
-    private static final long serialVersionUID = 1749958280;
+    private static final long serialVersionUID = -1392095457;
 
     /**
      * The reference instance of <code>public.gamma_to_delta</code>
@@ -123,7 +123,7 @@ public class GammaToDelta extends TableImpl<GammaToDeltaRecord> {
 
     @Override
     public List<Index> getIndexes() {
-        return Arrays.<Index>asList(Indexes.GD_DELTA_CAN_USE__INDEX, Indexes.GD_GAMMA_CAN_USE__INDEX);
+        return Arrays.<Index>asList(Indexes.GD_DELTA_CAN_USE__INDEX, Indexes.GD_DELTA_IS_ACTIVE__INDEX, Indexes.GD_GAMMA_CAN_USE__INDEX, Indexes.GD_GAMMA_IS_ACTIVE__INDEX);
     }
 
     @Override

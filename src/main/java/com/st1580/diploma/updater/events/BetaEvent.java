@@ -6,20 +6,20 @@ import com.st1580.diploma.collector.repository.types.EntityActiveType;
 import com.st1580.diploma.external.beta.data.ExternalBetaEntityEvent;
 
 public class BetaEvent {
-    private final long id;
+    private final long betaId;
     private final int epoch;
     private final EntityActiveType type;
     private final long createdTs;
 
-    public BetaEvent(long id, int epoch, EntityActiveType type, long createdTs) {
-        this.id = id;
+    public BetaEvent(long betaId, int epoch, EntityActiveType type, long createdTs) {
+        this.betaId = betaId;
         this.epoch = epoch;
         this.type = type;
         this.createdTs = createdTs;
     }
 
     public BetaEvent(ExternalBetaEntityEvent event) {
-        this.id = event.getEntity().getId();
+        this.betaId = event.getEntity().getId();
         this.epoch = event.getEntity().getEpoch();
         this.type = parseTypeFromExternalEvent(event.getType());
         this.createdTs = event.getEventTs();
@@ -37,8 +37,8 @@ public class BetaEvent {
         throw new IllegalArgumentException("Wrong beta event type");
     }
 
-    public long getId() {
-        return id;
+    public long getBetaId() {
+        return betaId;
     }
 
     public int getEpoch() {
@@ -54,12 +54,12 @@ public class BetaEvent {
             return false;
         }
         BetaEvent betaEvent = (BetaEvent) o;
-        return id == betaEvent.id && epoch == betaEvent.epoch && createdTs == betaEvent.createdTs && type == betaEvent.type;
+        return betaId == betaEvent.betaId && epoch == betaEvent.epoch && createdTs == betaEvent.createdTs && type == betaEvent.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, epoch, type, createdTs);
+        return Objects.hash(betaId, epoch, type, createdTs);
     }
 
     public EntityActiveType getType() {

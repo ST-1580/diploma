@@ -11,10 +11,13 @@ create table Alpha_to_Beta (
 
 alter table Alpha_to_Beta add constraint "alpha_to_beta__pkey" primary key (alpha_id, beta_id, created_ts);
 
-create index if not exists "ab_alpha_can_use__index" on Alpha_to_Beta (alpha_id, can_use, created_ts);
+create index if not exists "ab_alpha_can_use__index" on Alpha_to_Beta (alpha_id, created_ts, can_use);
 
-create index if not exists "ab_beta_can_use__index" on Alpha_to_Beta (beta_id, can_use, created_ts);
+create index if not exists "ab_beta_can_use__index" on Alpha_to_Beta (beta_id, created_ts, can_use);
 
+create index if not exists "ab_alpha_is_active__index" on Alpha_to_Beta (created_ts, is_active_alpha);
+
+create index if not exists "ab_beta_is_active__index" on Alpha_to_Beta (created_ts, is_active_beta);
 
 create or replace function fill_ab_can_use ()
     returns trigger language plpgsql as $$

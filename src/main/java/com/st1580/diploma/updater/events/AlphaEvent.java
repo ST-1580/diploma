@@ -7,20 +7,20 @@ import com.st1580.diploma.external.alpha.data.AlphaEventType;
 import com.st1580.diploma.external.alpha.data.entity.ExternalAlphaEntityEvent;
 
 public class AlphaEvent {
-    private final long id;
+    private final long alphaId;
     private final String name;
     private final EntityActiveType type;
     private final long createdTs;
 
-    public AlphaEvent(long id, String name, EntityActiveType type, long createdTs) {
-        this.id = id;
+    public AlphaEvent(long alphaId, String name, EntityActiveType type, long createdTs) {
+        this.alphaId = alphaId;
         this.name = name;
         this.type = type;
         this.createdTs = createdTs;
     }
 
     public AlphaEvent(ExternalAlphaEntityEvent event) {
-        this.id = event.getEntity().getId();
+        this.alphaId = event.getEntity().getId();
         this.name = event.getEntity().getName();
         this.type = parseTypeFromExternalEvent(event.getType());
         this.createdTs = event.getEventTs();
@@ -40,8 +40,8 @@ public class AlphaEvent {
         throw new IllegalArgumentException("Wrong AlphaEventType");
     }
 
-    public long getId() {
-        return id;
+    public long getAlphaId() {
+        return alphaId;
     }
 
     public String getName() {
@@ -65,11 +65,11 @@ public class AlphaEvent {
             return false;
         }
         AlphaEvent that = (AlphaEvent) o;
-        return id == that.id && createdTs == that.createdTs && Objects.equals(name, that.name) && type == that.type;
+        return alphaId == that.alphaId && createdTs == that.createdTs && Objects.equals(name, that.name) && type == that.type;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, type, createdTs);
+        return Objects.hash(alphaId, name, type, createdTs);
     }
 }
