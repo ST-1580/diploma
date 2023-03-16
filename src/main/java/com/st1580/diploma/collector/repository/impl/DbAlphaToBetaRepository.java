@@ -5,9 +5,12 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.st1580.diploma.collector.graph.links.AlphaToBetaLink;
+import com.st1580.diploma.collector.graph.links.GammaToAlphaLink;
 import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
 import com.st1580.diploma.collector.repository.types.EntityActiveType;
 import com.st1580.diploma.collector.repository.types.LinkEndActivityType;
@@ -24,12 +27,11 @@ import org.jooq.Row5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import static com.st1580.diploma.db.Tables.ALPHA;
 import static com.st1580.diploma.db.Tables.ALPHA_TO_BETA;
+import static com.st1580.diploma.db.Tables.GAMMA_TO_ALPHA;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.noCondition;
 import static org.jooq.impl.DSL.row;
-import static org.jooq.impl.DSL.update;
 
 @Repository
 public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
@@ -40,48 +42,67 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
 
     @Override
     public Map<Long, List<Long>> getConnectedBetaEntitiesIdsByAlphaIds(Collection<Long> alphaIds, long ts) {
-        return context
-                .select(ALPHA_TO_BETA.ALPHA_ID, ALPHA_TO_BETA.BETA_ID, max(ALPHA_TO_BETA.CREATED_TS))
+        Condition condition = ALPHA_TO_BETA.ALPHA_ID.in(alphaIds)
+                .and(ALPHA_TO_BETA.CREATED_TS.lessOrEqual(ts));
+
+        return getActualLinks(condition)
+                .collect(Collectors.groupingBy(AlphaToBetaLink::getAlphaId,
+                        Collectors.mapping(AlphaToBetaLink::getBetaId, Collectors.toList())));
+    }
+
+    @Override
+    public Map<Long, List<Long>> getConnectedAlphaEntitiesIdsByBetaIds(Collection<Long> betaIds, long ts) {
+        Condition condition = ALPHA_TO_BETA.BETA_ID.in(betaIds)
+                .and(ALPHA_TO_BETA.CREATED_TS.lessOrEqual(ts));
+
+        return getActualLinks(condition)
+                .collect(Collectors.groupingBy(AlphaToBetaLink::getBetaId,
+                Collectors.mapping(AlphaToBetaLink::getAlphaId, Collectors.toList())));
+    }
+
+    private Stream<AlphaToBetaLink> getActualLinks(Condition condition) {
+        Map<AlphaToBetaLink, Boolean> usabilityHelper = new HashMap<>();
+
+        context.select(ALPHA_TO_BETA.ALPHA_ID, ALPHA_TO_BETA.BETA_ID,
+                        ALPHA_TO_BETA.CAN_USE, max(ALPHA_TO_BETA.CREATED_TS))
                 .from(ALPHA_TO_BETA)
-                .where(ALPHA_TO_BETA.ALPHA_ID.in(alphaIds)
-                        .and(ALPHA_TO_BETA.CREATED_TS.lessOrEqual(ts))
-                        .and(ALPHA_TO_BETA.CAN_USE))
-                .groupBy(ALPHA_TO_BETA.ALPHA_ID, ALPHA_TO_BETA.BETA_ID)
-                .fetchGroups(ALPHA_TO_BETA.ALPHA_ID, ALPHA_TO_BETA.BETA_ID);
+                .where(condition)
+                .groupBy(ALPHA_TO_BETA.ALPHA_ID, ALPHA_TO_BETA.BETA_ID, ALPHA_TO_BETA.CAN_USE)
+                .orderBy(max(ALPHA_TO_BETA.CREATED_TS))
+                .fetch()
+                .forEach(record -> {
+                    AlphaToBetaLink currIds = new AlphaToBetaLink(
+                            record.get(0, Long.class),
+                            record.get(1, Long.class),
+                            null);
+                    usabilityHelper.put(currIds, record.get(2, Boolean.class));
+                });
+
+        return usabilityHelper.entrySet().stream()
+                .filter(Map.Entry::getValue)
+                .map(Map.Entry::getKey);
     }
 
     @Override
     public Map<Long, List<AlphaToBetaLink>> getConnectedBetaEntitiesByAlphaIds(Collection<Long> alphaIds, long ts) {
         Condition condition = LOW_LVL_AB.ALPHA_ID.in(alphaIds)
-                .and(LOW_LVL_AB.CREATED_TS.lessOrEqual(ts)
-                .and(LOW_LVL_AB.CAN_USE));
+                .and(LOW_LVL_AB.CREATED_TS.lessOrEqual(ts));
 
         return getABRecordByCondition(condition)
                 .stream()
+                .filter(AlphaToBetaRecord::getCanUse)
                 .map(this::convertToLink)
                 .collect(Collectors.groupingBy(AlphaToBetaLink::getAlphaId));
     }
 
     @Override
-    public Map<Long, List<Long>> getConnectedAlphaEntitiesIdsByBetaIds(Collection<Long> betaIds, long ts) {
-        return context
-                .select(ALPHA_TO_BETA.ALPHA_ID, ALPHA_TO_BETA.BETA_ID, max(ALPHA_TO_BETA.CREATED_TS))
-                .from(ALPHA_TO_BETA)
-                .where(ALPHA_TO_BETA.BETA_ID.in(betaIds)
-                        .and(ALPHA_TO_BETA.CREATED_TS.lessOrEqual(ts))
-                        .and(ALPHA_TO_BETA.CAN_USE))
-                .groupBy(ALPHA_TO_BETA.ALPHA_ID, ALPHA_TO_BETA.BETA_ID)
-                .fetchGroups(ALPHA_TO_BETA.BETA_ID, ALPHA_TO_BETA.ALPHA_ID);
-    }
-
-    @Override
     public Map<Long, List<AlphaToBetaLink>> getConnectedAlphaEntitiesByBetaIds(Collection<Long> betaIds, long ts) {
         Condition condition = LOW_LVL_AB.BETA_ID.in(betaIds)
-                .and(LOW_LVL_AB.CREATED_TS.lessOrEqual(ts)
-                .and(LOW_LVL_AB.CAN_USE));
+                .and(LOW_LVL_AB.CREATED_TS.lessOrEqual(ts));
 
         return getABRecordByCondition(condition)
                 .stream()
+                .filter(AlphaToBetaRecord::getCanUse)
                 .map(this::convertToLink)
                 .collect(Collectors.groupingBy(AlphaToBetaLink::getBetaId));
     }
@@ -89,7 +110,7 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
     @Override
     public void batchInsertNewEvents(List<AlphaToBetaEvent> events) {
         List<Row5<Long, Long, String, Boolean, Long>> rows =
-                events.stream().map(this::covertToRow).collect(Collectors.toList());
+                events.stream().map(this::covertToRecord).collect(Collectors.toList());
         context.insertInto(ALPHA_TO_BETA, ALPHA_TO_BETA.ALPHA_ID, ALPHA_TO_BETA.BETA_ID,
                         ALPHA_TO_BETA.HASH, ALPHA_TO_BETA.IS_ACTIVE, ALPHA_TO_BETA.CREATED_TS)
                 .valuesOfRows(rows)
@@ -98,8 +119,8 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
     }
 
     @Override
-    public void addLinkEventsTriggeredByEntitiesUpdate(List<List<AlphaEvent>> batchedAlphaEvents,
-                                                       List<List<BetaEvent>> batchedBetaEvents) {
+    public void addLinkEventsTriggeredByEntitiesUpdate(List<Set<AlphaEvent>> batchedAlphaEvents,
+                                                       List<Set<BetaEvent>> batchedBetaEvents) {
         Map<AlphaEvent, List<AlphaToBetaRecord>> ABLinksByAlphaEntity = getActualLinksForAlpha(batchedAlphaEvents);
         Map<BetaEvent, List<AlphaToBetaRecord>> ABLinksByBetaEntity = getActualLinksForBeta(batchedBetaEvents);
 
@@ -147,10 +168,10 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
                 .execute();
     }
 
-    private Map<AlphaEvent, List<AlphaToBetaRecord>> getActualLinksForAlpha(List<List<AlphaEvent>> batchedAlphaEvents) {
+    private Map<AlphaEvent, List<AlphaToBetaRecord>> getActualLinksForAlpha(List<Set<AlphaEvent>> batchedAlphaEvents) {
         Map<AlphaEvent, List<AlphaToBetaRecord>> res = new HashMap<>();
 
-        for (List<AlphaEvent> batch : batchedAlphaEvents) {
+        for (Set<AlphaEvent> batch : batchedAlphaEvents) {
             Map<Long, AlphaEvent> eventById = new HashMap<>();
             Condition condition = noCondition();
             for (AlphaEvent event : batch) {
@@ -168,10 +189,10 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
         return res;
     }
 
-    private Map<BetaEvent, List<AlphaToBetaRecord>> getActualLinksForBeta(List<List<BetaEvent>> batchedBetaEvents) {
+    private Map<BetaEvent, List<AlphaToBetaRecord>> getActualLinksForBeta(List<Set<BetaEvent>> batchedBetaEvents) {
         Map<BetaEvent, List<AlphaToBetaRecord>> res = new HashMap<>();
 
-        for (List<BetaEvent> batch : batchedBetaEvents) {
+        for (Set<BetaEvent> batch : batchedBetaEvents) {
             Map<Long, BetaEvent> eventById = new HashMap<>();
             Condition condition = noCondition();
             for (BetaEvent event : batch) {
@@ -254,8 +275,14 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
                 .fetch();
     }
 
-    private Row5<Long, Long, String, Boolean, Long> covertToRow(AlphaToBetaEvent event) {
-        return row(event.getAlphaId(), event.getBetaId(), event.getHash(), event.isActive(), event.getCreatedTs());
+    private Row5<Long, Long, String, Boolean, Long> covertToRecord(AlphaToBetaEvent event) {
+        return row(
+                event.getAlphaId(),
+                event.getBetaId(),
+                event.getHash(),
+                event.isActive(),
+                event.getCreatedTs()
+        );
     }
 
     private AlphaToBetaLink convertToLink(AlphaToBetaRecord record) {

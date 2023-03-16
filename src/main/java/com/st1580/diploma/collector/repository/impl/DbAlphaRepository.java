@@ -1,6 +1,5 @@
 package com.st1580.diploma.collector.repository.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -46,13 +45,13 @@ public class DbAlphaRepository implements AlphaRepository {
     private final Alpha LOW_LVL_ALPHA = ALPHA.as("low_lvl");
 
     @Override
-    public Map<Long, AlphaEntity> collectAllEntitiesByIds(Collection<Long> ids, long ts) {
+    public Map<Long, AlphaEntity> collectAllActiveEntitiesByIds(Collection<Long> ids, long ts) {
         Condition condition = LOW_LVL_ALPHA.ID.in(ids)
-                .and(LOW_LVL_ALPHA.CREATED_TS.lessOrEqual(ts))
-                .and(LOW_LVL_ALPHA.ACTIVE_STATUS.in(EntityActiveType.trueEntityActiveTypes));
+                .and(LOW_LVL_ALPHA.CREATED_TS.lessOrEqual(ts));
 
         return getAlphaRecordByCondition(condition)
                 .stream()
+                .filter(record -> EntityActiveType.trueEntityActiveTypes.contains(record.getActiveStatus()))
                 .map(this::convertToAlphaEntity)
                 .collect(Collectors.toMap(
                         AlphaEntity::getId,
@@ -95,7 +94,7 @@ public class DbAlphaRepository implements AlphaRepository {
     }
 
     @Override
-    public List<List<AlphaEvent>> getActiveStatusChangedEventsInRange(long tsFrom, long tsTo) {
+    public List<Set<AlphaEvent>> getActiveStatusChangedEventsInRange(long tsFrom, long tsTo) {
         Map<Long, List<AlphaEvent>> alphaEventsById = context
                 .selectFrom(ALPHA)
                 .where(ALPHA.CREATED_TS.greaterOrEqual(tsFrom)
@@ -121,7 +120,7 @@ public class DbAlphaRepository implements AlphaRepository {
                 .collect(Collectors.groupingBy(EntityEvent::getEntityId));
 
         Map<EntityEvent, Boolean> actualAlphaState = new HashMap<>();
-        for (List<EntityEvent> batch : getBatches(alphaDependenciesById)) {
+        for (Set<EntityEvent> batch : getBatches(alphaDependenciesById)) {
             Map<Long, EntityEvent> eventById = new HashMap<>();
 
             Condition condition = noCondition();

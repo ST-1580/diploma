@@ -10,7 +10,7 @@ import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.Link;
 
 public interface CollectorRepository {
-    Map<Long, ? extends Entity> collectAllEntitiesByIds(Collection<Long> ids, long ts);
+    Map<Long, ? extends Entity> collectAllActiveEntitiesByIds(Collection<Long> ids, long ts);
 
     default Map<EntityType, List<Long>> collectAllNeighborsIds(long id, long ts) {
         Map<EntityType, Map<Long, List<Long>>> res = collectAllNeighborsIdsByEntities(List.of(id), ts);

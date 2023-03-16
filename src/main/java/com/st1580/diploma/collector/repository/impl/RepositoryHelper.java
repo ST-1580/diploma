@@ -1,15 +1,22 @@
 package com.st1580.diploma.collector.repository.impl;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 public class RepositoryHelper {
-    public static <T> List<List<T>> getBatches(Map<Long, List<T>> listByEntityId) {
-        List<List<T>> batches = new ArrayList<>();
+    /**
+     *
+     * @return list of batches. Every element in batch has unique entityId
+     */
+    public static <T> List<Set<T>> getBatches(Map<Long, List<T>> listByEntityId) {
+        List<Set<T>> batches = new ArrayList<>();
         int currPos = 0;
         while (!listByEntityId.isEmpty()) {
-            List<T> currBatch = new ArrayList<>();
+            Set<T> currBatch = new HashSet<>();
             List<Long> idsToRemove = new ArrayList<>();
 
             for (long id :  listByEntityId.keySet()) {

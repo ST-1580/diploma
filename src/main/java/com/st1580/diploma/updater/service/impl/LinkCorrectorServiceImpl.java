@@ -2,6 +2,7 @@ package com.st1580.diploma.updater.service.impl;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -38,10 +39,10 @@ public class LinkCorrectorServiceImpl implements LinkCorrectorService {
 
     @Override
     public void addLinkEventsByEntityUpdate(long tsFrom, long tsTo) {
-        List<List<AlphaEvent>> batchedAlphaEventsInRange = alphaRepository.getActiveStatusChangedEventsInRange(tsFrom, tsTo);
-        List<List<BetaEvent>> batchedBetaEventsInRange = betaRepository.getActiveStatusChangedEventsInRange(tsFrom, tsTo);
-        List<List<GammaEvent>> batchedGammaEventsInRange = gammaRepository.getActiveStatusChangedEventsInRange(tsFrom, tsTo);
-        List<List<DeltaEvent>> batchedDeltaEventsInRange = deltaRepository.getActiveStatusChangedEventsInRange(tsFrom, tsTo);
+        List<Set<AlphaEvent>> batchedAlphaEventsInRange = alphaRepository.getActiveStatusChangedEventsInRange(tsFrom, tsTo);
+        List<Set<BetaEvent>> batchedBetaEventsInRange = betaRepository.getActiveStatusChangedEventsInRange(tsFrom, tsTo);
+        List<Set<GammaEvent>> batchedGammaEventsInRange = gammaRepository.getActiveStatusChangedEventsInRange(tsFrom, tsTo);
+        List<Set<DeltaEvent>> batchedDeltaEventsInRange = deltaRepository.getActiveStatusChangedEventsInRange(tsFrom, tsTo);
 
         alphaToBetaRepository.addLinkEventsTriggeredByEntitiesUpdate(batchedAlphaEventsInRange, batchedBetaEventsInRange);
         gammaToAlphaRepository.addLinkEventsTriggeredByEntitiesUpdate(batchedGammaEventsInRange, batchedAlphaEventsInRange);

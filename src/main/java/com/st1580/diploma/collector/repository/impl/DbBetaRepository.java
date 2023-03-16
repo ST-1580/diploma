@@ -1,13 +1,12 @@
 package com.st1580.diploma.collector.repository.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -18,9 +17,7 @@ import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
 import com.st1580.diploma.collector.repository.BetaRepository;
 import com.st1580.diploma.collector.repository.types.EntityActiveType;
 import com.st1580.diploma.db.tables.Beta;
-import com.st1580.diploma.db.tables.records.AlphaRecord;
 import com.st1580.diploma.db.tables.records.BetaRecord;
-import com.st1580.diploma.updater.events.AlphaEvent;
 import com.st1580.diploma.updater.events.BetaEvent;
 import com.st1580.diploma.updater.events.EntityEvent;
 import org.jooq.Condition;
@@ -30,11 +27,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import static com.st1580.diploma.collector.repository.impl.RepositoryHelper.getBatches;
-import static com.st1580.diploma.db.Tables.ALPHA;
 import static com.st1580.diploma.db.Tables.BETA;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.noCondition;
-import static org.jooq.impl.DSL.row;
 
 @Repository
 public class DbBetaRepository implements BetaRepository {
@@ -47,13 +42,13 @@ public class DbBetaRepository implements BetaRepository {
     private final Beta LOW_LVL_BETA = BETA.as("low_lvl");
 
     @Override
-    public Map<Long, BetaEntity> collectAllEntitiesByIds(Collection<Long> ids, long ts) {
+    public Map<Long, BetaEntity> collectAllActiveEntitiesByIds(Collection<Long> ids, long ts) {
         Condition condition = LOW_LVL_BETA.ID.in(ids)
-                .and(LOW_LVL_BETA.CREATED_TS.lessOrEqual(ts))
-                .and(LOW_LVL_BETA.ACTIVE_STATUS.in(EntityActiveType.trueEntityActiveTypes));
+                .and(LOW_LVL_BETA.CREATED_TS.lessOrEqual(ts));
 
         return getBetaRecordByCondition(condition)
                 .stream()
+                .filter(record -> EntityActiveType.trueEntityActiveTypes.contains(record.getActiveStatus()))
                 .map(this::convertToBetaEntity)
                 .collect(Collectors.toMap(
                         BetaEntity::getId,
@@ -93,7 +88,7 @@ public class DbBetaRepository implements BetaRepository {
     }
 
     @Override
-    public List<List<BetaEvent>> getActiveStatusChangedEventsInRange(long tsFrom, long tsTo) {
+    public List<Set<BetaEvent>> getActiveStatusChangedEventsInRange(long tsFrom, long tsTo) {
         Map<Long, List<BetaEvent>> betaEventsById = context
                 .selectFrom(BETA)
                 .where(BETA.CREATED_TS.greaterOrEqual(tsFrom)
@@ -117,7 +112,7 @@ public class DbBetaRepository implements BetaRepository {
                 .collect(Collectors.groupingBy(EntityEvent::getEntityId));
 
         Map<EntityEvent, Boolean> actualBetaState = new HashMap<>();
-        for (List<EntityEvent> batch : getBatches(betaDependenciesById)) {
+        for (Set<EntityEvent> batch : getBatches(betaDependenciesById)) {
             Map<Long, EntityEvent> eventById = new HashMap<>();
 
             Condition condition = noCondition();

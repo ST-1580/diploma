@@ -1,5 +1,6 @@
 package com.st1580.diploma.collector.graph;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -10,9 +11,12 @@ import java.util.stream.Collectors;
 
 import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.graph.links.LightLink;
+import com.st1580.diploma.collector.graph.links.LinkType;
 import com.st1580.diploma.collector.policy.Policy;
 import com.st1580.diploma.collector.policy.NonCyclicPolicy;
 import com.st1580.diploma.collector.service.dto.GraphDto;
+
+import static com.st1580.diploma.collector.graph.links.LinkType.possibleLinks;
 
 public class Graph {
     private final Set<Entity> graphEntities;
@@ -116,8 +120,23 @@ public class Graph {
     }
 
     private List<LightLink> createLightLinks(LightEntity centralEntity, List<LightEntity> connectedEntities) {
-        return connectedEntities.stream().map(entity -> new LightLink(centralEntity, entity)).collect(Collectors.toList());
+        if (connectedEntities.isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        LinkType normal = new LinkType(centralEntity.getType(), connectedEntities.get(0).getType());
+        LinkType rev = new LinkType(connectedEntities.get(0).getType(), centralEntity.getType());
+        boolean isRev = possibleLinks.contains(rev);
+        if (!isRev && !possibleLinks.contains(normal)) {
+            throw new IllegalArgumentException("Wrong types of link ends: " + normal.getTypeFrom() + ", " + normal.getTypeTo());
+        }
+
+        return connectedEntities.stream()
+                .map(entity -> isRev ? new LightLink(entity, centralEntity) : new LightLink(centralEntity, entity))
+                .collect(Collectors.toList());
     }
+
+
 
     public boolean canExtendFromEntityByPolicy(EntityType type, long id) {
         LightEntity entity = new LightEntity(type, id);

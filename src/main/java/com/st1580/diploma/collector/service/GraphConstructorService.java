@@ -56,7 +56,7 @@ public class GraphConstructorService {
 
     public Map<Long, ? extends Entity> getEntitiesByIds(EntityType entitiesType, Set<Long> entitiesIds, long ts) {
         CollectorRepository collectorRepository = matchRepository(entitiesType);
-        return collectorRepository.collectAllEntitiesByIds(entitiesIds, ts);
+        return collectorRepository.collectAllActiveEntitiesByIds(entitiesIds, ts);
     }
 
 

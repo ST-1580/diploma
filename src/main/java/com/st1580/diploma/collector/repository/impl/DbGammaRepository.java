@@ -1,12 +1,13 @@
 package com.st1580.diploma.collector.repository.impl;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.inject.Inject;
 
@@ -19,13 +20,18 @@ import com.st1580.diploma.collector.repository.GammaToDeltaRepository;
 import com.st1580.diploma.collector.repository.types.EntityActiveType;
 import com.st1580.diploma.db.tables.Gamma;
 import com.st1580.diploma.db.tables.records.GammaRecord;
+import com.st1580.diploma.updater.events.EntityEvent;
 import com.st1580.diploma.updater.events.GammaEvent;
+import org.jooq.Condition;
 import org.jooq.DSLContext;
+import org.jooq.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import static com.st1580.diploma.collector.repository.impl.RepositoryHelper.getBatches;
 import static com.st1580.diploma.db.Tables.GAMMA;
 import static org.jooq.impl.DSL.max;
+import static org.jooq.impl.DSL.noCondition;
 
 @Repository
 public class DbGammaRepository implements GammaRepository {
@@ -35,26 +41,17 @@ public class DbGammaRepository implements GammaRepository {
     GammaToAlphaRepository gammaToAlphaRepository;
     @Inject
     GammaToDeltaRepository gammaToDeltaRepository;
+    private final Gamma TOP_LVL_GAMMA = GAMMA.as("top_lvl");
+    private final Gamma LOW_LVL_GAMMA = GAMMA.as("low_lvl");
 
     @Override
-    public Map<Long, GammaEntity> collectAllEntitiesByIds(Collection<Long> ids, long ts) {
-        Gamma TOP_LVL_GAMMA = GAMMA.as("top_lvl");
-        Gamma LOW_LVL_GAMMA = GAMMA.as("low_lvl");
+    public Map<Long, GammaEntity> collectAllActiveEntitiesByIds(Collection<Long> ids, long ts) {
+        Condition condition = LOW_LVL_GAMMA.ID.in(ids)
+                .and(LOW_LVL_GAMMA.CREATED_TS.lessOrEqual(ts));
 
-        return context
-                .selectFrom(TOP_LVL_GAMMA)
-                .whereExists(
-                        context.select(LOW_LVL_GAMMA.ID, max(LOW_LVL_GAMMA.CREATED_TS))
-                                .from(LOW_LVL_GAMMA)
-                                .where(LOW_LVL_GAMMA.ID.in(ids)
-                                        .and(LOW_LVL_GAMMA.CREATED_TS.lessOrEqual(ts))
-                                        .and(LOW_LVL_GAMMA.ACTIVE_STATUS.in(EntityActiveType.trueEntityActiveTypes)))
-                                .groupBy(LOW_LVL_GAMMA.ID)
-                                .having(LOW_LVL_GAMMA.ID.eq(TOP_LVL_GAMMA.ID)
-                                        .and(max(LOW_LVL_GAMMA.CREATED_TS).eq(TOP_LVL_GAMMA.CREATED_TS)))
-                )
-                .fetch()
+        return getGammaRecordByCondition(condition)
                 .stream()
+                .filter(record -> EntityActiveType.trueEntityActiveTypes.contains(record.getActiveStatus()))
                 .map(this::convertToGammaEntity)
                 .collect(Collectors.toMap(
                         GammaEntity::getId,
@@ -99,13 +96,68 @@ public class DbGammaRepository implements GammaRepository {
     }
 
     @Override
-    public List<List<GammaEvent>> getActiveStatusChangedEventsInRange(long tsFrom, long tsTo) {
-        return new ArrayList<>();
+    public List<Set<GammaEvent>> getActiveStatusChangedEventsInRange(long tsFrom, long tsTo) {
+        Map<Long, List<GammaEvent>> gammaEventsById = context
+                .selectFrom(GAMMA)
+                .where(GAMMA.CREATED_TS.greaterOrEqual(tsFrom)
+                        .and(GAMMA.CREATED_TS.lessThan(tsTo))
+                        .and(GAMMA.ACTIVE_STATUS.in(EntityActiveType.changedEntityActiveTypes))
+                )
+                .fetchInto(GammaEvent.class)
+                .stream()
+                .collect(Collectors.groupingBy(GammaEvent::getGammaId));
+
+        return getBatches(gammaEventsById);
     }
 
     @Override
     public void correctDependentLinks(long tsFrom, long tsTo) {
+        List<EntityEvent> gammaToAlphaUndefinedDependencies =
+                gammaToAlphaRepository.getUndefinedGammaStateInRange(tsFrom, tsTo);
+        List<EntityEvent> gammaToDeltaUndefinedDependencies =
+                gammaToDeltaRepository.getUndefinedGammaStateInRange(tsFrom, tsTo);
 
+        Map<Long, List<EntityEvent>> gammaDependenciesById = Stream
+                .concat(gammaToAlphaUndefinedDependencies.stream(), gammaToDeltaUndefinedDependencies.stream())
+                .collect(Collectors.groupingBy(EntityEvent::getEntityId));
+
+        Map<EntityEvent, Boolean> actualGammaState = new HashMap<>();
+        for (Set<EntityEvent> batch : getBatches(gammaDependenciesById)) {
+            Map<Long, EntityEvent> eventById = new HashMap<>();
+
+            Condition condition = noCondition();
+            for (EntityEvent event : batch) {
+                condition = condition.or(LOW_LVL_GAMMA.ID.eq(event.getEntityId())
+                        .and(LOW_LVL_GAMMA.CREATED_TS.lessOrEqual(event.getCreatedTs())));
+                eventById.put(event.getEntityId(), event);
+            }
+
+            actualGammaState.putAll(getGammaRecordByCondition(condition)
+                    .stream()
+                    .map(this::convertToGammaEvent)
+                    .collect(Collectors.toMap(
+                            event -> eventById.get(event.getGammaId()),
+                            event -> EntityActiveType.trueEntityActiveTypes.contains(event.getType().name())
+                    ))
+            );
+        }
+
+        gammaToAlphaRepository.batchUpdateLinksDependentOnGamma(actualGammaState);
+        gammaToDeltaRepository.batchUpdateLinksDependentOnGamma(actualGammaState);
+    }
+
+    private Result<GammaRecord> getGammaRecordByCondition(Condition condition) {
+        return context
+                .selectFrom(TOP_LVL_GAMMA)
+                .whereExists(
+                        context.select(LOW_LVL_GAMMA.ID, max(LOW_LVL_GAMMA.CREATED_TS))
+                                .from(LOW_LVL_GAMMA)
+                                .where(condition)
+                                .groupBy(LOW_LVL_GAMMA.ID)
+                                .having(LOW_LVL_GAMMA.ID.eq(TOP_LVL_GAMMA.ID)
+                                        .and(max(LOW_LVL_GAMMA.CREATED_TS).eq(TOP_LVL_GAMMA.CREATED_TS)))
+                )
+                .fetch();
     }
 
     private GammaRecord convertToGammaRecord(GammaEvent event) {
@@ -121,6 +173,15 @@ public class DbGammaRepository implements GammaRepository {
         return new GammaEntity(
                 record.getId(),
                 record.getIsMaster()
+        );
+    }
+
+    private GammaEvent convertToGammaEvent(GammaRecord record) {
+        return new GammaEvent(
+                record.getId(),
+                record.getIsMaster(),
+                EntityActiveType.valueOf(record.getActiveStatus()),
+                record.getCreatedTs()
         );
     }
 }

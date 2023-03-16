@@ -11,9 +11,9 @@ create table Gamma_to_Alpha (
 
 alter table Gamma_to_Alpha add constraint "gamma_to_alpha__pkey" primary key (gamma_id, alpha_id, created_ts);
 
-create index if not exists "ga_gamma_can_use__index" on Gamma_to_Alpha (gamma_id, created_ts, can_use);
+create index if not exists "ga_gamma_can_use__index" on Gamma_to_Alpha (gamma_id, created_ts);
 
-create index if not exists "ga_alpha_can_use__index" on Gamma_to_Alpha (alpha_id, created_ts, can_use);
+create index if not exists "ga_alpha_can_use__index" on Gamma_to_Alpha (alpha_id, created_ts);
 
 create index if not exists "ga_gamma_is_active__index" on Gamma_to_Alpha(created_ts, is_active_gamma);
 

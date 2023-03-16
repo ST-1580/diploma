@@ -37,7 +37,7 @@ public abstract class AbstractCollectorService {
 
     public GraphDto getGraphByPolicy(Entity startEntity, PolicyType policyType,
                                      boolean isLinksLight, boolean isEntitiesLight) {
-        long constructedTs = 10;
+        long constructedTs = 105;
         if (!isEntityExist(startEntity, constructedTs)) {
             return new GraphDto(constructedTs, new HashSet<>(), new HashSet<>());
         }
@@ -173,7 +173,7 @@ public abstract class AbstractCollectorService {
     }
 
     private boolean isEntityExist(Entity entity, long ts) {
-        return !collectorRepository.collectAllEntitiesByIds(List.of(entity.getId()), ts).isEmpty();
+        return !collectorRepository.collectAllActiveEntitiesByIds(List.of(entity.getId()), ts).isEmpty();
     }
 
 }
