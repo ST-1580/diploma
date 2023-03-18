@@ -12,6 +12,7 @@ import com.st1580.diploma.db.tables.FlywaySchemaHistory;
 import com.st1580.diploma.db.tables.Gamma;
 import com.st1580.diploma.db.tables.GammaToAlpha;
 import com.st1580.diploma.db.tables.GammaToDelta;
+import com.st1580.diploma.db.tables.LastSync;
 
 import org.jooq.Index;
 import org.jooq.OrderField;
@@ -45,6 +46,7 @@ public class Indexes {
     public static final Index GD_DELTA_IS_ACTIVE__INDEX = Indexes0.GD_DELTA_IS_ACTIVE__INDEX;
     public static final Index GD_GAMMA_CAN_USE__INDEX = Indexes0.GD_GAMMA_CAN_USE__INDEX;
     public static final Index GD_GAMMA_IS_ACTIVE__INDEX = Indexes0.GD_GAMMA_IS_ACTIVE__INDEX;
+    public static final Index LAST_SYNC_NAME__INDEX = Indexes0.LAST_SYNC_NAME__INDEX;
 
     // -------------------------------------------------------------------------
     // [#1459] distribute members to avoid static initialisers > 64kb
@@ -68,5 +70,6 @@ public class Indexes {
         public static Index GD_DELTA_IS_ACTIVE__INDEX = Internal.createIndex("gd_delta_is_active__index", GammaToDelta.GAMMA_TO_DELTA, new OrderField[] { GammaToDelta.GAMMA_TO_DELTA.CREATED_TS, GammaToDelta.GAMMA_TO_DELTA.IS_ACTIVE_DELTA }, false);
         public static Index GD_GAMMA_CAN_USE__INDEX = Internal.createIndex("gd_gamma_can_use__index", GammaToDelta.GAMMA_TO_DELTA, new OrderField[] { GammaToDelta.GAMMA_TO_DELTA.GAMMA_ID, GammaToDelta.GAMMA_TO_DELTA.CREATED_TS }, false);
         public static Index GD_GAMMA_IS_ACTIVE__INDEX = Internal.createIndex("gd_gamma_is_active__index", GammaToDelta.GAMMA_TO_DELTA, new OrderField[] { GammaToDelta.GAMMA_TO_DELTA.CREATED_TS, GammaToDelta.GAMMA_TO_DELTA.IS_ACTIVE_GAMMA }, false);
+        public static Index LAST_SYNC_NAME__INDEX = Internal.createIndex("last_sync_name__index", LastSync.LAST_SYNC, new OrderField[] { LastSync.LAST_SYNC.NAME }, false);
     }
 }

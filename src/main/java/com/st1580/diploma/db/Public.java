@@ -12,6 +12,7 @@ import com.st1580.diploma.db.tables.FlywaySchemaHistory;
 import com.st1580.diploma.db.tables.Gamma;
 import com.st1580.diploma.db.tables.GammaToAlpha;
 import com.st1580.diploma.db.tables.GammaToDelta;
+import com.st1580.diploma.db.tables.LastSync;
 
 import java.util.Arrays;
 import java.util.List;
@@ -27,7 +28,7 @@ import org.jooq.impl.SchemaImpl;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Public extends SchemaImpl {
 
-    private static final long serialVersionUID = 1920101461;
+    private static final long serialVersionUID = -409109166;
 
     /**
      * The reference instance of <code>public</code>
@@ -75,6 +76,11 @@ public class Public extends SchemaImpl {
     public final GammaToDelta GAMMA_TO_DELTA = GammaToDelta.GAMMA_TO_DELTA;
 
     /**
+     * The table <code>public.last_sync</code>.
+     */
+    public final LastSync LAST_SYNC = LastSync.LAST_SYNC;
+
+    /**
      * No further instances allowed
      */
     private Public() {
@@ -97,6 +103,7 @@ public class Public extends SchemaImpl {
             FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY,
             Gamma.GAMMA,
             GammaToAlpha.GAMMA_TO_ALPHA,
-            GammaToDelta.GAMMA_TO_DELTA);
+            GammaToDelta.GAMMA_TO_DELTA,
+            LastSync.LAST_SYNC);
     }
 }

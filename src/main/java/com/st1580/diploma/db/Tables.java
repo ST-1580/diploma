@@ -12,6 +12,7 @@ import com.st1580.diploma.db.tables.FlywaySchemaHistory;
 import com.st1580.diploma.db.tables.Gamma;
 import com.st1580.diploma.db.tables.GammaToAlpha;
 import com.st1580.diploma.db.tables.GammaToDelta;
+import com.st1580.diploma.db.tables.LastSync;
 
 
 /**
@@ -59,4 +60,9 @@ public class Tables {
      * The table <code>public.gamma_to_delta</code>.
      */
     public static final GammaToDelta GAMMA_TO_DELTA = GammaToDelta.GAMMA_TO_DELTA;
+
+    /**
+     * The table <code>public.last_sync</code>.
+     */
+    public static final LastSync LAST_SYNC = LastSync.LAST_SYNC;
 }
