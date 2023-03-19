@@ -1,4 +1,4 @@
-package com.st1580.diploma.collector.repository.impl;
+package com.st1580.diploma.repository.impl;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,10 +14,10 @@ import javax.inject.Inject;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.Link;
 import com.st1580.diploma.collector.graph.entities.AlphaEntity;
-import com.st1580.diploma.collector.repository.AlphaRepository;
-import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
-import com.st1580.diploma.collector.repository.GammaToAlphaRepository;
-import com.st1580.diploma.collector.repository.types.EntityActiveType;
+import com.st1580.diploma.repository.AlphaRepository;
+import com.st1580.diploma.repository.AlphaToBetaRepository;
+import com.st1580.diploma.repository.GammaToAlphaRepository;
+import com.st1580.diploma.repository.types.EntityActiveType;
 import com.st1580.diploma.db.tables.Alpha;
 import com.st1580.diploma.db.tables.records.AlphaRecord;
 import com.st1580.diploma.updater.events.AlphaEvent;
@@ -28,7 +28,7 @@ import org.jooq.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import static com.st1580.diploma.collector.repository.impl.RepositoryHelper.getBatches;
+import static com.st1580.diploma.repository.impl.RepositoryHelper.getBatches;
 import static com.st1580.diploma.db.Tables.ALPHA;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.noCondition;

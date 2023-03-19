@@ -1,22 +1,17 @@
 package com.st1580.diploma.updater.service.impl;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import com.st1580.diploma.collector.repository.GammaRepository;
-import com.st1580.diploma.collector.repository.GammaToAlphaRepository;
-import com.st1580.diploma.collector.repository.GammaToDeltaRepository;
-import com.st1580.diploma.external.alpha.data.entity.ExternalAlphaEntityEvent;
-import com.st1580.diploma.external.gamma.data.GammaEventType;
+import com.st1580.diploma.repository.GammaRepository;
+import com.st1580.diploma.repository.GammaToAlphaRepository;
+import com.st1580.diploma.repository.GammaToDeltaRepository;
 import com.st1580.diploma.external.gamma.data.entity.ExternalGammaEntityEvent;
-import com.st1580.diploma.external.gamma.data.links.ga.ExternalGammaToAlphaLink;
 import com.st1580.diploma.external.gamma.data.links.ga.ExternalGammaToAlphaLinkEvent;
 import com.st1580.diploma.external.gamma.data.links.gd.ExternalGammaToDeltaLinkEvent;
 import com.st1580.diploma.updater.caller.GammaCaller;
-import com.st1580.diploma.updater.events.AlphaEvent;
 import com.st1580.diploma.updater.events.GammaEvent;
 import com.st1580.diploma.updater.events.GammaToAlphaEvent;
 import com.st1580.diploma.updater.events.GammaToDeltaEvent;

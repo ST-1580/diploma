@@ -1,4 +1,4 @@
-package com.st1580.diploma.collector.repository.impl;
+package com.st1580.diploma.repository.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,10 +10,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.st1580.diploma.collector.graph.links.AlphaToBetaLink;
-import com.st1580.diploma.collector.graph.links.GammaToAlphaLink;
-import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
-import com.st1580.diploma.collector.repository.types.EntityActiveType;
-import com.st1580.diploma.collector.repository.types.LinkEndActivityType;
+import com.st1580.diploma.repository.AlphaToBetaRepository;
+import com.st1580.diploma.repository.types.EntityActiveType;
+import com.st1580.diploma.repository.types.LinkEndActivityType;
 import com.st1580.diploma.db.tables.AlphaToBeta;
 import com.st1580.diploma.db.tables.records.AlphaToBetaRecord;
 import com.st1580.diploma.updater.events.AlphaEvent;
@@ -28,7 +27,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import static com.st1580.diploma.db.Tables.ALPHA_TO_BETA;
-import static com.st1580.diploma.db.Tables.GAMMA_TO_ALPHA;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.noCondition;
 import static org.jooq.impl.DSL.row;

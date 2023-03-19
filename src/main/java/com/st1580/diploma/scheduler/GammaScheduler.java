@@ -6,30 +6,30 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import com.st1580.diploma.repository.LastSyncRepository;
-import com.st1580.diploma.updater.service.AlphaUpdateService;
+import com.st1580.diploma.updater.service.GammaUpdateService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import static java.lang.System.currentTimeMillis;
 
 @Service
-public class AlphaScheduler {
-    private final static SchedulerType schedulerType = SchedulerType.ALPHA;
+public class GammaScheduler {
+    private final static SchedulerType schedulerType = SchedulerType.GAMMA;
     private final ScheduledThreadPoolExecutor executor;
-    private final AlphaUpdateService alphaUpdateService;
+    private final GammaUpdateService gammaUpdateService;
     private final LastSyncRepository lastSyncRepository;
     private final long rangeCrossingMillis;
     private final long updateRangeMillis;
     private final long updateDelaySeconds;
 
     @Inject
-    public AlphaScheduler(AlphaUpdateService alphaUpdateService,
+    public GammaScheduler(GammaUpdateService gammaUpdateService,
                           LastSyncRepository lastSyncRepository,
-                          @Value("${scheduler.alpha.range.crossing.seconds}") long rangeCrossingSeconds,
-                          @Value("${scheduler.alpha.update.range.minutes}") long updateRangeMinutes,
-                          @Value("${scheduler.alpha.update.delay.seconds}") long updateDelaySeconds) {
+                          @Value("${scheduler.gamma.range.crossing.seconds}") long rangeCrossingSeconds,
+                          @Value("${scheduler.gamma.update.range.minutes}") long updateRangeMinutes,
+                          @Value("${scheduler.gamma.update.delay.seconds}") long updateDelaySeconds) {
         this.executor = new ScheduledThreadPoolExecutor(1);
-        this.alphaUpdateService = alphaUpdateService;
+        this.gammaUpdateService = gammaUpdateService;
         this.lastSyncRepository = lastSyncRepository;
         this.rangeCrossingMillis = TimeUnit.SECONDS.toMillis(rangeCrossingSeconds);
         this.updateRangeMillis = TimeUnit.MINUTES.toMillis(updateRangeMinutes);
@@ -42,11 +42,12 @@ public class AlphaScheduler {
     }
 
     private void run() {
-        long tsFrom = lastSyncRepository.getSchedulerLastSync(schedulerType) ;
+        long tsFrom = lastSyncRepository.getSchedulerLastSync(schedulerType);
         long tsTo = Math.min(tsFrom + updateRangeMillis, currentTimeMillis());
 
-        alphaUpdateService.updateAlphaEntity(tsFrom, tsTo);
-        alphaUpdateService.updateAlphaToBetaLink(tsFrom, tsTo);
+        gammaUpdateService.updateGammaEntity(tsFrom, tsTo);
+        gammaUpdateService.updateGammaToAlphaLink(tsFrom, tsTo);
+        gammaUpdateService.updateGammaToDeltaLink(tsFrom, tsTo);
 
         lastSyncRepository.setSchedulerLastSync(schedulerType, tsTo - rangeCrossingMillis);
     }

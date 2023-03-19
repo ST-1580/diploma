@@ -56,3 +56,11 @@ values
     (80, 11, true, 'TRUE', 'TRUE', 2),
     (77, 12, true, 'TRUE', 'TRUE', 3),
     (70, 12, true, 'TRUE', 'TRUE', 5);
+
+insert into last_sync (name, last_sync_ts)
+values
+    ('ALPHA', 0),
+    ('BETA', 0),
+    ('GAMMA', 0),
+    ('DELTA', 0),
+    ('LINK_CORRECTOR', 0)

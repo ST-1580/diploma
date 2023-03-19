@@ -1,4 +1,4 @@
-package com.st1580.diploma.collector.repository.impl;
+package com.st1580.diploma.repository.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -10,9 +10,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import com.st1580.diploma.collector.graph.links.GammaToAlphaLink;
-import com.st1580.diploma.collector.repository.GammaToAlphaRepository;
-import com.st1580.diploma.collector.repository.types.EntityActiveType;
-import com.st1580.diploma.collector.repository.types.LinkEndActivityType;
+import com.st1580.diploma.repository.GammaToAlphaRepository;
+import com.st1580.diploma.repository.types.EntityActiveType;
+import com.st1580.diploma.repository.types.LinkEndActivityType;
 import com.st1580.diploma.db.tables.GammaToAlpha;
 import com.st1580.diploma.db.tables.records.GammaToAlphaRecord;
 import com.st1580.diploma.updater.events.AlphaEvent;

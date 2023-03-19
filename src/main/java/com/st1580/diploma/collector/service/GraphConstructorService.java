@@ -10,11 +10,11 @@ import javax.inject.Inject;
 import com.st1580.diploma.collector.graph.Entity;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.Link;
-import com.st1580.diploma.collector.repository.AlphaRepository;
-import com.st1580.diploma.collector.repository.BetaRepository;
-import com.st1580.diploma.collector.repository.CollectorRepository;
-import com.st1580.diploma.collector.repository.DeltaRepository;
-import com.st1580.diploma.collector.repository.GammaRepository;
+import com.st1580.diploma.repository.AlphaRepository;
+import com.st1580.diploma.repository.BetaRepository;
+import com.st1580.diploma.repository.CollectorRepository;
+import com.st1580.diploma.repository.DeltaRepository;
+import com.st1580.diploma.repository.GammaRepository;
 import org.springframework.stereotype.Service;
 
 @Service

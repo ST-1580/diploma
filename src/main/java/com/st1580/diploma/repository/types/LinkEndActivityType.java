@@ -1,4 +1,4 @@
-package com.st1580.diploma.collector.repository.types;
+package com.st1580.diploma.repository.types;
 
 public enum LinkEndActivityType {
     TRUE, FALSE, UNDEFINED;

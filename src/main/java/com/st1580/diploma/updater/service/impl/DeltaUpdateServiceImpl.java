@@ -5,11 +5,9 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import com.st1580.diploma.collector.repository.DeltaRepository;
-import com.st1580.diploma.external.alpha.data.entity.ExternalAlphaEntityEvent;
+import com.st1580.diploma.repository.DeltaRepository;
 import com.st1580.diploma.external.delta.data.ExternalDeltaEntityEvent;
 import com.st1580.diploma.updater.caller.DeltaCaller;
-import com.st1580.diploma.updater.events.AlphaEvent;
 import com.st1580.diploma.updater.events.DeltaEvent;
 import com.st1580.diploma.updater.service.DeltaUpdateService;
 import org.springframework.stereotype.Service;

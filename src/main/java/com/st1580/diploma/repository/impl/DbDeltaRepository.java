@@ -1,4 +1,4 @@
-package com.st1580.diploma.collector.repository.impl;
+package com.st1580.diploma.repository.impl;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,9 +13,9 @@ import javax.inject.Inject;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.Link;
 import com.st1580.diploma.collector.graph.entities.DeltaEntity;
-import com.st1580.diploma.collector.repository.DeltaRepository;
-import com.st1580.diploma.collector.repository.GammaToDeltaRepository;
-import com.st1580.diploma.collector.repository.types.EntityActiveType;
+import com.st1580.diploma.repository.DeltaRepository;
+import com.st1580.diploma.repository.GammaToDeltaRepository;
+import com.st1580.diploma.repository.types.EntityActiveType;
 import com.st1580.diploma.db.tables.Delta;
 import com.st1580.diploma.db.tables.records.DeltaRecord;
 import com.st1580.diploma.updater.events.DeltaEvent;
@@ -26,7 +26,7 @@ import org.jooq.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import static com.st1580.diploma.collector.repository.impl.RepositoryHelper.getBatches;
+import static com.st1580.diploma.repository.impl.RepositoryHelper.getBatches;
 import static com.st1580.diploma.db.Tables.DELTA;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.noCondition;

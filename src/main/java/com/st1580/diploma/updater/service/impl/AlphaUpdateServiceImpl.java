@@ -5,8 +5,8 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import com.st1580.diploma.collector.repository.AlphaRepository;
-import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
+import com.st1580.diploma.repository.AlphaRepository;
+import com.st1580.diploma.repository.AlphaToBetaRepository;
 import com.st1580.diploma.external.alpha.data.entity.ExternalAlphaEntityEvent;
 import com.st1580.diploma.external.alpha.data.link.ExternalAlphaToBetaLinkEvent;
 import com.st1580.diploma.updater.caller.AlphaCaller;

@@ -1,4 +1,4 @@
-package com.st1580.diploma.collector.repository.types;
+package com.st1580.diploma.repository.types;
 
 import java.util.Collections;
 import java.util.List;

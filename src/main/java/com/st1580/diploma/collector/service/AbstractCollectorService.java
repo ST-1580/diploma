@@ -20,10 +20,11 @@ import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.policy.NonCyclicPolicy;
 import com.st1580.diploma.collector.policy.Policy;
 import com.st1580.diploma.collector.policy.StartEntityPolicy;
-import com.st1580.diploma.collector.repository.CollectorRepository;
+import com.st1580.diploma.repository.CollectorRepository;
 import com.st1580.diploma.collector.service.dto.GraphDto;
 import com.st1580.diploma.collector.service.dto.GraphLinkDto;
 import com.st1580.diploma.collector.service.dto.PolicyType;
+import com.st1580.diploma.repository.LastSyncRepository;
 
 public abstract class AbstractCollectorService {
     private final CollectorRepository collectorRepository;
@@ -31,13 +32,16 @@ public abstract class AbstractCollectorService {
     @Inject
     private GraphConstructorService graphConstructorService;
 
+    @Inject
+    private LastSyncRepository lastSyncRepository;
+
     public AbstractCollectorService(CollectorRepository collectorRepository) {
         this.collectorRepository = collectorRepository;
     }
 
     public GraphDto getGraphByPolicy(Entity startEntity, PolicyType policyType,
                                      boolean isLinksLight, boolean isEntitiesLight) {
-        long constructedTs = 105;
+        long constructedTs = lastSyncRepository.getCorrectorLastSync();
         if (!isEntityExist(startEntity, constructedTs)) {
             return new GraphDto(constructedTs, new HashSet<>(), new HashSet<>());
         }
@@ -153,7 +157,7 @@ public abstract class AbstractCollectorService {
     }
 
     public List<GraphLinkDto> getEntityNeighbors(Entity startEntity, boolean isLinksLight) {
-        long constructedTs = 10;
+        long constructedTs = lastSyncRepository.getCorrectorLastSync();
         if (!isEntityExist(startEntity, constructedTs)) {
             return new ArrayList<>();
         }

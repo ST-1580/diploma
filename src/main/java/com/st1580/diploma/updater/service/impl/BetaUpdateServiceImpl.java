@@ -5,12 +5,10 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import com.st1580.diploma.collector.repository.BetaRepository;
+import com.st1580.diploma.repository.BetaRepository;
 import com.st1580.diploma.external.beta.data.ExternalBetaEntityEvent;
-import com.st1580.diploma.external.delta.data.ExternalDeltaEntityEvent;
 import com.st1580.diploma.updater.caller.BetaCaller;
 import com.st1580.diploma.updater.events.BetaEvent;
-import com.st1580.diploma.updater.events.DeltaEvent;
 import com.st1580.diploma.updater.service.BetaUpdateService;
 import org.springframework.stereotype.Service;
 

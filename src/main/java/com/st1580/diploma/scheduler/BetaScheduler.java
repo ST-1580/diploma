@@ -6,30 +6,30 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import com.st1580.diploma.repository.LastSyncRepository;
-import com.st1580.diploma.updater.service.AlphaUpdateService;
+import com.st1580.diploma.updater.service.BetaUpdateService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import static java.lang.System.currentTimeMillis;
 
 @Service
-public class AlphaScheduler {
-    private final static SchedulerType schedulerType = SchedulerType.ALPHA;
+public class BetaScheduler {
+    private final static SchedulerType schedulerType = SchedulerType.BETA;
     private final ScheduledThreadPoolExecutor executor;
-    private final AlphaUpdateService alphaUpdateService;
+    private final BetaUpdateService betaUpdateService;
     private final LastSyncRepository lastSyncRepository;
     private final long rangeCrossingMillis;
     private final long updateRangeMillis;
     private final long updateDelaySeconds;
 
     @Inject
-    public AlphaScheduler(AlphaUpdateService alphaUpdateService,
+    public BetaScheduler(BetaUpdateService betaUpdateService,
                           LastSyncRepository lastSyncRepository,
-                          @Value("${scheduler.alpha.range.crossing.seconds}") long rangeCrossingSeconds,
-                          @Value("${scheduler.alpha.update.range.minutes}") long updateRangeMinutes,
-                          @Value("${scheduler.alpha.update.delay.seconds}") long updateDelaySeconds) {
+                          @Value("${scheduler.beta.range.crossing.seconds}") long rangeCrossingSeconds,
+                          @Value("${scheduler.beta.update.range.minutes}") long updateRangeMinutes,
+                          @Value("${scheduler.beta.update.delay.seconds}") long updateDelaySeconds) {
         this.executor = new ScheduledThreadPoolExecutor(1);
-        this.alphaUpdateService = alphaUpdateService;
+        this.betaUpdateService = betaUpdateService;
         this.lastSyncRepository = lastSyncRepository;
         this.rangeCrossingMillis = TimeUnit.SECONDS.toMillis(rangeCrossingSeconds);
         this.updateRangeMillis = TimeUnit.MINUTES.toMillis(updateRangeMinutes);
@@ -45,8 +45,7 @@ public class AlphaScheduler {
         long tsFrom = lastSyncRepository.getSchedulerLastSync(schedulerType) ;
         long tsTo = Math.min(tsFrom + updateRangeMillis, currentTimeMillis());
 
-        alphaUpdateService.updateAlphaEntity(tsFrom, tsTo);
-        alphaUpdateService.updateAlphaToBetaLink(tsFrom, tsTo);
+        betaUpdateService.updateBetaEntity(tsFrom, tsTo);
 
         lastSyncRepository.setSchedulerLastSync(schedulerType, tsTo - rangeCrossingMillis);
     }

@@ -2,7 +2,7 @@ package com.st1580.diploma.updater.events;
 
 import java.util.Objects;
 
-import com.st1580.diploma.collector.repository.types.EntityActiveType;
+import com.st1580.diploma.repository.types.EntityActiveType;
 import com.st1580.diploma.external.delta.data.DeltaEventType;
 import com.st1580.diploma.external.delta.data.ExternalDeltaEntityEvent;
 

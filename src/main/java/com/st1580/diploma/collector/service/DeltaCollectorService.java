@@ -8,7 +8,7 @@ import com.st1580.diploma.collector.api.DeltaCollectorController;
 import com.st1580.diploma.collector.graph.Entity;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.entities.LightEntity;
-import com.st1580.diploma.collector.repository.DeltaRepository;
+import com.st1580.diploma.repository.DeltaRepository;
 import com.st1580.diploma.collector.service.dto.GraphDto;
 import com.st1580.diploma.collector.service.dto.GraphLinkDto;
 import com.st1580.diploma.collector.service.dto.PolicyType;

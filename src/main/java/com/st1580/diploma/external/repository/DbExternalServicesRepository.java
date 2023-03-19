@@ -3,7 +3,7 @@ package com.st1580.diploma.external.repository;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import com.st1580.diploma.collector.repository.types.EntityActiveType;
+import com.st1580.diploma.repository.types.EntityActiveType;
 import com.st1580.diploma.db.tables.Alpha;
 import com.st1580.diploma.db.tables.AlphaToBeta;
 import com.st1580.diploma.db.tables.Beta;

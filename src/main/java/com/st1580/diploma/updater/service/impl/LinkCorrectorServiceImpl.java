@@ -1,18 +1,17 @@
 package com.st1580.diploma.updater.service.impl;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.inject.Inject;
 
-import com.st1580.diploma.collector.repository.AlphaRepository;
-import com.st1580.diploma.collector.repository.AlphaToBetaRepository;
-import com.st1580.diploma.collector.repository.BetaRepository;
-import com.st1580.diploma.collector.repository.DeltaRepository;
-import com.st1580.diploma.collector.repository.GammaRepository;
-import com.st1580.diploma.collector.repository.GammaToAlphaRepository;
-import com.st1580.diploma.collector.repository.GammaToDeltaRepository;
+import com.st1580.diploma.repository.AlphaRepository;
+import com.st1580.diploma.repository.AlphaToBetaRepository;
+import com.st1580.diploma.repository.BetaRepository;
+import com.st1580.diploma.repository.DeltaRepository;
+import com.st1580.diploma.repository.GammaRepository;
+import com.st1580.diploma.repository.GammaToAlphaRepository;
+import com.st1580.diploma.repository.GammaToDeltaRepository;
 import com.st1580.diploma.updater.events.AlphaEvent;
 import com.st1580.diploma.updater.events.BetaEvent;
 import com.st1580.diploma.updater.events.DeltaEvent;
