@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import static com.st1580.diploma.db.Tables.ALPHA_TO_BETA;
+import static com.st1580.diploma.repository.impl.RepositoryHelper.fillConnectedEntities;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.noCondition;
 import static org.jooq.impl.DSL.row;
@@ -43,9 +44,11 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
         Condition condition = ALPHA_TO_BETA.ALPHA_ID.in(alphaIds)
                 .and(ALPHA_TO_BETA.CREATED_TS.lessOrEqual(ts));
 
-        return getActualLinks(condition)
+        Map<Long, List<Long>> existingLinks = getActualLinks(condition)
                 .collect(Collectors.groupingBy(AlphaToBetaLink::getAlphaId,
                         Collectors.mapping(AlphaToBetaLink::getBetaId, Collectors.toList())));
+
+        return fillConnectedEntities(alphaIds, existingLinks);
     }
 
     @Override
@@ -53,9 +56,11 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
         Condition condition = ALPHA_TO_BETA.BETA_ID.in(betaIds)
                 .and(ALPHA_TO_BETA.CREATED_TS.lessOrEqual(ts));
 
-        return getActualLinks(condition)
+        Map<Long, List<Long>> existingLinks = getActualLinks(condition)
                 .collect(Collectors.groupingBy(AlphaToBetaLink::getBetaId,
                 Collectors.mapping(AlphaToBetaLink::getAlphaId, Collectors.toList())));
+
+        return fillConnectedEntities(betaIds, existingLinks);
     }
 
     private Stream<AlphaToBetaLink> getActualLinks(Condition condition) {
@@ -86,11 +91,13 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
         Condition condition = LOW_LVL_AB.ALPHA_ID.in(alphaIds)
                 .and(LOW_LVL_AB.CREATED_TS.lessOrEqual(ts));
 
-        return getABRecordByCondition(condition)
+        Map<Long, List<AlphaToBetaLink>> existingLinks = getABRecordByCondition(condition)
                 .stream()
                 .filter(AlphaToBetaRecord::getCanUse)
                 .map(this::convertToLink)
                 .collect(Collectors.groupingBy(AlphaToBetaLink::getAlphaId));
+
+        return fillConnectedEntities(alphaIds, existingLinks);
     }
 
     @Override
@@ -98,11 +105,13 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
         Condition condition = LOW_LVL_AB.BETA_ID.in(betaIds)
                 .and(LOW_LVL_AB.CREATED_TS.lessOrEqual(ts));
 
-        return getABRecordByCondition(condition)
+        Map<Long, List<AlphaToBetaLink>> existingLinks = getABRecordByCondition(condition)
                 .stream()
                 .filter(AlphaToBetaRecord::getCanUse)
                 .map(this::convertToLink)
                 .collect(Collectors.groupingBy(AlphaToBetaLink::getBetaId));
+
+        return fillConnectedEntities(betaIds, existingLinks);
     }
 
     @Override

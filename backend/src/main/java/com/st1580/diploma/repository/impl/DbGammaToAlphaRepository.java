@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import static com.st1580.diploma.db.Tables.GAMMA_TO_ALPHA;
+import static com.st1580.diploma.repository.impl.RepositoryHelper.fillConnectedEntities;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.noCondition;
 import static org.jooq.impl.DSL.row;
@@ -44,9 +45,11 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
         Condition condition = GAMMA_TO_ALPHA.ALPHA_ID.in(alphaIds)
                 .and(GAMMA_TO_ALPHA.CREATED_TS.lessOrEqual(ts));
 
-        return getActualLinks(condition)
+        Map<Long, List<Long>> existingLinks = getActualLinks(condition)
                 .collect(Collectors.groupingBy(GammaToAlphaLink::getAlphaId,
                         Collectors.mapping(GammaToAlphaLink::getGammaId, Collectors.toList())));
+
+        return fillConnectedEntities(alphaIds, existingLinks);
     }
 
     @Override
@@ -54,9 +57,11 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
         Condition condition = GAMMA_TO_ALPHA.GAMMA_ID.in(gammaIds)
                 .and(GAMMA_TO_ALPHA.CREATED_TS.lessOrEqual(ts));
 
-        return getActualLinks(condition)
+        Map<Long, List<Long>> existingLinks = getActualLinks(condition)
                 .collect(Collectors.groupingBy(GammaToAlphaLink::getGammaId,
                         Collectors.mapping(GammaToAlphaLink::getAlphaId, Collectors.toList())));
+
+        return fillConnectedEntities(gammaIds, existingLinks);
     }
 
     private Stream<GammaToAlphaLink> getActualLinks(Condition condition) {
@@ -87,11 +92,13 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
         Condition condition = LOW_LVL_GA.ALPHA_ID.in(alphaIds)
                 .and(LOW_LVL_GA.CREATED_TS.lessOrEqual(ts));
 
-        return getGARecordByCondition(condition)
+        Map<Long, List<GammaToAlphaLink>> existingLinks = getGARecordByCondition(condition)
                 .stream()
                 .filter(GammaToAlphaRecord::getCanUse)
                 .map(this::convertToLink)
                 .collect(Collectors.groupingBy(GammaToAlphaLink::getAlphaId));
+
+        return fillConnectedEntities(alphaIds, existingLinks);
     }
 
     @Override
@@ -99,11 +106,13 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
         Condition condition = LOW_LVL_GA.GAMMA_ID.in(gammaIds)
                 .and(LOW_LVL_GA.CREATED_TS.lessOrEqual(ts));
 
-        return getGARecordByCondition(condition)
+        Map<Long, List<GammaToAlphaLink>> existingLinks = getGARecordByCondition(condition)
                 .stream()
                 .filter(GammaToAlphaRecord::getCanUse)
                 .map(this::convertToLink)
                 .collect(Collectors.groupingBy(GammaToAlphaLink::getGammaId));
+
+        return fillConnectedEntities(gammaIds, existingLinks);
     }
 
     @Override

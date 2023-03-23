@@ -1,6 +1,8 @@
 package com.st1580.diploma.repository.impl;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -37,5 +39,18 @@ public class RepositoryHelper {
         }
 
         return batches;
+    }
+
+    public static <T> Map<Long, List<T>> fillConnectedEntities(Collection<Long> ids,
+                                                               Map<Long, List<T>> existingLinks) {
+        Map<Long, List<T>> connectedEntities = new HashMap<>();
+        for (long entityId : ids) {
+            connectedEntities.put(
+                    entityId,
+                    existingLinks.containsKey(entityId) ? existingLinks.get(entityId) : new ArrayList<>()
+            );
+        }
+
+        return connectedEntities;
     }
 }

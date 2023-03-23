@@ -27,6 +27,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import static com.st1580.diploma.db.Tables.GAMMA_TO_DELTA;
+import static com.st1580.diploma.repository.impl.RepositoryHelper.fillConnectedEntities;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.noCondition;
 import static org.jooq.impl.DSL.row;
@@ -43,9 +44,11 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
         Condition condition = GAMMA_TO_DELTA.DELTA_ID.in(deltaIds)
                 .and(GAMMA_TO_DELTA.CREATED_TS.lessOrEqual(ts));
 
-        return getActiveLinks(condition)
+        Map<Long, List<Long>> existingLinks = getActiveLinks(condition)
                 .collect(Collectors.groupingBy(GammaToDeltaLink::getDeltaId,
                         Collectors.mapping(GammaToDeltaLink::getGammaId, Collectors.toList())));
+
+        return fillConnectedEntities(deltaIds, existingLinks);
     }
 
     @Override
@@ -53,9 +56,11 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
         Condition condition = GAMMA_TO_DELTA.GAMMA_ID.in(gammaIds)
                 .and(GAMMA_TO_DELTA.CREATED_TS.lessOrEqual(ts));
 
-        return getActiveLinks(condition)
+        Map<Long, List<Long>> existingLinks = getActiveLinks(condition)
                 .collect(Collectors.groupingBy(GammaToDeltaLink::getGammaId,
                         Collectors.mapping(GammaToDeltaLink::getDeltaId, Collectors.toList())));
+
+        return fillConnectedEntities(gammaIds, existingLinks);
     }
 
     private Stream<GammaToDeltaLink> getActiveLinks(Condition condition) {
@@ -85,11 +90,13 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
         Condition condition = LOW_LVL_GD.DELTA_ID.in(deltaIds)
                 .and(LOW_LVL_GD.CREATED_TS.lessOrEqual(ts));
 
-        return getGDRecordByCondition(condition)
+        Map<Long, List<GammaToDeltaLink>> existingLinks = getGDRecordByCondition(condition)
                 .stream()
                 .filter(GammaToDeltaRecord::getCanUse)
                 .map(this::convertToLink)
                 .collect(Collectors.groupingBy(GammaToDeltaLink::getDeltaId));
+
+        return fillConnectedEntities(deltaIds, existingLinks);
     }
 
     @Override
@@ -97,11 +104,13 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
         Condition condition = LOW_LVL_GD.GAMMA_ID.in(gammaIds)
                 .and(LOW_LVL_GD.CREATED_TS.lessOrEqual(ts));
 
-        return getGDRecordByCondition(condition)
+        Map<Long, List<GammaToDeltaLink>> existingLinks = getGDRecordByCondition(condition)
                 .stream()
                 .filter(GammaToDeltaRecord::getCanUse)
                 .map(this::convertToLink)
                 .collect(Collectors.groupingBy(GammaToDeltaLink::getGammaId));
+
+        return fillConnectedEntities(gammaIds, existingLinks);
     }
 
     @Override

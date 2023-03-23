@@ -23,7 +23,7 @@ public class GammaEntity extends AbstractEntity {
     @Override
     public GraphEntityDto convertToDto() {
         return new GraphEntityDto(
-                GraphEntityType.DELTA,
+                GraphEntityType.GAMMA,
                 getId(),
                 Map.of("isMaster", Boolean.toString(isMaster))
         );
