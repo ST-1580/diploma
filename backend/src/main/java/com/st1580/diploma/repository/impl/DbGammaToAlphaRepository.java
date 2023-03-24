@@ -26,6 +26,7 @@ import org.jooq.Row5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
+import static com.st1580.diploma.db.Tables.ALPHA_TO_BETA;
 import static com.st1580.diploma.db.Tables.GAMMA_TO_ALPHA;
 import static com.st1580.diploma.repository.impl.RepositoryHelper.fillConnectedEntities;
 import static org.jooq.impl.DSL.max;
@@ -237,6 +238,19 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
                         .and(GAMMA_TO_ALPHA.IS_ACTIVE_ALPHA.eq(LinkEndActivityType.UNDEFINED.name())))
                 .fetch()
                 .map(record -> new EntityEvent(record.getAlphaId(), record.getCreatedTs()));
+    }
+
+    @Override
+    public void deleteUndefinedLinks(long tsFrom, long tsTo) {
+        context.batchDelete(
+                context.selectFrom(GAMMA_TO_ALPHA)
+                        .where(GAMMA_TO_ALPHA.CREATED_TS.greaterOrEqual(tsFrom)
+                                .and(GAMMA_TO_ALPHA.CREATED_TS.lessThan(tsTo))
+                                .and(GAMMA_TO_ALPHA.IS_ACTIVE_GAMMA.eq(LinkEndActivityType.UNDEFINED.name())
+                                        .or(GAMMA_TO_ALPHA.IS_ACTIVE_ALPHA.eq(LinkEndActivityType.UNDEFINED.name())))
+                        )
+                        .fetch()
+        ).execute();
     }
 
     @Override

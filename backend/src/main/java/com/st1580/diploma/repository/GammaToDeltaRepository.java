@@ -28,6 +28,8 @@ public interface GammaToDeltaRepository {
 
     List<EntityEvent> getUndefinedDeltaStateInRange(long tsFrom, long tsTo);
 
+    void deleteUndefinedLinks(long tsFrom, long tsTo);
+
     void batchUpdateLinksDependentOnGamma(Map<EntityEvent, Boolean> gammaActiveStatusByEvent);
 
     void batchUpdateLinksDependentOnDelta(Map<EntityEvent, Boolean> deltaActiveStatusByEvent);

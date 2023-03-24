@@ -39,6 +39,7 @@ public class LinkCorrectorScheduler {
 
         linkCorrectorService.addLinkEventsByEntityUpdate(tsFrom, tsTo);
         linkCorrectorService.correctLinks(tsFrom, tsTo);
+        linkCorrectorService.deleteUndefinedLinks(tsFrom, tsTo);
 
         lastSyncRepository.setSchedulerLastSync(schedulerType, tsTo);
     }

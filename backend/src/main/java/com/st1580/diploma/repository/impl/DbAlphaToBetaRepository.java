@@ -240,6 +240,19 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
     }
 
     @Override
+    public void deleteUndefinedLinks(long tsFrom, long tsTo) {
+        context.batchDelete(
+                context.selectFrom(ALPHA_TO_BETA)
+                        .where(ALPHA_TO_BETA.CREATED_TS.greaterOrEqual(tsFrom)
+                                .and(ALPHA_TO_BETA.CREATED_TS.lessThan(tsTo))
+                                .and(ALPHA_TO_BETA.IS_ACTIVE_ALPHA.eq(LinkEndActivityType.UNDEFINED.name())
+                                        .or(ALPHA_TO_BETA.IS_ACTIVE_BETA.eq(LinkEndActivityType.UNDEFINED.name())))
+                        )
+                        .fetch()
+        ).execute();
+    }
+
+    @Override
     public void batchUpdateLinksDependentOnAlpha(Map<EntityEvent, Boolean> alphaActiveStatusByEvent) {
         context.batched(ctx -> {
             for (EntityEvent event : alphaActiveStatusByEvent.keySet()) {

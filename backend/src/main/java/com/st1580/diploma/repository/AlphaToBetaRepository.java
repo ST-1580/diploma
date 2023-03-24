@@ -28,6 +28,8 @@ public interface AlphaToBetaRepository {
 
     List<EntityEvent> getUndefinedBetaStateInRange(long tsFrom, long tsTo);
 
+    void deleteUndefinedLinks(long tsFrom, long tsTo);
+
     void batchUpdateLinksDependentOnAlpha(Map<EntityEvent, Boolean> alphaActiveStatusByEvent);
 
     void batchUpdateLinksDependentOnBeta(Map<EntityEvent, Boolean> betaActiveStatusByEvent);

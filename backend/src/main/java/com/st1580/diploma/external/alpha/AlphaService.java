@@ -67,6 +67,26 @@ public class AlphaService implements AlphaServiceApi {
     }
 
     @Override
+    public List<ExternalAlphaEntityDto> getAllActiveAlphaEntities() {
+        List<ExternalAlphaEntityDto> res = new ArrayList<>();
+        for (long alphaId : activeAlphaEntities) {
+            res.add(new ExternalAlphaEntityDto(alphaId, lastName.get(alphaId)));
+        }
+
+        return res;
+    }
+
+    @Override
+    public List<ExternalAlphaEntityDto> getAllDisableAlphaEntities() {
+        List<ExternalAlphaEntityDto> res = new ArrayList<>();
+        for (long alphaId : disableAlphaEntities) {
+            res.add(new ExternalAlphaEntityDto(alphaId, lastName.get(alphaId)));
+        }
+
+        return res;
+    }
+
+    @Override
     public String createEntity(ExternalAlphaEntityDto newEntity) {
         long newEntityId = newEntity.getId();
         if (activeAlphaEntities.contains(newEntityId) || disableAlphaEntities.contains(newEntityId)) {

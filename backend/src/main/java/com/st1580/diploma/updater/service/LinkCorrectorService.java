@@ -4,4 +4,6 @@ public interface LinkCorrectorService {
     void addLinkEventsByEntityUpdate(long tsFrom, long tsTo);
 
     void correctLinks(long tsFrom, long tsTo);
+
+    void deleteUndefinedLinks(long tsFrom, long tsTo);
 }

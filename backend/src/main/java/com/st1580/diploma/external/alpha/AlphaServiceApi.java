@@ -6,6 +6,7 @@ import com.st1580.diploma.external.alpha.data.entity.ExternalAlphaEntityEvent;
 import com.st1580.diploma.external.alpha.data.link.ExternalAlphaToBetaLinkEvent;
 import com.st1580.diploma.external.alpha.data.entity.ExternalAlphaEntityDto;
 import com.st1580.diploma.external.alpha.data.link.ExternalAlphaToBetaLinkDto;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,6 +18,14 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/external/v1/alpha")
 public interface AlphaServiceApi {
+    @GetMapping("/entities/active")
+    @CrossOrigin(origins = "http://localhost:3000")
+    List<ExternalAlphaEntityDto> getAllActiveAlphaEntities();
+
+    @GetMapping("/entities/disable")
+    @CrossOrigin(origins = "http://localhost:3000")
+    List<ExternalAlphaEntityDto> getAllDisableAlphaEntities();
+
     @PostMapping("/create/entity")
     String createEntity(@RequestBody ExternalAlphaEntityDto newEntity);
 

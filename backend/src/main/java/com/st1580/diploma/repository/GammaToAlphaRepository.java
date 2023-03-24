@@ -28,6 +28,8 @@ public interface GammaToAlphaRepository {
 
     List<EntityEvent> getUndefinedAlphaStateInRange(long tsFrom, long tsTo);
 
+    void deleteUndefinedLinks(long tsFrom, long tsTo);
+
     void batchUpdateLinksDependentOnGamma(Map<EntityEvent, Boolean> gammaActiveStatusByEvent);
 
     void batchUpdateLinksDependentOnAlpha(Map<EntityEvent, Boolean> alphaActiveStatusByEvent);

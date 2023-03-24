@@ -4,23 +4,23 @@ import java.util.Map;
 import java.util.Objects;
 
 public class GraphLinkDto {
-    private final GraphEntityDto fromGraphEntityDto;
-    private final GraphEntityDto toGraphEntityDto;
+    private final LinkEndDto fromGraphEntityDto;
+    private final LinkEndDto toGraphEntityDto;
     private final Map<String, String> payload;
 
-    public GraphLinkDto(GraphEntityDto fromGraphEntityDto,
-                        GraphEntityDto toGraphEntityDto,
+    public GraphLinkDto(LinkEndDto fromGraphEntityDto,
+                        LinkEndDto toGraphEntityDto,
                         Map<String, String> payload) {
         this.fromGraphEntityDto = fromGraphEntityDto;
         this.toGraphEntityDto = toGraphEntityDto;
         this.payload = payload;
     }
 
-    public GraphEntityDto getFromGraphEntity() {
+    public LinkEndDto getFromGraphEntity() {
         return fromGraphEntityDto;
     }
 
-    public GraphEntityDto getToGraphEntity() {
+    public LinkEndDto getToGraphEntity() {
         return toGraphEntityDto;
     }
 

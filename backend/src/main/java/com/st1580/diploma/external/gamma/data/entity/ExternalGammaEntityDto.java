@@ -11,7 +11,7 @@ public class ExternalGammaEntityDto {
 
     public ExternalGammaEntityDto(@JsonProperty("id") long id,
                                   @JsonProperty("isMaster") boolean isMaster,
-                                  @JsonProperty("unimportant") String unimportantData) {
+                                  @JsonProperty("unimportantData") String unimportantData) {
         this.id = id;
         this.unimportantData = unimportantData;
         this.isMaster = isMaster;

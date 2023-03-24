@@ -7,6 +7,7 @@ import com.st1580.diploma.collector.graph.AbstractLink;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.service.dto.GraphLinkDto;
+import com.st1580.diploma.collector.service.dto.LinkEndDto;
 import com.st1580.diploma.external.alpha.data.link.ExternalAlphaToBetaLink;
 
 public class AlphaToBetaLink extends AbstractLink {
@@ -32,8 +33,8 @@ public class AlphaToBetaLink extends AbstractLink {
     @Override
     public GraphLinkDto convertToDto() {
         return new GraphLinkDto(
-                getFrom().convertToDto(),
-                getTo().convertToDto(),
+                new LinkEndDto(getFrom().convertToDto().getType(), getFrom().getId()),
+                new LinkEndDto(getTo().convertToDto().getType(), getTo().getId()),
                 Map.of("hash", hash)
         );
     }

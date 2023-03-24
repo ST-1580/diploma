@@ -6,6 +6,7 @@ import com.st1580.diploma.collector.graph.AbstractLink;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.service.dto.GraphLinkDto;
+import com.st1580.diploma.collector.service.dto.LinkEndDto;
 import com.st1580.diploma.external.gamma.data.links.gd.ExternalGammaToDeltaLink;
 
 public class GammaToDeltaLink extends AbstractLink {
@@ -35,7 +36,10 @@ public class GammaToDeltaLink extends AbstractLink {
 
     @Override
     public GraphLinkDto convertToDto() {
-        return new GraphLinkDto(getFrom().convertToDto(), getTo().convertToDto(), null);
+        return new GraphLinkDto(
+                new LinkEndDto(getFrom().convertToDto().getType(), getFrom().getId()),
+                new LinkEndDto(getTo().convertToDto().getType(), getTo().getId()),
+                null);
     }
 
     @Override

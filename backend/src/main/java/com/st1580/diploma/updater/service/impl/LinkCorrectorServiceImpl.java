@@ -55,4 +55,11 @@ public class LinkCorrectorServiceImpl implements LinkCorrectorService {
         gammaRepository.correctDependentLinks(tsFrom, tsTo);
         deltaRepository.correctDependentLinks(tsFrom, tsTo);
     }
+
+    @Override
+    public void deleteUndefinedLinks(long tsFrom, long tsTo) {
+        alphaToBetaRepository.deleteUndefinedLinks(tsFrom, tsTo);
+        gammaToAlphaRepository.deleteUndefinedLinks(tsFrom, tsTo);
+        gammaToDeltaRepository.deleteUndefinedLinks(tsFrom, tsTo);
+    }
 }
