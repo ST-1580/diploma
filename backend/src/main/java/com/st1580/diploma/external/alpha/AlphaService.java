@@ -146,6 +146,34 @@ public class AlphaService implements AlphaServiceApi {
     }
 
     @Override
+    public List<ExternalAlphaToBetaLinkDto> getAllActiveAlphaToBetaLinks() {
+        List<ExternalAlphaToBetaLinkDto> res = new ArrayList<>();
+        for (AlphaBetaId alphaBetaId : activeAlphaToBetaLinks) {
+            res.add(new ExternalAlphaToBetaLinkDto(
+                    alphaBetaId.getAlphaId(),
+                    alphaBetaId.getBetaId(),
+                    lastHash.get(alphaBetaId))
+            );
+        }
+
+        return res;
+    }
+
+    @Override
+    public List<ExternalAlphaToBetaLinkDto> getAllDisableAlphaToBetaLinks() {
+        List<ExternalAlphaToBetaLinkDto> res = new ArrayList<>();
+        for (AlphaBetaId alphaBetaId : disableAlphaToBetaLinks) {
+            res.add(new ExternalAlphaToBetaLinkDto(
+                    alphaBetaId.getAlphaId(),
+                    alphaBetaId.getBetaId(),
+                    lastHash.get(alphaBetaId))
+            );
+        }
+
+        return res;
+    }
+
+    @Override
     public String createAlphaToBetaLink(ExternalAlphaToBetaLinkDto newLink) {
         AlphaBetaId ab = new AlphaBetaId(newLink.getAlphaId(), newLink.getBetaId());
         if (!activeAlphaEntities.contains(ab.getAlphaId())) {

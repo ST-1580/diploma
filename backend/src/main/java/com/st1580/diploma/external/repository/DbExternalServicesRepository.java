@@ -46,7 +46,6 @@ public class DbExternalServicesRepository implements ExternalServicesRepository 
                 .whereExists(
                         context.select(LOW_LVL_ALPHA.ID, max(LOW_LVL_ALPHA.CREATED_TS))
                                 .from(LOW_LVL_ALPHA)
-                                .where(LOW_LVL_ALPHA.ACTIVE_STATUS.in(EntityActiveType.trueEntityActiveTypes))
                                 .groupBy(LOW_LVL_ALPHA.ID)
                                 .having(LOW_LVL_ALPHA.ID.eq(TOP_LVL_ALPHA.ID)
                                         .and(max(LOW_LVL_ALPHA.CREATED_TS).eq(TOP_LVL_ALPHA.CREATED_TS)))
@@ -71,7 +70,6 @@ public class DbExternalServicesRepository implements ExternalServicesRepository 
                 .whereExists(context
                         .select(LOW_LVL_AB.ALPHA_ID, LOW_LVL_AB.BETA_ID, max(LOW_LVL_AB.CREATED_TS))
                         .from(LOW_LVL_AB)
-                        .where(LOW_LVL_AB.CAN_USE)
                         .groupBy(LOW_LVL_AB.ALPHA_ID, LOW_LVL_AB.BETA_ID)
                         .having(LOW_LVL_AB.ALPHA_ID.eq(TOP_LVL_AB.ALPHA_ID)
                                 .and(LOW_LVL_AB.BETA_ID.eq(TOP_LVL_AB.BETA_ID))
@@ -98,7 +96,6 @@ public class DbExternalServicesRepository implements ExternalServicesRepository 
                 .whereExists(
                         context.select(LOW_LVL_BETA.ID, max(LOW_LVL_BETA.CREATED_TS))
                                 .from(LOW_LVL_BETA)
-                                .where(LOW_LVL_BETA.ACTIVE_STATUS.in(EntityActiveType.trueEntityActiveTypes))
                                 .groupBy(LOW_LVL_BETA.ID)
                                 .having(LOW_LVL_BETA.ID.eq(TOP_LVL_BETA.ID)
                                         .and(max(LOW_LVL_BETA.CREATED_TS).eq(TOP_LVL_BETA.CREATED_TS)))
@@ -122,7 +119,6 @@ public class DbExternalServicesRepository implements ExternalServicesRepository 
                 .whereExists(
                         context.select(LOW_LVL_GAMMA.ID, max(LOW_LVL_GAMMA.CREATED_TS))
                                 .from(LOW_LVL_GAMMA)
-                                .where(LOW_LVL_GAMMA.ACTIVE_STATUS.in(EntityActiveType.trueEntityActiveTypes))
                                 .groupBy(LOW_LVL_GAMMA.ID)
                                 .having(LOW_LVL_GAMMA.ID.eq(TOP_LVL_GAMMA.ID)
                                         .and(max(LOW_LVL_GAMMA.CREATED_TS).eq(TOP_LVL_GAMMA.CREATED_TS)))
@@ -148,7 +144,6 @@ public class DbExternalServicesRepository implements ExternalServicesRepository 
                 .whereExists(context
                         .select(LOW_LVL_GA.GAMMA_ID, LOW_LVL_GA.ALPHA_ID, max(LOW_LVL_GA.CREATED_TS))
                         .from(LOW_LVL_GA)
-                        .where(LOW_LVL_GA.CAN_USE)
                         .groupBy(LOW_LVL_GA.GAMMA_ID, LOW_LVL_GA.ALPHA_ID)
                         .having(LOW_LVL_GA.GAMMA_ID.eq(TOP_LVL_GA.GAMMA_ID)
                                 .and(LOW_LVL_GA.ALPHA_ID.eq(TOP_LVL_GA.ALPHA_ID))
@@ -175,7 +170,6 @@ public class DbExternalServicesRepository implements ExternalServicesRepository 
                 .whereExists(context
                         .select(LOW_LVL_GD.GAMMA_ID, LOW_LVL_GD.DELTA_ID, max(LOW_LVL_GD.CREATED_TS))
                         .from(LOW_LVL_GD)
-                        .where(LOW_LVL_GD.CAN_USE)
                         .groupBy(LOW_LVL_GD.GAMMA_ID, LOW_LVL_GD.DELTA_ID)
                         .having(LOW_LVL_GD.GAMMA_ID.eq(TOP_LVL_GD.GAMMA_ID)
                                 .and(LOW_LVL_GD.DELTA_ID.eq(TOP_LVL_GD.DELTA_ID))
@@ -201,7 +195,6 @@ public class DbExternalServicesRepository implements ExternalServicesRepository 
                 .whereExists(
                         context.select(LOW_LVL_DELTA.ID, max(LOW_LVL_DELTA.CREATED_TS))
                                 .from(LOW_LVL_DELTA)
-                                .where(LOW_LVL_DELTA.ACTIVE_STATUS.in(EntityActiveType.trueEntityActiveTypes))
                                 .groupBy(LOW_LVL_DELTA.ID)
                                 .having(LOW_LVL_DELTA.ID.eq(TOP_LVL_DELTA.ID)
                                         .and(max(LOW_LVL_DELTA.CREATED_TS).eq(TOP_LVL_DELTA.CREATED_TS)))

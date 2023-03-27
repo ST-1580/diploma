@@ -1,23 +1,23 @@
 import React from "react";
 import "./App.css";
-import Alpha from "./Alpha";
+import Alpha from "./alpha/Alpha";
 import Beta from "./Beta";
 import Gamma from "./Gamma";
 import Delta from "./Delta";
 import Space from "./Space";
 
-import {BrowserRouter, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 
 function App() {
   return (
     <BrowserRouter>
       <Header />
       <Routes>
-        <Route path="/" Component={ Space }></Route>
-        <Route path="alpha" Component={ Alpha }></Route>
-        <Route path="/beta" Component={ Beta }></Route>
-        <Route path="/gamma" Component={ Gamma }></Route>
-        <Route path="/delta" Component={ Delta }></Route>
+        <Route path="/" Component={Space}></Route>
+        <Route path="alpha" Component={Alpha}></Route>
+        <Route path="/beta" Component={Beta}></Route>
+        <Route path="/gamma" Component={Gamma}></Route>
+        <Route path="/delta" Component={Delta}></Route>
       </Routes>
       <Footer />
     </BrowserRouter>
@@ -26,12 +26,24 @@ function App() {
 
 function Header() {
   return (
-    <header className="header">
-      <Link to="/">Space</Link>
-      <Link to="/alpha">Alpha</Link>
-      <Link to="/beta">Beta</Link>
-      <Link to="/gamma">Gamma</Link>
-      <Link to="/delta">Delta</Link>
+    <header>
+      <div className="flex_header">
+        <div className="header_left">
+          <Link to="/">Space</Link>
+        </div>
+        <div className="header_right">
+          <Link to="/alpha">Alpha</Link>
+        </div>
+        <div className="header_right">
+          <Link to="/beta">Beta</Link>
+        </div>
+        <div className="header_right">
+          <Link to="/gamma">Gamma</Link>
+        </div>
+        <div className="header_right">
+          <Link to="/delta">Delta</Link>
+        </div>
+      </div>
     </header>
   )
 }
@@ -39,7 +51,9 @@ function Header() {
 function Footer() {
   return (
     <footer>
+      <div>
         Made by st1580
+      </div>
     </footer>
   )
 }

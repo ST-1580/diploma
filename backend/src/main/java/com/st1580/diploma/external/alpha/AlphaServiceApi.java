@@ -17,13 +17,14 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/external/v1/alpha")
+@CrossOrigin(origins = "http://localhost:3000")
 public interface AlphaServiceApi {
+    // ------------- alpha entity
+
     @GetMapping("/entities/active")
-    @CrossOrigin(origins = "http://localhost:3000")
     List<ExternalAlphaEntityDto> getAllActiveAlphaEntities();
 
     @GetMapping("/entities/disable")
-    @CrossOrigin(origins = "http://localhost:3000")
     List<ExternalAlphaEntityDto> getAllDisableAlphaEntities();
 
     @PostMapping("/create/entity")
@@ -35,6 +36,14 @@ public interface AlphaServiceApi {
     @PostMapping("/switch/entity")
     String switchEntity(@RequestParam("id") long entityId);
 
+    // ------------- alpha -> beta link
+
+    @GetMapping("/link/beta/active")
+    List<ExternalAlphaToBetaLinkDto> getAllActiveAlphaToBetaLinks();
+
+    @GetMapping("/link/beta/disable")
+    List<ExternalAlphaToBetaLinkDto> getAllDisableAlphaToBetaLinks();
+
     @PostMapping("/create/link/beta")
     String createAlphaToBetaLink(@RequestBody ExternalAlphaToBetaLinkDto newLink);
 
@@ -43,6 +52,8 @@ public interface AlphaServiceApi {
 
     @PostMapping("/switch/link/beta")
     String switchAlphaToBetaLink(@RequestParam("alphaId") long alphaId, @RequestParam("betaId") long betaId);
+
+    // ------------- space update
 
     @GetMapping("/events/entity")
     List<ExternalAlphaEntityEvent> getAlphaEntityEvents(@RequestParam("from") long tsFrom,
