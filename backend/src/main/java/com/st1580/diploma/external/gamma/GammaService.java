@@ -10,17 +10,13 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
-import com.st1580.diploma.external.alpha.data.AlphaEventType;
-import com.st1580.diploma.external.alpha.data.entity.ExternalAlphaEntity;
-import com.st1580.diploma.external.alpha.data.entity.ExternalAlphaEntityEvent;
+import com.st1580.diploma.db.tables.GammaToDelta;
 import com.st1580.diploma.external.alpha.data.link.AlphaBetaId;
-import com.st1580.diploma.external.alpha.data.link.ExternalAlphaToBetaLink;
-import com.st1580.diploma.external.alpha.data.link.ExternalAlphaToBetaLinkEvent;
+import com.st1580.diploma.external.alpha.data.link.ExternalAlphaToBetaLinkDto;
 import com.st1580.diploma.external.gamma.data.GammaEventType;
 import com.st1580.diploma.external.gamma.data.entity.ExternalGammaEntity;
 import com.st1580.diploma.external.gamma.data.entity.ExternalGammaEntityDto;
 import com.st1580.diploma.external.gamma.data.entity.ExternalGammaEntityEvent;
-import com.st1580.diploma.external.gamma.data.entity.ExternalGammaEntityPayload;
 import com.st1580.diploma.external.gamma.data.links.ga.ExternalGammaToAlphaLink;
 import com.st1580.diploma.external.gamma.data.links.ga.ExternalGammaToAlphaLinkDto;
 import com.st1580.diploma.external.gamma.data.links.ga.ExternalGammaToAlphaLinkEvent;
@@ -39,7 +35,7 @@ public class GammaService implements GammaServiceApi {
     private final List<ExternalGammaToDeltaLinkEvent> gammaToDeltaLinkEvents;
     private final Set<Long> activeGammaEntities;
     private final Set<Long> disableGammaEntities;
-    private final Map<Long, ExternalGammaEntityPayload> lastPayload;
+    private final Map<Long, Boolean> lastIsMaster;
     private final Set<GammaAlphaId> activeGammaToAlphaLinks;
     private final Set<GammaAlphaId> disableGammaToAlphaLinks;
     private final Map<GammaAlphaId, Long> lastWeight;
@@ -62,10 +58,10 @@ public class GammaService implements GammaServiceApi {
                 .filter(Predicate.not(ExternalGammaEntity::isActive))
                 .map(ExternalGammaEntity::getId)
                 .collect(Collectors.toSet());
-        this.lastPayload = entities.stream().collect(Collectors.toMap(
+        this.lastIsMaster = entities.stream().collect(Collectors.toMap(
                 ExternalGammaEntity::getId,
-                entity -> new ExternalGammaEntityPayload(entity.isMaster(), entity.getUnimportantData())
-        ));
+                ExternalGammaEntity::isMaster)
+        );
 
         List<ExternalGammaToAlphaLink> gaLinks = externalServicesRepository.getAllGammaToAlphaLinks();
         this.activeGammaToAlphaLinks = gaLinks.stream()
@@ -93,14 +89,33 @@ public class GammaService implements GammaServiceApi {
     }
 
     @Override
+    public List<ExternalGammaEntityDto> getAllActiveGammaEntities() {
+        List<ExternalGammaEntityDto> res = new ArrayList<>();
+        for (long gammaId : activeGammaEntities) {
+            res.add(new ExternalGammaEntityDto(gammaId, lastIsMaster.get(gammaId)));
+        }
+
+        return res;
+    }
+
+    @Override
+    public List<ExternalGammaEntityDto> getAllDisableGammaEntities() {
+        List<ExternalGammaEntityDto> res = new ArrayList<>();
+        for (long gammaId : disableGammaEntities) {
+            res.add(new ExternalGammaEntityDto(gammaId, lastIsMaster.get(gammaId)));
+        }
+
+        return res;
+    }
+
+    @Override
     public String createEntity(ExternalGammaEntityDto newEntity) {
         long newEntityId = newEntity.getId();
         if (activeGammaEntities.contains(newEntityId) || disableGammaEntities.contains(newEntityId)) {
             return "Gamma entity id " + newEntityId + " is already exist";
         }
         activeGammaEntities.add(newEntityId);
-        lastPayload.put(newEntityId,
-                new ExternalGammaEntityPayload(newEntity.isMaster(), newEntity.getUnimportantData()));
+        lastIsMaster.put(newEntityId, newEntity.isMaster());
 
         entityEvents.add(
                 new ExternalGammaEntityEvent(
@@ -108,7 +123,6 @@ public class GammaService implements GammaServiceApi {
                         new ExternalGammaEntity(
                                 newEntityId,
                                 newEntity.isMaster(),
-                                newEntity.getUnimportantData(),
                                 true)
                 ));
         return "done";
@@ -119,8 +133,7 @@ public class GammaService implements GammaServiceApi {
         if (!activeGammaEntities.contains(gammaEntity.getId())) {
             return "Gamma entity with id " + gammaEntity.getId() + " does not exist or does not active";
         }
-        lastPayload.put(gammaEntity.getId(),
-                new ExternalGammaEntityPayload(gammaEntity.isMaster(), gammaEntity.getUnimportantData()));
+        lastIsMaster.put(gammaEntity.getId(), gammaEntity.isMaster());
 
         entityEvents.add(
                 new ExternalGammaEntityEvent(
@@ -128,7 +141,6 @@ public class GammaService implements GammaServiceApi {
                         new ExternalGammaEntity(
                                 gammaEntity.getId(),
                                 gammaEntity.isMaster(),
-                                gammaEntity.getUnimportantData(),
                                 true)
                 ));
         return "done";
@@ -140,28 +152,24 @@ public class GammaService implements GammaServiceApi {
             activeGammaEntities.remove(entityId);
             disableGammaEntities.add(entityId);
 
-            ExternalGammaEntityPayload payload = lastPayload.get(entityId);
             entityEvents.add(
                     new ExternalGammaEntityEvent(
                             GammaEventType.TURN_OFF,
                             new ExternalGammaEntity(
                                     entityId,
-                                    payload.isMaster(),
-                                    payload.getUnimportantData(),
+                                    lastIsMaster.get(entityId),
                                     false)
                     ));
         } else if (disableGammaEntities.contains(entityId)) {
             activeGammaEntities.add(entityId);
             disableGammaEntities.remove(entityId);
 
-            ExternalGammaEntityPayload payload = lastPayload.get(entityId);
             entityEvents.add(
                     new ExternalGammaEntityEvent(
                             GammaEventType.TURN_ON,
                             new ExternalGammaEntity(
                                     entityId,
-                                    payload.isMaster(),
-                                    payload.getUnimportantData(),
+                                    lastIsMaster.get(entityId),
                                     true)
                     ));
         } else {
@@ -169,6 +177,34 @@ public class GammaService implements GammaServiceApi {
         }
 
         return "done";
+    }
+
+    @Override
+    public List<ExternalGammaToAlphaLinkDto> getAllActiveGammaToAlphaLinks() {
+        List<ExternalGammaToAlphaLinkDto> res = new ArrayList<>();
+        for (GammaAlphaId gammaAlphaId : activeGammaToAlphaLinks) {
+            res.add(new ExternalGammaToAlphaLinkDto(
+                    gammaAlphaId.getGammaId(),
+                    gammaAlphaId.getAlphaId(),
+                    lastWeight.get(gammaAlphaId))
+            );
+        }
+
+        return res;
+    }
+
+    @Override
+    public List<ExternalGammaToAlphaLinkDto> getAllDisableGammaToAlphaLinks() {
+        List<ExternalGammaToAlphaLinkDto> res = new ArrayList<>();
+        for (GammaAlphaId gammaAlphaId : disableGammaToAlphaLinks) {
+            res.add(new ExternalGammaToAlphaLinkDto(
+                    gammaAlphaId.getGammaId(),
+                    gammaAlphaId.getAlphaId(),
+                    lastWeight.get(gammaAlphaId))
+            );
+        }
+
+        return res;
     }
 
     @Override
@@ -257,6 +293,32 @@ public class GammaService implements GammaServiceApi {
         }
 
         return "done";
+    }
+
+    @Override
+    public List<ExternalGammaToDeltaLinkDto> getAllActiveGammaToDeltaLinks() {
+        List<ExternalGammaToDeltaLinkDto> res = new ArrayList<>();
+        for (GammaDeltaId gammaDeltaId : activeGammaToDeltaLinks) {
+            res.add(new ExternalGammaToDeltaLinkDto(
+                    gammaDeltaId.getGammaId(),
+                    gammaDeltaId.getDeltaId())
+            );
+        }
+
+        return res;
+    }
+
+    @Override
+    public List<ExternalGammaToDeltaLinkDto> getAllDisableGammaToDeltaLinks() {
+        List<ExternalGammaToDeltaLinkDto> res = new ArrayList<>();
+        for (GammaDeltaId gammaDeltaId : disableGammaToDeltaLinks) {
+            res.add(new ExternalGammaToDeltaLinkDto(
+                    gammaDeltaId.getGammaId(),
+                    gammaDeltaId.getDeltaId())
+            );
+        }
+
+        return res;
     }
 
     @Override

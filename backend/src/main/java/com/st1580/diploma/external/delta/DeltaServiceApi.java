@@ -2,8 +2,10 @@ package com.st1580.diploma.external.delta;
 
 import java.util.List;
 
+import com.st1580.diploma.external.beta.data.ExternalBetaEntity;
 import com.st1580.diploma.external.delta.data.ExternalDeltaEntity;
 import com.st1580.diploma.external.delta.data.ExternalDeltaEntityEvent;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -15,7 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/external/v1/delta")
+@CrossOrigin(origins = "http://localhost:3000")
 public interface DeltaServiceApi {
+    @GetMapping("/entities/active")
+    List<ExternalDeltaEntity> getAllActiveDeltaEntities();
     @PostMapping("/create/entity")
     String createEntity(@RequestBody ExternalDeltaEntity newEntity);
 

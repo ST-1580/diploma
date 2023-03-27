@@ -6,19 +6,21 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class ExternalGammaEntityDto {
     private final long id;
-    private final String unimportantData;
     private final boolean isMaster;
 
     public ExternalGammaEntityDto(@JsonProperty("id") long id,
-                                  @JsonProperty("isMaster") boolean isMaster,
-                                  @JsonProperty("unimportantData") String unimportantData) {
+                                  @JsonProperty("isMaster") boolean isMaster) {
         this.id = id;
-        this.unimportantData = unimportantData;
         this.isMaster = isMaster;
     }
 
     public long getId() {
         return id;
+    }
+
+    @JsonProperty("isMaster")
+    public boolean isMaster() {
+        return isMaster;
     }
 
     @Override
@@ -30,20 +32,11 @@ public class ExternalGammaEntityDto {
             return false;
         }
         ExternalGammaEntityDto that = (ExternalGammaEntityDto) o;
-        return id == that.id && isMaster == that.isMaster && Objects.equals(unimportantData, that.unimportantData);
+        return id == that.id && isMaster == that.isMaster;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, unimportantData, isMaster);
+        return Objects.hash(id, isMaster);
     }
-
-    public String getUnimportantData() {
-        return unimportantData;
-    }
-
-    public boolean isMaster() {
-        return isMaster;
-    }
-
 }

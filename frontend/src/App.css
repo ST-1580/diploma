@@ -1,6 +1,11 @@
 header {
-    margin: 20px 0;
+    margin: 0;
     border-bottom: 1px solid #616467;
+    position: fixed;
+    top: 0;
+    height: 60px;
+    width: 60%;
+    background-color: white;
 }
 
 header a {
@@ -33,7 +38,7 @@ header a:hover {
 }
 
 .tables {
-    margin: 20px;
+    margin: 80px 20px 30px;
     color: #222;
 }
 
@@ -56,10 +61,12 @@ header a:hover {
 
 .active_table {
     margin: 0 auto auto;
+    width: 45%;
 }
 
 .disable_table {
     margin: 0 auto auto;
+    width: 45%;
 }
 
 table {
@@ -68,6 +75,11 @@ table {
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     border-collapse: collapse;
     display: table;
+}
+
+table form {
+    display: flex;
+    align-items: center;
 }
 
 tr {
@@ -101,6 +113,7 @@ input {
     line-height: 20px;
     background-color: transparent;
     border-radius: 3px;
+    text-align: center;
 }
 
 button {
@@ -119,6 +132,8 @@ button:hover {
 }
 
 .add_form div {
+    display: flex;
+    align-items: center;
     margin-bottom: 10px;
 }
 

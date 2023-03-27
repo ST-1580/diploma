@@ -199,7 +199,7 @@ function AlphaToBetaLinkTables() {
             <p className='entities_type'>Alpha - Beta Links</p>
             <div className='flex_tables_wrapper'>
                 <div className='active_table'>
-                    <p>Active ab links</p>
+                    <p>Active links</p>
                     <table>
                         <thead>
                             <tr>
@@ -244,7 +244,7 @@ function AlphaToBetaLinkTables() {
                 </div>
 
                 <div className='disable_table'>
-                    <p>Disable ab links</p>
+                    <p>Disable links</p>
                     <table>
                         <thead>
                             <tr>

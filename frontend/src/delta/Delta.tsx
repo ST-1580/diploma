@@ -1,41 +1,29 @@
-import axios from 'axios';
-import React, { useState, useEffect } from 'react';
-import { BACKEND_URL } from '../Utils';
+import "./Delta.css";
+import axios from "axios";
+import React, { useState, useEffect } from "react";
+import { BACKEND_URL } from "../Utils";
 
-type AlphaEntity = {
+type DeltaEntity = {
     id: number,
     name: string
 }
 
-const URL: string = BACKEND_URL + 'external/v1/alpha';
+const URL: string = BACKEND_URL + 'external/v1/delta';
 
-
-function AlphaEntiyTables() {
-    const [activeAlphaEntites, setActiveAlphaEntites] = useState<AlphaEntity[]>([]);
-    const [disableAlphaEntites, setDisableAlphaEntites] = useState<AlphaEntity[]>([]);
+function Delta() {
+    const [activeDeltaEntites, setActiveDeltaEntites] = useState<DeltaEntity[]>([]);
     const [editEntityId, setEditEntityId] = useState<number | null>(null);
 
     useEffect(() => {
         axios.get(URL + '/entities/active')
             .then(response => {
-                const newActiveAlphaEntities: AlphaEntity[] = response.data.map(
+                const newActiveDeltaEntities: DeltaEntity[] = response.data.map(
                     (e: any) => {
-                        const parsedEntity: AlphaEntity = { id: e.id, name: e.name }
+                        const parsedEntity: DeltaEntity = { id: e.id, name: e.name }
                         return parsedEntity
                     }
                 );
-                setActiveAlphaEntites(newActiveAlphaEntities);
-            });
-
-        axios.get(URL + '/entities/disable')
-            .then(response => {
-                const disableAlphaEntities: AlphaEntity[] = response.data.map(
-                    (e: any) => {
-                        const parsedEntity: AlphaEntity = { id: e.id, name: e.name }
-                        return parsedEntity
-                    }
-                );
-                setDisableAlphaEntites(disableAlphaEntities);
+                setActiveDeltaEntites(newActiveDeltaEntities);
             });
     }, []);
 
@@ -51,15 +39,15 @@ function AlphaEntiyTables() {
         axios.patch(URL + '/patch/entity', { id: editEntityId, name: newName })
             .then(response => {
                 if (response.data === 'done') {
-                    const updatedActiveAlphaEntites = activeAlphaEntites.map((entity) => {
+                    const updatedActiveDeltaEntites = activeDeltaEntites.map((entity) => {
                         if (entity.id === editEntityId) {
-                            const updatedEntity: AlphaEntity = { id: entity.id, name: newName }
+                            const updatedEntity: DeltaEntity = { id: entity.id, name: newName }
                             return updatedEntity;
                         }
                         return entity;
                     });
 
-                    setActiveAlphaEntites(updatedActiveAlphaEntites);
+                    setActiveDeltaEntites(updatedActiveDeltaEntites);
                 }
 
                 setEditEntityId(null);
@@ -67,42 +55,17 @@ function AlphaEntiyTables() {
 
     }
 
-    const hadleSwitchActivity = (id: number, isSwitchToActive: boolean) => {
-        axios.post(URL + '/switch/entity?id=' + id)
+    const handleDeleteEntity = (id: number) => {
+        axios.delete(URL + '/delete/entity?id=' + id)
             .then(response => {
                 if (response.data === 'done') {
-                    let updatedActiveAlphaEntites: AlphaEntity[] = [];
-                    let updatedDisableAlphaEntites: AlphaEntity[] = [];
-
-                    if (isSwitchToActive) {
-                        for (const entity of disableAlphaEntites) {
-                            if (entity.id === id) {
-                                activeAlphaEntites.push(entity);
-                                break;
-                            }
-                        }
-
-                        updatedActiveAlphaEntites = activeAlphaEntites;
-                        updatedDisableAlphaEntites = disableAlphaEntites.filter((entity) => entity.id !== id);
-                    } else {
-                        for (const entity of activeAlphaEntites) {
-                            if (entity.id === id) {
-                                disableAlphaEntites.push(entity);
-                                break;
-                            }
-                        }
-
-                        updatedDisableAlphaEntites = disableAlphaEntites;
-                        updatedActiveAlphaEntites = activeAlphaEntites.filter((entity) => entity.id !== id);
-                    }
-
-                    setActiveAlphaEntites(updatedActiveAlphaEntites);
-                    setDisableAlphaEntites(updatedDisableAlphaEntites);
+                    const updatedActiveDeltaEntites = activeDeltaEntites.filter((entity) => entity.id !== id);
+                    setActiveDeltaEntites(updatedActiveDeltaEntites);
                 }
             });
     };
 
-    const AlphaEntityAddForm = () => {
+    const DeltaEntityAddForm = () => {
         const [showForm, setShowForm] = useState(false);
         const [id, setId] = useState(0);
         const [name, setName] = useState("");
@@ -122,9 +85,9 @@ function AlphaEntiyTables() {
             axios.post(URL + '/create/entity', newEntity)
                 .then(response => {
                     if (response.data === 'done') {
-                        activeAlphaEntites.push(newEntity);
-                        const updatedActiveAlphaEntites = activeAlphaEntites.slice();
-                        setActiveAlphaEntites(updatedActiveAlphaEntites);
+                        activeDeltaEntites.push(newEntity);
+                        const updatedActiveDeltaEntites = activeDeltaEntites.slice();
+                        setActiveDeltaEntites(updatedActiveDeltaEntites);
 
                         setId(0);
                         setName("");
@@ -174,11 +137,10 @@ function AlphaEntiyTables() {
     }
 
     return (
-        <>
-            <p className='entities_type'>Alpha Entites</p>
+        <div className='tables delta_tables'>
             <div className='flex_tables_wrapper'>
                 <div className='active_table'>
-                    <p>Active entities</p>
+                    <p style={{textDecoration: "underline"}}>Delta entities</p>
                     <table>
                         <thead>
                             <tr>
@@ -188,7 +150,7 @@ function AlphaEntiyTables() {
                             </tr>
                         </thead>
                         <tbody>
-                            {activeAlphaEntites.map((entity) => (
+                            {activeDeltaEntites.map((entity) => (
                                 <tr key={entity.id}>
                                     <td>{entity.id}</td>
                                     {editEntityId === entity.id ? (
@@ -209,45 +171,20 @@ function AlphaEntiyTables() {
                                         <button onClick={() => setEditEntityId(entity.id)}>
                                             Edit
                                         </button>
-                                        <button onClick={() => hadleSwitchActivity(entity.id, false)}>
-                                            Make disabled
+                                        <button onClick={() => handleDeleteEntity(entity.id)}>
+                                            Delete
                                         </button>
                                     </td>
                                 </tr>
                             ))}
                         </tbody>
                     </table>
-                    <AlphaEntityAddForm />
-                </div>
-
-                <div className='disable_table'>
-                    <p>Disable entities</p>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Id</th>
-                                <th>Name</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {disableAlphaEntites.map((entity) => (
-                                <tr key={entity.id}>
-                                    <td>{entity.id}</td>
-                                    <td>{entity.name}</td>
-                                    <td>
-                                        <button onClick={() => hadleSwitchActivity(entity.id, true)}>
-                                            Make active
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
+                    <DeltaEntityAddForm />
                 </div>
             </div>
-        </>
+        </div>
+
     );
 }
 
-export default AlphaEntiyTables;
+export default Delta;

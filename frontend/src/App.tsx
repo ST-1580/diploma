@@ -1,10 +1,10 @@
 import React from "react";
 import "./App.css";
 import Alpha from "./alpha/Alpha";
-import Beta from "./Beta";
-import Gamma from "./Gamma";
-import Delta from "./Delta";
-import Space from "./Space";
+import Beta from "./beta/Beta";
+import Gamma from "./gamma/Gamma";
+import Delta from "./delta/Delta";
+import Space from "./space/Space";
 
 import { BrowserRouter, Routes, Route, Link } from "react-router-dom";
 

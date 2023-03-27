@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import com.st1580.diploma.external.beta.data.ExternalBetaEntity;
 import com.st1580.diploma.external.delta.data.ExternalDeltaEntityEvent;
 import com.st1580.diploma.external.delta.data.DeltaEventType;
 import com.st1580.diploma.external.delta.data.ExternalDeltaEntity;
@@ -34,6 +35,16 @@ public class DeltaService implements DeltaServiceApi {
                 ExternalDeltaEntity::getId,
                 ExternalDeltaEntity::getName
         ));
+    }
+
+    @Override
+    public List<ExternalDeltaEntity> getAllActiveDeltaEntities() {
+        List<ExternalDeltaEntity> res = new ArrayList<>();
+        for (long deltaId : activeDeltaEntities) {
+            res.add(new ExternalDeltaEntity(deltaId, lastName.get(deltaId)));
+        }
+
+        return res;
     }
 
     @Override

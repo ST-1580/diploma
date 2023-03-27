@@ -128,7 +128,6 @@ public class DbExternalServicesRepository implements ExternalServicesRepository 
                 .map(record -> new ExternalGammaEntity(
                         record.getId(),
                         record.getIsMaster(),
-                        "random string number" + (int) (Math.random() * 10),
                         record.getActiveStatus().endsWith("TRUE")
                 ))
                 .collect(Collectors.toList());

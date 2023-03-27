@@ -9,6 +9,9 @@ import java.util.stream.Collectors;
 
 import javax.inject.Inject;
 
+import com.st1580.diploma.external.alpha.data.entity.ExternalAlphaEntityDto;
+import com.st1580.diploma.external.alpha.data.link.AlphaBetaId;
+import com.st1580.diploma.external.alpha.data.link.ExternalAlphaToBetaLinkDto;
 import com.st1580.diploma.external.beta.data.ExternalBetaEntityEvent;
 import com.st1580.diploma.external.beta.data.ExternalBetaEntity;
 import com.st1580.diploma.external.delta.data.DeltaEventType;
@@ -35,6 +38,16 @@ public class BetaService implements BetaServiceApi {
                 ExternalBetaEntity::getId,
                 ExternalBetaEntity::getEpoch
         ));
+    }
+
+    @Override
+    public List<ExternalBetaEntity> getAllActiveBetaEntities() {
+        List<ExternalBetaEntity> res = new ArrayList<>();
+        for (long betaId : activeBetaEntities) {
+            res.add(new ExternalBetaEntity(betaId, lastEpoch.get(betaId)));
+        }
+
+        return res;
     }
 
     @Override

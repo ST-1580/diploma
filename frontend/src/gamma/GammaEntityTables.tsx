@@ -2,40 +2,40 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import { BACKEND_URL } from '../Utils';
 
-type AlphaEntity = {
+type GammaEntity = {
     id: number,
-    name: string
+    isMaster: boolean
 }
 
-const URL: string = BACKEND_URL + 'external/v1/alpha';
+const URL: string = BACKEND_URL + 'external/v1/gamma';
 
 
-function AlphaEntiyTables() {
-    const [activeAlphaEntites, setActiveAlphaEntites] = useState<AlphaEntity[]>([]);
-    const [disableAlphaEntites, setDisableAlphaEntites] = useState<AlphaEntity[]>([]);
+function GammaEntiyTables() {
+    const [activeGammaEntites, setActiveGammaEntites] = useState<GammaEntity[]>([]);
+    const [disableGammaEntites, setDisableGammaEntites] = useState<GammaEntity[]>([]);
     const [editEntityId, setEditEntityId] = useState<number | null>(null);
 
     useEffect(() => {
         axios.get(URL + '/entities/active')
             .then(response => {
-                const newActiveAlphaEntities: AlphaEntity[] = response.data.map(
+                const newActiveGammaEntities: GammaEntity[] = response.data.map(
                     (e: any) => {
-                        const parsedEntity: AlphaEntity = { id: e.id, name: e.name }
+                        const parsedEntity: GammaEntity = { id: e.id, isMaster: e.isMaster}
                         return parsedEntity
                     }
                 );
-                setActiveAlphaEntites(newActiveAlphaEntities);
+                setActiveGammaEntites(newActiveGammaEntities);
             });
 
         axios.get(URL + '/entities/disable')
             .then(response => {
-                const disableAlphaEntities: AlphaEntity[] = response.data.map(
+                const disableGammaEntities: GammaEntity[] = response.data.map(
                     (e: any) => {
-                        const parsedEntity: AlphaEntity = { id: e.id, name: e.name }
+                        const parsedEntity: GammaEntity = { id: e.id, isMaster: e.isMaster}
                         return parsedEntity
                     }
                 );
-                setDisableAlphaEntites(disableAlphaEntities);
+                setDisableGammaEntites(disableGammaEntities);
             });
     }, []);
 
@@ -46,20 +46,20 @@ function AlphaEntiyTables() {
         }
 
         const formData = new FormData(event.currentTarget);
-        const newName: string = formData.get("name") as string;
+        const newMaster: boolean = Boolean(formData.get("isMaster"));
 
-        axios.patch(URL + '/patch/entity', { id: editEntityId, name: newName })
+        axios.patch(URL + '/patch/entity', { id: editEntityId, isMaster: newMaster })
             .then(response => {
                 if (response.data === 'done') {
-                    const updatedActiveAlphaEntites = activeAlphaEntites.map((entity) => {
+                    const updatedActiveGammaEntites = activeGammaEntites.map((entity) => {
                         if (entity.id === editEntityId) {
-                            const updatedEntity: AlphaEntity = { id: entity.id, name: newName }
+                            const updatedEntity: GammaEntity = { id: entity.id, isMaster: newMaster}
                             return updatedEntity;
                         }
                         return entity;
                     });
 
-                    setActiveAlphaEntites(updatedActiveAlphaEntites);
+                    setActiveGammaEntites(updatedActiveGammaEntites);
                 }
 
                 setEditEntityId(null);
@@ -71,63 +71,63 @@ function AlphaEntiyTables() {
         axios.post(URL + '/switch/entity?id=' + id)
             .then(response => {
                 if (response.data === 'done') {
-                    let updatedActiveAlphaEntites: AlphaEntity[] = [];
-                    let updatedDisableAlphaEntites: AlphaEntity[] = [];
+                    let updatedActiveGammaEntites: GammaEntity[] = [];
+                    let updatedDisableGammaEntites: GammaEntity[] = [];
 
                     if (isSwitchToActive) {
-                        for (const entity of disableAlphaEntites) {
+                        for (const entity of disableGammaEntites) {
                             if (entity.id === id) {
-                                activeAlphaEntites.push(entity);
+                                activeGammaEntites.push(entity);
                                 break;
                             }
                         }
 
-                        updatedActiveAlphaEntites = activeAlphaEntites;
-                        updatedDisableAlphaEntites = disableAlphaEntites.filter((entity) => entity.id !== id);
+                        updatedActiveGammaEntites = activeGammaEntites;
+                        updatedDisableGammaEntites = disableGammaEntites.filter((entity) => entity.id !== id);
                     } else {
-                        for (const entity of activeAlphaEntites) {
+                        for (const entity of activeGammaEntites) {
                             if (entity.id === id) {
-                                disableAlphaEntites.push(entity);
+                                disableGammaEntites.push(entity);
                                 break;
                             }
                         }
 
-                        updatedDisableAlphaEntites = disableAlphaEntites;
-                        updatedActiveAlphaEntites = activeAlphaEntites.filter((entity) => entity.id !== id);
+                        updatedDisableGammaEntites = disableGammaEntites;
+                        updatedActiveGammaEntites = activeGammaEntites.filter((entity) => entity.id !== id);
                     }
 
-                    setActiveAlphaEntites(updatedActiveAlphaEntites);
-                    setDisableAlphaEntites(updatedDisableAlphaEntites);
+                    setActiveGammaEntites(updatedActiveGammaEntites);
+                    setDisableGammaEntites(updatedDisableGammaEntites);
                 }
             });
     };
 
-    const AlphaEntityAddForm = () => {
+    const GammaEntityAddForm = () => {
         const [showForm, setShowForm] = useState(false);
         const [id, setId] = useState(0);
-        const [name, setName] = useState("");
+        const [isMaster, setIsMaster] = useState(false)
         const [error, setError] = useState("");
 
         const handleAddClick = () => {
             setId(0);
-            setName("");
+            setIsMaster(false);
             setError("");
             setShowForm(true);
         };
 
         const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
-            const newEntity = { id, name };
+            const newEntity = { id, isMaster };
 
             axios.post(URL + '/create/entity', newEntity)
                 .then(response => {
                     if (response.data === 'done') {
-                        activeAlphaEntites.push(newEntity);
-                        const updatedActiveAlphaEntites = activeAlphaEntites.slice();
-                        setActiveAlphaEntites(updatedActiveAlphaEntites);
+                        activeGammaEntites.push(newEntity);
+                        const updatedActiveGammaEntites = activeGammaEntites.slice();
+                        setActiveGammaEntites(updatedActiveGammaEntites);
 
                         setId(0);
-                        setName("");
+                        setIsMaster(false);
                         setError("");
                         setShowForm(false);
                     } else {
@@ -140,8 +140,8 @@ function AlphaEntiyTables() {
             setId(Number(e.target.value));
         };
 
-        const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            setName(e.target.value);
+        const handleIsMasterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+            setIsMaster(Boolean(e.target.value));
         };
 
         if (!showForm) {
@@ -160,8 +160,8 @@ function AlphaEntiyTables() {
                 </div>
                 <div>
                     <label>
-                        Name:
-                        <input type="text" value={name} onChange={handleNameChange} />
+                        Is Master:
+                        <input type="checkbox" onChange={handleIsMasterChange} />
                     </label>
                 </div>
                 <div>
@@ -175,7 +175,7 @@ function AlphaEntiyTables() {
 
     return (
         <>
-            <p className='entities_type'>Alpha Entites</p>
+            <p className='entities_type'>Gamma Entites</p>
             <div className='flex_tables_wrapper'>
                 <div className='active_table'>
                     <p>Active entities</p>
@@ -183,27 +183,27 @@ function AlphaEntiyTables() {
                         <thead>
                             <tr>
                                 <th>Id</th>
-                                <th>Name</th>
+                                <th>Is Master</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {activeAlphaEntites.map((entity) => (
+                            {activeGammaEntites.map((entity) => (
                                 <tr key={entity.id}>
                                     <td>{entity.id}</td>
                                     {editEntityId === entity.id ? (
                                         <td>
                                             <form onSubmit={handleSaveAfterEdit}>
                                                 <input
-                                                    type="text"
-                                                    name="name"
-                                                    defaultValue={entity.name}
+                                                    type="checkbox"
+                                                    name="isMaster"
+                                                    defaultChecked={entity.isMaster}
                                                 />
                                                 <button type="submit">Save</button>
                                             </form>
                                         </td>
                                     ) : (
-                                        <td>{entity.name}</td>
+                                        <td>{entity.isMaster ? 'true' : 'false'}</td>
                                     )}
                                     <td>
                                         <button onClick={() => setEditEntityId(entity.id)}>
@@ -217,7 +217,7 @@ function AlphaEntiyTables() {
                             ))}
                         </tbody>
                     </table>
-                    <AlphaEntityAddForm />
+                    <GammaEntityAddForm />
                 </div>
 
                 <div className='disable_table'>
@@ -226,15 +226,15 @@ function AlphaEntiyTables() {
                         <thead>
                             <tr>
                                 <th>Id</th>
-                                <th>Name</th>
+                                <th>Is Master</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {disableAlphaEntites.map((entity) => (
+                            {disableGammaEntites.map((entity) => (
                                 <tr key={entity.id}>
                                     <td>{entity.id}</td>
-                                    <td>{entity.name}</td>
+                                    <td>{entity.isMaster ? 'true' : 'false'}</td>
                                     <td>
                                         <button onClick={() => hadleSwitchActivity(entity.id, true)}>
                                             Make active
@@ -250,4 +250,4 @@ function AlphaEntiyTables() {
     );
 }
 
-export default AlphaEntiyTables;
+export default GammaEntiyTables;
