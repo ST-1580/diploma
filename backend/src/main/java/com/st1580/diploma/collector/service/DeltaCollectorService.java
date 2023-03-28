@@ -26,14 +26,14 @@ public class DeltaCollectorService extends AbstractCollectorService implements D
     }
 
     @Override
-    public GraphDto collectGraph(long entityId, PolicyType policyType, boolean isLinksLight, boolean isEntitiesLight) {
+    public GraphDto collectGraph(long entityId, long ts, PolicyType policyType, boolean isLinksLight, boolean isEntitiesLight) {
         final Entity startEntity = new LightEntity(EntityType.DELTA, entityId);
-        return getGraphByPolicy(startEntity, policyType, isLinksLight, isEntitiesLight);
+        return getGraphByPolicy(startEntity, ts, policyType, isLinksLight, isEntitiesLight);
     }
 
     @Override
-    public List<GraphLinkDto> collectEntityNeighbors(long entityId, boolean isLinksLight) {
+    public List<GraphLinkDto> collectEntityNeighbors(long entityId, long ts, boolean isLinksLight) {
         final Entity startEntity = new LightEntity(EntityType.DELTA, entityId);
-        return getEntityNeighbors(startEntity, isLinksLight);
+        return getEntityNeighbors(startEntity, ts, isLinksLight);
     }
 }

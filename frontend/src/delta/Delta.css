@@ -1,16 +1,16 @@
 .delta_tables th {
     font-weight: 800;
     color: #ffffff;
-    background: #6D72ED;
+    background: purple;
 }
 
 .delta_tables input:focus {
-    border-color: #6D72ED;
+    border-color: purple;
     background-color: #E1D5E7;
 }
 
 .delta_tables button {
-    box-shadow: inset 0 0 0 1px #6D72ED;
+    box-shadow: inset 0 0 0 1px purple;
 }
 
 .delta_tables button:hover {

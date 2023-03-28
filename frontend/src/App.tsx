@@ -12,13 +12,15 @@ function App() {
   return (
     <BrowserRouter>
       <Header />
-      <Routes>
-        <Route path="/" Component={Space}></Route>
-        <Route path="alpha" Component={Alpha}></Route>
-        <Route path="/beta" Component={Beta}></Route>
-        <Route path="/gamma" Component={Gamma}></Route>
-        <Route path="/delta" Component={Delta}></Route>
-      </Routes>
+      <div className="content">
+        <Routes>
+          <Route path="/" Component={Space}></Route>
+          <Route path="alpha" Component={Alpha}></Route>
+          <Route path="/beta" Component={Beta}></Route>
+          <Route path="/gamma" Component={Gamma}></Route>
+          <Route path="/delta" Component={Delta}></Route>
+        </Routes>
+      </div>
       <Footer />
     </BrowserRouter>
   );

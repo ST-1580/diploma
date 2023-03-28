@@ -67,12 +67,12 @@ function Delta() {
 
     const DeltaEntityAddForm = () => {
         const [showForm, setShowForm] = useState(false);
-        const [id, setId] = useState(0);
+        const [id, setId] = useState("");
         const [name, setName] = useState("");
         const [error, setError] = useState("");
 
         const handleAddClick = () => {
-            setId(0);
+            setId("");
             setName("");
             setError("");
             setShowForm(true);
@@ -80,7 +80,7 @@ function Delta() {
 
         const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
-            const newEntity = { id, name };
+            const newEntity = { id: Number(id), name };
 
             axios.post(URL + '/create/entity', newEntity)
                 .then(response => {
@@ -89,7 +89,7 @@ function Delta() {
                         const updatedActiveDeltaEntites = activeDeltaEntites.slice();
                         setActiveDeltaEntites(updatedActiveDeltaEntites);
 
-                        setId(0);
+                        setId("");
                         setName("");
                         setError("");
                         setShowForm(false);
@@ -100,7 +100,7 @@ function Delta() {
         };
 
         const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            setId(Number(e.target.value));
+            setId(e.target.value);
         };
 
         const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -118,7 +118,7 @@ function Delta() {
                 <div>
                     <label>
                         Id:
-                        <input type="text" value={id} onChange={handleIdChange} />
+                        <input type="number" value={id} onChange={handleIdChange} />
                     </label>
                 </div>
                 <div>

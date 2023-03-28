@@ -111,22 +111,23 @@ function GammaToAlphaLinkTables() {
 
     const GammaToAlphaLinkAddForm = () => {
         const [showForm, setShowForm] = useState(false);
-        const [gammaId, setGammaId] = useState(0);
-        const [alphaId, setAlphaId] = useState(0);
-        const [weight, setWeight] = useState(0);
+        const [gammaId, setGammaId] = useState("");
+        const [alphaId, setAlphaId] = useState("");
+        const [weight, setWeight] = useState("");
         const [error, setError] = useState("");
 
         const handleAddClick = () => {
-            setGammaId(0);
-            setAlphaId(0);
-            setWeight(0);
+            setGammaId("");
+            setAlphaId("");
+            setWeight("");
             setError("");
             setShowForm(true);
         };
 
         const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
-            const newEntity: GammaToAlphaLink = { gammaId: gammaId, alphaId: alphaId, weight: weight };
+            const newEntity: GammaToAlphaLink =
+                { gammaId: Number(gammaId), alphaId: Number(alphaId), weight: Number(weight) };
 
             axios.post(URL + '/create/link/alpha', newEntity)
                 .then(response => {
@@ -135,9 +136,9 @@ function GammaToAlphaLinkTables() {
                         const updatedActiveGammaToAlphaLinks = activeGammaToAlphaLinks.slice();
                         setActiveGammaToAlphaLinks(updatedActiveGammaToAlphaLinks);
 
-                        setGammaId(0);
-                        setAlphaId(0);
-                        setWeight(0);
+                        setGammaId("");
+                        setAlphaId("");
+                        setWeight("");
                         setError("");
                         setShowForm(false);
                     } else {
@@ -147,15 +148,15 @@ function GammaToAlphaLinkTables() {
         };
 
         const handleGammaIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            setGammaId(Number(e.target.value))
+            setGammaId(e.target.value)
         };
 
         const handleAlphaIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            setAlphaId(Number(e.target.value));
+            setAlphaId(e.target.value);
         };
 
         const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            setWeight(Number(e.target.value));
+            setWeight(e.target.value);
         };
 
         if (!showForm) {
@@ -169,19 +170,19 @@ function GammaToAlphaLinkTables() {
                 <div>
                     <label>
                         Gamma Id:
-                        <input type="text" value={gammaId} onChange={handleGammaIdChange} />
+                        <input type="number" value={gammaId} onChange={handleGammaIdChange} />
                     </label>
                 </div>
                 <div>
                     <label>
                         Alpha Id:
-                        <input type="text" value={alphaId} onChange={handleAlphaIdChange} />
+                        <input type="number" value={alphaId} onChange={handleAlphaIdChange} />
                     </label>
                 </div>
                 <div>
                     <label>
                         Weight:
-                        <input type="text" value={weight} onChange={handleNameChange} />
+                        <input type="number" value={weight} onChange={handleNameChange} />
                     </label>
                 </div>
                 <div>
@@ -218,7 +219,7 @@ function GammaToAlphaLinkTables() {
                                         <td>
                                             <form onSubmit={handleSaveAfterEdit}>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     name="weight"
                                                     defaultValue={link.weight}
                                                 />
@@ -233,7 +234,7 @@ function GammaToAlphaLinkTables() {
                                             Edit
                                         </button>
                                         <button onClick={() => hadleSwitchActivity(link.gammaId, link.alphaId, false)}>
-                                            Make disabled
+                                            Disable
                                         </button>
                                     </td>
                                 </tr>
@@ -244,7 +245,7 @@ function GammaToAlphaLinkTables() {
                 </div>
 
                 <div className='disable_table'>
-                    <p>Disable links</p>
+                    <p>Disabled links</p>
                     <table>
                         <thead>
                             <tr>
@@ -262,7 +263,7 @@ function GammaToAlphaLinkTables() {
                                     <td>{link.weight}</td>
                                     <td>
                                         <button onClick={() => hadleSwitchActivity(link.gammaId, link.alphaId, true)}>
-                                            Make active
+                                            Enable
                                         </button>
                                     </td>
                                 </tr>

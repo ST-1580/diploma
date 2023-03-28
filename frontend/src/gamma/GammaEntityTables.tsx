@@ -104,12 +104,12 @@ function GammaEntiyTables() {
 
     const GammaEntityAddForm = () => {
         const [showForm, setShowForm] = useState(false);
-        const [id, setId] = useState(0);
+        const [id, setId] = useState("");
         const [isMaster, setIsMaster] = useState(false)
         const [error, setError] = useState("");
 
         const handleAddClick = () => {
-            setId(0);
+            setId("");
             setIsMaster(false);
             setError("");
             setShowForm(true);
@@ -117,7 +117,7 @@ function GammaEntiyTables() {
 
         const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
-            const newEntity = { id, isMaster };
+            const newEntity = { id: Number(id), isMaster };
 
             axios.post(URL + '/create/entity', newEntity)
                 .then(response => {
@@ -126,7 +126,7 @@ function GammaEntiyTables() {
                         const updatedActiveGammaEntites = activeGammaEntites.slice();
                         setActiveGammaEntites(updatedActiveGammaEntites);
 
-                        setId(0);
+                        setId("");
                         setIsMaster(false);
                         setError("");
                         setShowForm(false);
@@ -137,7 +137,7 @@ function GammaEntiyTables() {
         };
 
         const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            setId(Number(e.target.value));
+            setId(e.target.value);
         };
 
         const handleIsMasterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,7 +155,7 @@ function GammaEntiyTables() {
                 <div>
                     <label>
                         Id:
-                        <input type="text" value={id} onChange={handleIdChange} />
+                        <input type="number" value={id} onChange={handleIdChange} />
                     </label>
                 </div>
                 <div>
@@ -210,7 +210,7 @@ function GammaEntiyTables() {
                                             Edit
                                         </button>
                                         <button onClick={() => hadleSwitchActivity(entity.id, false)}>
-                                            Make disabled
+                                            Disable
                                         </button>
                                     </td>
                                 </tr>
@@ -221,7 +221,7 @@ function GammaEntiyTables() {
                 </div>
 
                 <div className='disable_table'>
-                    <p>Disable entities</p>
+                    <p>Disabled entities</p>
                     <table>
                         <thead>
                             <tr>
@@ -237,7 +237,7 @@ function GammaEntiyTables() {
                                     <td>{entity.isMaster ? 'true' : 'false'}</td>
                                     <td>
                                         <button onClick={() => hadleSwitchActivity(entity.id, true)}>
-                                            Make active
+                                            Enable
                                         </button>
                                     </td>
                                 </tr>

@@ -67,20 +67,20 @@ function Beta() {
 
     const BetaEntityAddForm = () => {
         const [showForm, setShowForm] = useState(false);
-        const [id, setId] = useState(0);
-        const [epoch, setEpoch] = useState(0);
+        const [id, setId] = useState("");
+        const [epoch, setEpoch] = useState("");
         const [error, setError] = useState("");
 
         const handleAddClick = () => {
-            setId(0);
-            setEpoch(0);
+            setId("");
+            setEpoch("");
             setError("");
             setShowForm(true);
         };
 
         const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
-            const newEntity = { id, epoch: epoch };
+            const newEntity = { id: Number(id), epoch: Number(epoch) };
 
             axios.post(URL + '/create/entity', newEntity)
                 .then(response => {
@@ -89,8 +89,8 @@ function Beta() {
                         const updatedActiveBetaEntites = activeBetaEntites.slice();
                         setActiveBetaEntites(updatedActiveBetaEntites);
 
-                        setId(0);
-                        setEpoch(0);
+                        setId("");
+                        setEpoch("");
                         setError("");
                         setShowForm(false);
                     } else {
@@ -100,11 +100,11 @@ function Beta() {
         };
 
         const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            setId(Number(e.target.value));
+            setId(e.target.value);
         };
 
         const handleEpochChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            setEpoch(Number(e.target.value));
+            setEpoch(e.target.value);
         };
 
         if (!showForm) {
@@ -118,13 +118,13 @@ function Beta() {
                 <div>
                     <label>
                         Id:
-                        <input type="text" value={id} onChange={handleIdChange} />
+                        <input type="number" value={id} onChange={handleIdChange} />
                     </label>
                 </div>
                 <div>
                     <label>
                         Epoch:
-                        <input type="text" value={epoch} onChange={handleEpochChange} />
+                        <input type="number" value={epoch} onChange={handleEpochChange} />
                     </label>
                 </div>
                 <div>
@@ -157,7 +157,7 @@ function Beta() {
                                         <td>
                                             <form onSubmit={handleSaveAfterEdit}>
                                                 <input
-                                                    type="text"
+                                                    type="number"
                                                     name="epoch"
                                                     defaultValue={entity.epoch}
                                                 />

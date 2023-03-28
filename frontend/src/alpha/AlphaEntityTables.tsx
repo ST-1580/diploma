@@ -104,12 +104,12 @@ function AlphaEntiyTables() {
 
     const AlphaEntityAddForm = () => {
         const [showForm, setShowForm] = useState(false);
-        const [id, setId] = useState(0);
+        const [id, setId] = useState("");
         const [name, setName] = useState("");
         const [error, setError] = useState("");
 
         const handleAddClick = () => {
-            setId(0);
+            setId("");
             setName("");
             setError("");
             setShowForm(true);
@@ -117,7 +117,7 @@ function AlphaEntiyTables() {
 
         const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
-            const newEntity = { id, name };
+            const newEntity = { id: Number(id), name };
 
             axios.post(URL + '/create/entity', newEntity)
                 .then(response => {
@@ -126,7 +126,7 @@ function AlphaEntiyTables() {
                         const updatedActiveAlphaEntites = activeAlphaEntites.slice();
                         setActiveAlphaEntites(updatedActiveAlphaEntites);
 
-                        setId(0);
+                        setId("");
                         setName("");
                         setError("");
                         setShowForm(false);
@@ -137,7 +137,7 @@ function AlphaEntiyTables() {
         };
 
         const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            setId(Number(e.target.value));
+            setId(e.target.value);
         };
 
         const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -155,7 +155,7 @@ function AlphaEntiyTables() {
                 <div>
                     <label>
                         Id:
-                        <input type="text" value={id} onChange={handleIdChange} />
+                        <input type="number" value={id} onChange={handleIdChange} />
                     </label>
                 </div>
                 <div>
@@ -210,7 +210,7 @@ function AlphaEntiyTables() {
                                             Edit
                                         </button>
                                         <button onClick={() => hadleSwitchActivity(entity.id, false)}>
-                                            Make disabled
+                                            Disable
                                         </button>
                                     </td>
                                 </tr>
@@ -221,7 +221,7 @@ function AlphaEntiyTables() {
                 </div>
 
                 <div className='disable_table'>
-                    <p>Disable entities</p>
+                    <p>Disabled entities</p>
                     <table>
                         <thead>
                             <tr>
@@ -237,7 +237,7 @@ function AlphaEntiyTables() {
                                     <td>{entity.name}</td>
                                     <td>
                                         <button onClick={() => hadleSwitchActivity(entity.id, true)}>
-                                            Make active
+                                            Enable
                                         </button>
                                     </td>
                                 </tr>

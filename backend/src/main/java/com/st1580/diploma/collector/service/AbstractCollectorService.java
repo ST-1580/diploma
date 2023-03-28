@@ -39,9 +39,10 @@ public abstract class AbstractCollectorService {
         this.collectorRepository = collectorRepository;
     }
 
-    public GraphDto getGraphByPolicy(Entity startEntity, PolicyType policyType,
+    public GraphDto getGraphByPolicy(Entity startEntity, long ts, PolicyType policyType,
                                      boolean isLinksLight, boolean isEntitiesLight) {
-        long constructedTs = lastSyncRepository.getCorrectorLastSync();
+        long actualTs = lastSyncRepository.getCorrectorLastSync();
+        long constructedTs = ts != -1 && ts < actualTs ? ts : actualTs;
         if (!isEntityExist(startEntity, constructedTs)) {
             return new GraphDto(constructedTs, new HashSet<>(), new HashSet<>());
         }
@@ -156,8 +157,9 @@ public abstract class AbstractCollectorService {
         throw new IllegalArgumentException("Wrong policy type parameter " + policyType);
     }
 
-    public List<GraphLinkDto> getEntityNeighbors(Entity startEntity, boolean isLinksLight) {
-        long constructedTs = lastSyncRepository.getCorrectorLastSync();
+    public List<GraphLinkDto> getEntityNeighbors(Entity startEntity, long ts, boolean isLinksLight) {
+        long actualTs = lastSyncRepository.getCorrectorLastSync();
+        long constructedTs = ts != -1 && ts < actualTs ? ts : actualTs;
         if (!isEntityExist(startEntity, constructedTs)) {
             return new ArrayList<>();
         }

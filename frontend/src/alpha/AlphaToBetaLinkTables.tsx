@@ -111,14 +111,14 @@ function AlphaToBetaLinkTables() {
 
     const AlphaToBetaLinkAddForm = () => {
         const [showForm, setShowForm] = useState(false);
-        const [alphaId, setAlphaId] = useState(0);
-        const [betaId, setBetaId] = useState(0);
+        const [alphaId, setAlphaId] = useState("");
+        const [betaId, setBetaId] = useState("");
         const [hash, setHash] = useState("");
         const [error, setError] = useState("");
 
         const handleAddClick = () => {
-            setAlphaId(0);
-            setBetaId(0);
+            setAlphaId("");
+            setBetaId("");
             setHash("");
             setError("");
             setShowForm(true);
@@ -126,7 +126,7 @@ function AlphaToBetaLinkTables() {
 
         const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
-            const newEntity: AlphaToBetaLink = { alphaId: alphaId, betaId: betaId, hash: hash };
+            const newEntity: AlphaToBetaLink = { alphaId: Number(alphaId), betaId: Number(betaId), hash };
 
             axios.post(URL + '/create/link/beta', newEntity)
                 .then(response => {
@@ -135,8 +135,8 @@ function AlphaToBetaLinkTables() {
                         const updatedActiveAlphaToBetaLinks = activeAlphaToBetaLinks.slice();
                         setActiveAlphaToBetaLinks(updatedActiveAlphaToBetaLinks);
 
-                        setAlphaId(0);
-                        setBetaId(0);
+                        setAlphaId("");
+                        setBetaId("");
                         setHash("");
                         setError("");
                         setShowForm(false);
@@ -147,11 +147,11 @@ function AlphaToBetaLinkTables() {
         };
 
         const handleAlphaIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            setAlphaId(Number(e.target.value));
+            setAlphaId(e.target.value);
         };
 
         const handleBetaIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            setBetaId(Number(e.target.value));
+            setBetaId(e.target.value);
         };
 
         const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -169,13 +169,13 @@ function AlphaToBetaLinkTables() {
                 <div>
                     <label>
                         Alpha Id:
-                        <input type="text" value={alphaId} onChange={handleAlphaIdChange} />
+                        <input type="number" value={alphaId} onChange={handleAlphaIdChange} />
                     </label>
                 </div>
                 <div>
                     <label>
                         Beta Id:
-                        <input type="text" value={betaId} onChange={handleBetaIdChange} />
+                        <input type="number" value={betaId} onChange={handleBetaIdChange} />
                     </label>
                 </div>
                 <div>
@@ -233,7 +233,7 @@ function AlphaToBetaLinkTables() {
                                             Edit
                                         </button>
                                         <button onClick={() => hadleSwitchActivity(link.alphaId, link.betaId, false)}>
-                                            Make disabled
+                                            Disable
                                         </button>
                                     </td>
                                 </tr>
@@ -244,7 +244,7 @@ function AlphaToBetaLinkTables() {
                 </div>
 
                 <div className='disable_table'>
-                    <p>Disable links</p>
+                    <p>Disabled links</p>
                     <table>
                         <thead>
                             <tr>
@@ -262,7 +262,7 @@ function AlphaToBetaLinkTables() {
                                     <td>{link.hash}</td>
                                     <td>
                                         <button onClick={() => hadleSwitchActivity(link.alphaId, link.betaId, true)}>
-                                            Make active
+                                            Enable
                                         </button>
                                     </td>
                                 </tr>

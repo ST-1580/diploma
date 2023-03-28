@@ -76,20 +76,20 @@ function GammaToDeltaLinkTables() {
 
     const GammaToDeltaLinkAddForm = () => {
         const [showForm, setShowForm] = useState(false);
-        const [gammaId, setGammaId] = useState(0);
-        const [deltaId, setDeltaId] = useState(0);
+        const [gammaId, setGammaId] = useState("");
+        const [deltaId, setDeltaId] = useState("");
         const [error, setError] = useState("");
 
         const handleAddClick = () => {
-            setGammaId(0);
-            setDeltaId(0);
+            setGammaId("");
+            setDeltaId("");
             setError("");
             setShowForm(true);
         };
 
         const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
-            const newEntity: GammaToDeltaLink = { gammaId: gammaId, deltaId: deltaId };
+            const newEntity: GammaToDeltaLink = { gammaId: Number(gammaId), deltaId: Number(deltaId) };
 
             axios.post(URL + '/create/link/delta', newEntity)
                 .then(response => {
@@ -98,8 +98,8 @@ function GammaToDeltaLinkTables() {
                         const updatedActiveGammaToDeltaLinks = activeGammaToDeltaLinks.slice();
                         setActiveGammaToDeltaLinks(updatedActiveGammaToDeltaLinks);
 
-                        setGammaId(0);
-                        setDeltaId(0);
+                        setGammaId("");
+                        setDeltaId("");
                         setError("");
                         setShowForm(false);
                     } else {
@@ -109,11 +109,11 @@ function GammaToDeltaLinkTables() {
         };
 
         const handleGammaIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            setGammaId(Number(e.target.value))
+            setGammaId(e.target.value);
         };
 
         const handleDeltaIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-            setDeltaId(Number(e.target.value));
+            setDeltaId(e.target.value);
         };
 
         if (!showForm) {
@@ -127,13 +127,13 @@ function GammaToDeltaLinkTables() {
                 <div>
                     <label>
                         Gamma Id:
-                        <input type="text" value={gammaId} onChange={handleGammaIdChange} />
+                        <input type="number" value={gammaId} onChange={handleGammaIdChange} />
                     </label>
                 </div>
                 <div>
                     <label>
                         Delta Id:
-                        <input type="text" value={deltaId} onChange={handleDeltaIdChange} />
+                        <input type="number" value={deltaId} onChange={handleDeltaIdChange} />
                     </label>
                 </div>
                 <div>
@@ -167,7 +167,7 @@ function GammaToDeltaLinkTables() {
                                     <td>{link.deltaId}</td>
                                     <td>
                                         <button onClick={() => hadleSwitchActivity(link.gammaId, link.deltaId, false)}>
-                                            Make disabled
+                                            Disable
                                         </button>
                                     </td>
                                 </tr>
@@ -178,7 +178,7 @@ function GammaToDeltaLinkTables() {
                 </div>
 
                 <div className='disable_table'>
-                    <p>Disable links</p>
+                    <p>Disabled links</p>
                     <table>
                         <thead>
                             <tr>
@@ -194,7 +194,7 @@ function GammaToDeltaLinkTables() {
                                     <td>{link.deltaId}</td>
                                     <td>
                                         <button onClick={() => hadleSwitchActivity(link.gammaId, link.deltaId, true)}>
-                                            Make active
+                                            Enable
                                         </button>
                                     </td>
                                 </tr>
