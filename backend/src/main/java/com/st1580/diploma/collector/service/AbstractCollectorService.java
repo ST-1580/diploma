@@ -17,17 +17,19 @@ import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.Graph;
 import com.st1580.diploma.collector.graph.Link;
 import com.st1580.diploma.collector.graph.entities.LightEntity;
+import com.st1580.diploma.collector.graph.links.LightLink;
+import com.st1580.diploma.collector.graph.links.LinkType;
 import com.st1580.diploma.collector.policy.NonCyclicPolicy;
 import com.st1580.diploma.collector.policy.Policy;
 import com.st1580.diploma.collector.policy.StartEntityPolicy;
-import com.st1580.diploma.repository.CollectorRepository;
+import com.st1580.diploma.repository.EntityCollectorRepository;
 import com.st1580.diploma.collector.service.dto.GraphDto;
 import com.st1580.diploma.collector.service.dto.GraphLinkDto;
 import com.st1580.diploma.collector.service.dto.PolicyType;
 import com.st1580.diploma.repository.LastSyncRepository;
 
 public abstract class AbstractCollectorService {
-    private final CollectorRepository collectorRepository;
+    private final EntityCollectorRepository collectorRepository;
 
     @Inject
     private GraphConstructorService graphConstructorService;
@@ -35,8 +37,8 @@ public abstract class AbstractCollectorService {
     @Inject
     private LastSyncRepository lastSyncRepository;
 
-    public AbstractCollectorService(CollectorRepository collectorRepository) {
-        this.collectorRepository = collectorRepository;
+    public AbstractCollectorService(EntityCollectorRepository entityCollectorRepository) {
+        this.collectorRepository = entityCollectorRepository;
     }
 
     public GraphDto getGraphByPolicy(Entity startEntity, long ts, PolicyType policyType,
@@ -48,14 +50,16 @@ public abstract class AbstractCollectorService {
         }
 
         Policy policy = createPolicy(policyType, startEntity);
-        Graph g = constructGraph(startEntity, policy, constructedTs, isLinksLight);
-        return isEntitiesLight ? g.convertToDto(constructedTs) : constructHeavyGraph(g, constructedTs).convertToDto(constructedTs);
+        Graph g = constructGraph(startEntity, policy, constructedTs);
+        Graph gWithCorrectLinks = isLinksLight ? g : constructGraphWithHeavyLinks(g, constructedTs);
+        return isEntitiesLight ?
+                gWithCorrectLinks.convertToDto(constructedTs) :
+                constructHeavyGraph(gWithCorrectLinks, constructedTs).convertToDto(constructedTs);
     }
 
     private Graph constructGraph(Entity startEntity,
                                  Policy policy,
-                                 long ts,
-                                 boolean isLinksLight) {
+                                 long ts) {
         Graph graph = new Graph(policy);
         Queue<BfsStage> queue = new ArrayDeque<>();
         queue.add(new BfsStage(startEntity.getType(), Set.of(startEntity.getId())));
@@ -71,59 +75,52 @@ public abstract class AbstractCollectorService {
                 }
             }
 
-            if (isLinksLight) {
-                Map<EntityType, Map<Long, List<Long>>> currStageNeighbors =
-                        graphConstructorService.getEntitiesNeighborsIds(currStage.getType(), notFinishEntitiesIds, ts);
+            Map<EntityType, Map<Long, List<Long>>> currStageNeighbors =
+                    graphConstructorService.getEntitiesNeighborsIds(currStage.getType(), notFinishEntitiesIds, ts);
 
-                currStageNeighbors.forEach((nextStageType, linkedEntitiesIds) -> {
-                    Set<Long> nextStageEntitiesIds = new HashSet<>();
+            currStageNeighbors.forEach((nextStageType, linkedEntitiesIds) -> {
+                Set<Long> nextStageEntitiesIds = new HashSet<>();
 
-                    for (long entityId : linkedEntitiesIds.keySet()) {
-                        List<Long> neighbors = linkedEntitiesIds.get(entityId);
+                for (long entityId : linkedEntitiesIds.keySet()) {
+                    List<Long> neighbors = linkedEntitiesIds.get(entityId);
 
-                        graph.addLightNeighbors(
-                                currStage.getType(),
-                                entityId,
-                                Map.of(nextStageType, neighbors)
-                        );
+                    graph.addLightNeighbors(
+                            currStage.getType(),
+                            entityId,
+                            Map.of(nextStageType, neighbors)
+                    );
 
-                        nextStageEntitiesIds.addAll(neighbors);
-                    }
+                    nextStageEntitiesIds.addAll(neighbors);
+                }
 
-                    if (!nextStageEntitiesIds.isEmpty()) {
-                        queue.add(new BfsStage(nextStageType, nextStageEntitiesIds));
-                    }
-                });
-            } else {
-                Map<EntityType, Map<Long, List<? extends Link>>> currStageNeighbors =
-                        graphConstructorService.getEntitiesNeighbors(currStage.getType(), notFinishEntitiesIds, ts);
-
-                currStageNeighbors.forEach((nextStageType, links) -> {
-                    Set<Long> nextStageEntitiesIds = new HashSet<>();
-
-                    for (long entityId : links.keySet()) {
-                        List<? extends Link> neighbors = links.get(entityId);
-                        graph.addNeighbors(
-                                currStage.getType(),
-                                entityId,
-                                Map.of(nextStageType, neighbors)
-                        );
-
-                        List<Long> neighborsIds = neighbors
-                                .stream()
-                                .map(link -> link.getEntityWithType(nextStageType).getId())
-                                .collect(Collectors.toList());
-                        nextStageEntitiesIds.addAll(neighborsIds);
-                    }
-
-                    if (!nextStageEntitiesIds.isEmpty()) {
-                        queue.add(new BfsStage(nextStageType, nextStageEntitiesIds));
-                    }
-                });
-            }
+                if (!nextStageEntitiesIds.isEmpty()) {
+                    queue.add(new BfsStage(nextStageType, nextStageEntitiesIds));
+                }
+            });
         }
 
         return graph;
+    }
+
+    private Graph constructGraphWithHeavyLinks(Graph lightGraph, long ts) {
+        Map<LinkType, Set<LightLink>> lightLinks = lightGraph.getGraphLinks()
+                .stream()
+                .collect(Collectors.groupingBy(
+                        link -> new LinkType(link.getFrom().getType(), link.getTo().getType()),
+                        Collectors.mapping(
+                                link -> new LightLink(link.getFrom(), link.getTo()),
+                                Collectors.toSet())
+                        )
+                );
+
+        Set<Link> heavyLinks = new HashSet<>();
+        for (LinkType type : lightLinks.keySet()) {
+            Map<LightLink, ? extends Link> heavyLinkById =
+                    graphConstructorService.getLinksByEnds(type, lightLinks.get(type), ts);
+            heavyLinks.addAll(heavyLinkById.values());
+        }
+
+        return new Graph(lightGraph.getGraphEntities(), heavyLinks);
     }
 
     private Graph constructHeavyGraph(Graph lightGraph, long ts) {

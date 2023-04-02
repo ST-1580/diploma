@@ -11,7 +11,7 @@ import com.st1580.diploma.updater.events.AlphaToBetaEvent;
 import com.st1580.diploma.updater.events.BetaEvent;
 import com.st1580.diploma.updater.events.EntityEvent;
 
-public interface AlphaToBetaRepository {
+public interface AlphaToBetaRepository extends LinkCollectorRepository {
     Map<Long, List<Long>> getConnectedBetaEntitiesIdsByAlphaIds(Collection<Long> alphaIds, long ts);
 
     Map<Long, List<Long>> getConnectedAlphaEntitiesIdsByBetaIds(Collection<Long> betaIds, long ts);

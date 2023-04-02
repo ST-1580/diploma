@@ -11,7 +11,7 @@ import com.st1580.diploma.updater.events.EntityEvent;
 import com.st1580.diploma.updater.events.GammaEvent;
 import com.st1580.diploma.updater.events.GammaToDeltaEvent;
 
-public interface GammaToDeltaRepository {
+public interface GammaToDeltaRepository extends LinkCollectorRepository{
     Map<Long, List<Long>> getConnectedGammaEntitiesIdsByDeltaIds(Collection<Long> deltaIds, long ts);
 
     Map<Long, List<Long>> getConnectedDeltaEntitiesIdsByGammaIds(Collection<Long> gammaIds, long ts);

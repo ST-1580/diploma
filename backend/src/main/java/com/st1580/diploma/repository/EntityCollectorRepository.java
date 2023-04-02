@@ -11,7 +11,7 @@ import com.st1580.diploma.collector.graph.Entity;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.Link;
 
-public interface CollectorRepository {
+public interface EntityCollectorRepository {
     Map<Long, ? extends Entity> collectAllActiveEntitiesByIds(Collection<Long> ids, long ts);
 
     default Map<EntityType, List<Long>> collectAllNeighborsIds(long id, long ts) {

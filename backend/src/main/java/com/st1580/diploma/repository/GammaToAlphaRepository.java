@@ -11,7 +11,7 @@ import com.st1580.diploma.updater.events.EntityEvent;
 import com.st1580.diploma.updater.events.GammaEvent;
 import com.st1580.diploma.updater.events.GammaToAlphaEvent;
 
-public interface GammaToAlphaRepository {
+public interface GammaToAlphaRepository extends LinkCollectorRepository {
     Map<Long, List<Long>> getConnectedGammaEntitiesIdsByAlphaIds(Collection<Long> alphaIds, long ts);
 
     Map<Long, List<Long>> getConnectedAlphaEntitiesIdsByGammaIds(Collection<Long> gammaIds, long ts);

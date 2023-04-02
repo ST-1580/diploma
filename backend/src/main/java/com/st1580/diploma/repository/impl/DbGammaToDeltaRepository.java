@@ -6,10 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.st1580.diploma.collector.graph.EntityType;
+import com.st1580.diploma.collector.graph.Link;
+import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.graph.links.GammaToDeltaLink;
+import com.st1580.diploma.collector.graph.links.LightLink;
 import com.st1580.diploma.repository.GammaToDeltaRepository;
 import com.st1580.diploma.repository.types.EntityActiveType;
 import com.st1580.diploma.repository.types.LinkEndActivityType;
@@ -84,6 +89,24 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
         return usabilityHelper.entrySet().stream()
                 .filter(Map.Entry::getValue)
                 .map(Map.Entry::getKey);
+    }
+
+    @Override
+    public Map<LightLink, ? extends Link> collectAllActiveLinksByEnds(Collection<Long> fromIds,
+                                                                      Collection<Long> toIds, long ts) {
+        Condition condition = LOW_LVL_GD.GAMMA_ID.in(fromIds)
+                .and(LOW_LVL_GD.DELTA_ID.in(toIds))
+                .and(LOW_LVL_GD.CREATED_TS.lessOrEqual(ts));
+
+        return getGDRecordByCondition(condition)
+                .stream()
+                .map(this::convertToLink)
+                .collect(Collectors.toMap(
+                        link -> new LightLink(
+                                new LightEntity(EntityType.GAMMA, link.getGammaId()),
+                                new LightEntity(EntityType.DELTA, link.getDeltaId())),
+                        Function.identity()
+                ));
     }
 
     @Override

@@ -6,10 +6,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import com.st1580.diploma.collector.graph.EntityType;
+import com.st1580.diploma.collector.graph.Link;
+import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.graph.links.AlphaToBetaLink;
+import com.st1580.diploma.collector.graph.links.LightLink;
 import com.st1580.diploma.repository.AlphaToBetaRepository;
 import com.st1580.diploma.repository.types.EntityActiveType;
 import com.st1580.diploma.repository.types.LinkEndActivityType;
@@ -84,6 +89,24 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
         return usabilityHelper.entrySet().stream()
                 .filter(Map.Entry::getValue)
                 .map(Map.Entry::getKey);
+    }
+
+    @Override
+    public Map<LightLink, ? extends Link> collectAllActiveLinksByEnds(Collection<Long> fromIds,
+                                                                      Collection<Long> toIds, long ts) {
+        Condition condition = LOW_LVL_AB.ALPHA_ID.in(fromIds)
+                .and(LOW_LVL_AB.BETA_ID.in(toIds))
+                .and(LOW_LVL_AB.CREATED_TS.lessOrEqual(ts));
+
+        return getABRecordByCondition(condition)
+                .stream()
+                .map(this::convertToLink)
+                .collect(Collectors.toMap(
+                        link -> new LightLink(
+                                new LightEntity(EntityType.ALPHA, link.getAlphaId()),
+                                new LightEntity(EntityType.BETA, link.getBetaId())),
+                        Function.identity()
+                ));
     }
 
     @Override
