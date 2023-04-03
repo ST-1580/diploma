@@ -137,7 +137,7 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
                                 entry.getKey().getType() == EntityActiveType.DELETED ? false : link.getIsActive(),
                                 EntityActiveType.trueEntityActiveTypes.contains(entry.getKey().getType().name()) ?
                                         LinkEndActivityType.TRUE.name() : LinkEndActivityType.FALSE.name(),
-                                link.getIsActiveBeta(),
+                                LinkEndActivityType.UNDEFINED.name(),
                                 null,
                                 entry.getKey().getCreatedTs()
                         ))
@@ -152,7 +152,7 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
                                 link.getBetaId(),
                                 link.getHash(),
                                 entry.getKey().getType() == EntityActiveType.DELETED ? false : link.getIsActive(),
-                                link.getIsActiveAlpha(),
+                                LinkEndActivityType.UNDEFINED.name(),
                                 EntityActiveType.trueEntityActiveTypes.contains(entry.getKey().getType().name()) ?
                                         LinkEndActivityType.TRUE.name() : LinkEndActivityType.FALSE.name(),
                                 null,

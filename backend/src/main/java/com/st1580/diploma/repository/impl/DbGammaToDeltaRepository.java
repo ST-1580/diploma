@@ -136,7 +136,7 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
                                 entry.getKey().getType() == EntityActiveType.DELETED ? false : link.getIsActive(),
                                 EntityActiveType.trueEntityActiveTypes.contains(entry.getKey().getType().name()) ?
                                         LinkEndActivityType.TRUE.name() : LinkEndActivityType.FALSE.name(),
-                                link.getIsActiveDelta(),
+                                LinkEndActivityType.UNDEFINED.name(),
                                 null,
                                 entry.getKey().getCreatedTs()
                         ))
@@ -150,7 +150,7 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
                                 link.getGammaId(),
                                 link.getDeltaId(),
                                 entry.getKey().getType() == EntityActiveType.DELETED ? false : link.getIsActive(),
-                                link.getIsActiveGamma(),
+                                LinkEndActivityType.UNDEFINED.name(),
                                 EntityActiveType.trueEntityActiveTypes.contains(entry.getKey().getType().name()) ?
                                         LinkEndActivityType.TRUE.name() : LinkEndActivityType.FALSE.name(),
                                 null,

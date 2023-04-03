@@ -138,7 +138,7 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
                                 entry.getKey().getType() == EntityActiveType.DELETED ? false : link.getIsActive(),
                                 EntityActiveType.trueEntityActiveTypes.contains(entry.getKey().getType().name()) ?
                                         LinkEndActivityType.TRUE.name() : LinkEndActivityType.FALSE.name(),
-                                link.getIsActiveAlpha(),
+                                LinkEndActivityType.UNDEFINED.name(),
                                 null,
                                 entry.getKey().getCreatedTs()
                         ))
@@ -153,7 +153,7 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
                                 link.getAlphaId(),
                                 link.getWeight(),
                                 entry.getKey().getType() == EntityActiveType.DELETED ? false : link.getIsActive(),
-                                link.getIsActiveGamma(),
+                                LinkEndActivityType.UNDEFINED.name(),
                                 EntityActiveType.trueEntityActiveTypes.contains(entry.getKey().getType().name()) ?
                                         LinkEndActivityType.TRUE.name() : LinkEndActivityType.FALSE.name(),
                                 null,
