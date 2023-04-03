@@ -16,10 +16,6 @@ public interface GammaToAlphaRepository extends LinkCollectorRepository {
 
     Map<Long, List<Long>> getConnectedAlphaEntitiesIdsByGammaIds(Collection<Long> gammaIds, long ts);
 
-    Map<Long, List<GammaToAlphaLink>> getConnectedGammaEntitiesByAlphaIds(Collection<Long> alphaIds, long ts);
-
-    Map<Long, List<GammaToAlphaLink>> getConnectedAlphaEntitiesByGammaIds(Collection<Long> gammaIds, long ts);
-
     void batchInsertNewEvents(List<GammaToAlphaEvent> events);
 
     void addLinkEventsTriggeredByEntitiesUpdate(List<Set<GammaEvent>> gammaEvents, List<Set<AlphaEvent>> alphaEvents);

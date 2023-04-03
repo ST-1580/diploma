@@ -110,34 +110,6 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
     }
 
     @Override
-    public Map<Long, List<AlphaToBetaLink>> getConnectedBetaEntitiesByAlphaIds(Collection<Long> alphaIds, long ts) {
-        Condition condition = LOW_LVL_AB.ALPHA_ID.in(alphaIds)
-                .and(LOW_LVL_AB.CREATED_TS.lessOrEqual(ts));
-
-        Map<Long, List<AlphaToBetaLink>> existingLinks = getABRecordByCondition(condition)
-                .stream()
-                .filter(AlphaToBetaRecord::getCanUse)
-                .map(this::convertToLink)
-                .collect(Collectors.groupingBy(AlphaToBetaLink::getAlphaId));
-
-        return fillConnectedEntities(alphaIds, existingLinks);
-    }
-
-    @Override
-    public Map<Long, List<AlphaToBetaLink>> getConnectedAlphaEntitiesByBetaIds(Collection<Long> betaIds, long ts) {
-        Condition condition = LOW_LVL_AB.BETA_ID.in(betaIds)
-                .and(LOW_LVL_AB.CREATED_TS.lessOrEqual(ts));
-
-        Map<Long, List<AlphaToBetaLink>> existingLinks = getABRecordByCondition(condition)
-                .stream()
-                .filter(AlphaToBetaRecord::getCanUse)
-                .map(this::convertToLink)
-                .collect(Collectors.groupingBy(AlphaToBetaLink::getBetaId));
-
-        return fillConnectedEntities(betaIds, existingLinks);
-    }
-
-    @Override
     public void batchInsertNewEvents(List<AlphaToBetaEvent> events) {
         List<Row5<Long, Long, String, Boolean, Long>> rows =
                 events.stream().map(this::covertToRecord).collect(Collectors.toList());

@@ -112,34 +112,6 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
     }
 
     @Override
-    public Map<Long, List<GammaToAlphaLink>> getConnectedGammaEntitiesByAlphaIds(Collection<Long> alphaIds, long ts) {
-        Condition condition = LOW_LVL_GA.ALPHA_ID.in(alphaIds)
-                .and(LOW_LVL_GA.CREATED_TS.lessOrEqual(ts));
-
-        Map<Long, List<GammaToAlphaLink>> existingLinks = getGARecordByCondition(condition)
-                .stream()
-                .filter(GammaToAlphaRecord::getCanUse)
-                .map(this::convertToLink)
-                .collect(Collectors.groupingBy(GammaToAlphaLink::getAlphaId));
-
-        return fillConnectedEntities(alphaIds, existingLinks);
-    }
-
-    @Override
-    public Map<Long, List<GammaToAlphaLink>> getConnectedAlphaEntitiesByGammaIds(Collection<Long> gammaIds, long ts) {
-        Condition condition = LOW_LVL_GA.GAMMA_ID.in(gammaIds)
-                .and(LOW_LVL_GA.CREATED_TS.lessOrEqual(ts));
-
-        Map<Long, List<GammaToAlphaLink>> existingLinks = getGARecordByCondition(condition)
-                .stream()
-                .filter(GammaToAlphaRecord::getCanUse)
-                .map(this::convertToLink)
-                .collect(Collectors.groupingBy(GammaToAlphaLink::getGammaId));
-
-        return fillConnectedEntities(gammaIds, existingLinks);
-    }
-
-    @Override
     public void batchInsertNewEvents(List<GammaToAlphaEvent> events) {
         List<Row5<Long, Long, Long, Boolean, Long>> rows =
                 events.stream().map(this::covertToRow).collect(Collectors.toList());

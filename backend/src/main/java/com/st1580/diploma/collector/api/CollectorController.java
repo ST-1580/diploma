@@ -18,9 +18,4 @@ public interface CollectorController {
                           @RequestParam(value = "policy", defaultValue = "start", required = false) PolicyType policyType,
                           @RequestParam(value = "ll", defaultValue = "true", required = false) boolean isLinksLight,
                           @RequestParam(value = "le", defaultValue = "true", required = false) boolean isEntitiesLight);
-
-    @GetMapping("/neighbors/{id}")
-    List<GraphLinkDto> collectEntityNeighbors(@PathVariable("id") long entityId,
-                                              @RequestParam(value = "ts", defaultValue = "-1", required = false) long ts,
-                                              @RequestParam(value = "ll", defaultValue = "false", required = false) boolean isLinksLight);
 }

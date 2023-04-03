@@ -58,24 +58,7 @@ public class DbDeltaRepository implements DeltaRepository {
     @Override
     public Map<EntityType, Map<Long, List<Long>>> collectAllNeighborsIdsByEntities(Collection<Long> ids, long ts) {
         Map<EntityType, Map<Long, List<Long>>> res = new HashMap<>();
-
-        context.transaction(ctx -> {
-            res.put(EntityType.GAMMA, gammaToDeltaRepository.getConnectedGammaEntitiesIdsByDeltaIds(ids, ts));
-        });
-
-        return res;
-    }
-
-    @Override
-    public Map<EntityType, Map<Long, List<? extends Link>>> collectAllNeighborsByEntities(Collection<Long> ids,
-                                                                                          long ts) {
-        Map<EntityType, Map<Long, List<? extends Link>>> res = new HashMap<>();
-
-        context.transaction(ctx -> {
-            res.put(EntityType.GAMMA, new HashMap<>(gammaToDeltaRepository.getConnectedGammaEntitiesByDeltaIds(ids,
-                    ts)));
-        });
-
+        res.put(EntityType.GAMMA, gammaToDeltaRepository.getConnectedGammaEntitiesIdsByDeltaIds(ids, ts));
         return res;
     }
 

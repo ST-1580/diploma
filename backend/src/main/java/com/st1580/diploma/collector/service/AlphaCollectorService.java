@@ -30,10 +30,4 @@ public class AlphaCollectorService extends AbstractCollectorService implements A
         final Entity startEntity = new LightEntity(EntityType.ALPHA, entityId);
         return getGraphByPolicy(startEntity, ts, policyType, isLinksLight, isEntitiesLight);
     }
-
-    @Override
-    public List<GraphLinkDto> collectEntityNeighbors(long entityId, long ts, boolean isLinksLight) {
-        final Entity startEntity = new LightEntity(EntityType.ALPHA, entityId);
-        return getEntityNeighbors(startEntity, ts, isLinksLight);
-    }
 }

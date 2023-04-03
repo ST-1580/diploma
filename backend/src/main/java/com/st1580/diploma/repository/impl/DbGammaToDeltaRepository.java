@@ -110,34 +110,6 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
     }
 
     @Override
-    public Map<Long, List<GammaToDeltaLink>> getConnectedGammaEntitiesByDeltaIds(Collection<Long> deltaIds, long ts) {
-        Condition condition = LOW_LVL_GD.DELTA_ID.in(deltaIds)
-                .and(LOW_LVL_GD.CREATED_TS.lessOrEqual(ts));
-
-        Map<Long, List<GammaToDeltaLink>> existingLinks = getGDRecordByCondition(condition)
-                .stream()
-                .filter(GammaToDeltaRecord::getCanUse)
-                .map(this::convertToLink)
-                .collect(Collectors.groupingBy(GammaToDeltaLink::getDeltaId));
-
-        return fillConnectedEntities(deltaIds, existingLinks);
-    }
-
-    @Override
-    public Map<Long, List<GammaToDeltaLink>> getConnectedDeltaEntitiesByGammaIds(Collection<Long> gammaIds, long ts) {
-        Condition condition = LOW_LVL_GD.GAMMA_ID.in(gammaIds)
-                .and(LOW_LVL_GD.CREATED_TS.lessOrEqual(ts));
-
-        Map<Long, List<GammaToDeltaLink>> existingLinks = getGDRecordByCondition(condition)
-                .stream()
-                .filter(GammaToDeltaRecord::getCanUse)
-                .map(this::convertToLink)
-                .collect(Collectors.groupingBy(GammaToDeltaLink::getGammaId));
-
-        return fillConnectedEntities(gammaIds, existingLinks);
-    }
-
-    @Override
     public void batchInsertNewEvents(List<GammaToDeltaEvent> events) {
         List<Row4<Long, Long, Boolean, Long>> rows =
                 events.stream().map(this::covertToRow).collect(Collectors.toList());

@@ -154,27 +154,6 @@ public abstract class AbstractCollectorService {
         throw new IllegalArgumentException("Wrong policy type parameter " + policyType);
     }
 
-    public List<GraphLinkDto> getEntityNeighbors(Entity startEntity, long ts, boolean isLinksLight) {
-        long actualTs = lastSyncRepository.getCorrectorLastSync();
-        long constructedTs = ts != -1 && ts < actualTs ? ts : actualTs;
-        if (!isEntityExist(startEntity, constructedTs)) {
-            return new ArrayList<>();
-        }
-
-        Graph g = new Graph();
-
-        if (isLinksLight) {
-            Map<EntityType, List<Long>> neighbors = collectorRepository.collectAllNeighborsIds(startEntity.getId(), constructedTs);
-            g.addLightNeighbors(startEntity.convertToLight(), neighbors);
-        } else {
-            Map<EntityType, List<? extends Link>> neighbors =
-                    collectorRepository.collectAllNeighbors(startEntity.getId(), constructedTs);
-            g.addNeighbors(startEntity.convertToLight(), neighbors);
-        }
-
-        return g.getGraphLinks().stream().map(Link::convertToDto).collect(Collectors.toList());
-    }
-
     private boolean isEntityExist(Entity entity, long ts) {
         return !collectorRepository.collectAllActiveEntitiesByIds(List.of(entity.getId()), ts).isEmpty();
     }

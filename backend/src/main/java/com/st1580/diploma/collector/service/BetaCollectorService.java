@@ -30,10 +30,4 @@ public class BetaCollectorService extends AbstractCollectorService implements Be
         final Entity startEntity = new LightEntity(EntityType.BETA, entityId);
         return getGraphByPolicy(startEntity, ts, policyType, isLinksLight, isEntitiesLight);
     }
-
-    @Override
-    public List<GraphLinkDto> collectEntityNeighbors(long entityId, long ts, boolean isLinksLight) {
-        final Entity startEntity = new LightEntity(EntityType.BETA, entityId);
-        return getEntityNeighbors(startEntity, ts, isLinksLight);
-    }
 }

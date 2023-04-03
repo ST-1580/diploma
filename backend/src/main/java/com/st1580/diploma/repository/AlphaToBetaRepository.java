@@ -16,10 +16,6 @@ public interface AlphaToBetaRepository extends LinkCollectorRepository {
 
     Map<Long, List<Long>> getConnectedAlphaEntitiesIdsByBetaIds(Collection<Long> betaIds, long ts);
 
-    Map<Long, List<AlphaToBetaLink>> getConnectedBetaEntitiesByAlphaIds(Collection<Long> alphaIds, long ts);
-
-    Map<Long, List<AlphaToBetaLink>> getConnectedAlphaEntitiesByBetaIds(Collection<Long> betaIds, long ts);
-
     void batchInsertNewEvents(List<AlphaToBetaEvent> events);
 
     void addLinkEventsTriggeredByEntitiesUpdate(List<Set<AlphaEvent>> alphaEvents, List<Set<BetaEvent>> betaEvents);

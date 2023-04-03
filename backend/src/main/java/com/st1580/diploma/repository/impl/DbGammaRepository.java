@@ -63,25 +63,8 @@ public class DbGammaRepository implements GammaRepository {
     public Map<EntityType, Map<Long, List<Long>>> collectAllNeighborsIdsByEntities(Collection<Long> ids, long ts) {
         Map<EntityType, Map<Long, List<Long>>> res = new HashMap<>();
 
-        context.transaction(ctx -> {
-            res.put(EntityType.ALPHA, gammaToAlphaRepository.getConnectedAlphaEntitiesIdsByGammaIds(ids, ts));
-            res.put(EntityType.DELTA, gammaToDeltaRepository.getConnectedDeltaEntitiesIdsByGammaIds(ids, ts));
-        });
-
-        return res;
-    }
-
-    @Override
-    public Map<EntityType, Map<Long, List<? extends Link>>> collectAllNeighborsByEntities(Collection<Long> ids,
-                                                                                          long ts) {
-        Map<EntityType, Map<Long, List<? extends Link>>> res = new HashMap<>();
-
-        context.transaction(ctx -> {
-            res.put(EntityType.ALPHA, new HashMap<>(gammaToAlphaRepository.getConnectedAlphaEntitiesByGammaIds(ids,
-                    ts)));
-            res.put(EntityType.DELTA, new HashMap<>(gammaToDeltaRepository.getConnectedDeltaEntitiesByGammaIds(ids,
-                    ts)));
-        });
+        res.put(EntityType.ALPHA, gammaToAlphaRepository.getConnectedAlphaEntitiesIdsByGammaIds(ids, ts));
+        res.put(EntityType.DELTA, gammaToDeltaRepository.getConnectedDeltaEntitiesIdsByGammaIds(ids, ts));
 
         return res;
     }

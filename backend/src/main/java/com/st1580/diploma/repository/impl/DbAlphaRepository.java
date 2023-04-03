@@ -63,23 +63,8 @@ public class DbAlphaRepository implements AlphaRepository {
     public Map<EntityType, Map<Long, List<Long>>> collectAllNeighborsIdsByEntities(Collection<Long> ids, long ts) {
         Map<EntityType, Map<Long, List<Long>>> res = new HashMap<>();
 
-        context.transaction(ctx -> {
-            res.put(EntityType.BETA, alphaToBetaRepository.getConnectedBetaEntitiesIdsByAlphaIds(ids, ts));
-            res.put(EntityType.GAMMA, gammaToAlphaRepository.getConnectedGammaEntitiesIdsByAlphaIds(ids, ts));
-        });
-
-        return res;
-    }
-
-    @Override
-    public Map<EntityType, Map<Long, List<? extends Link>>> collectAllNeighborsByEntities(Collection<Long> ids,
-                                                                                          long ts) {
-        Map<EntityType, Map<Long, List<? extends Link>>> res = new HashMap<>();
-
-        context.transaction(ctx -> {
-            res.put(EntityType.BETA, new HashMap<>(alphaToBetaRepository.getConnectedBetaEntitiesByAlphaIds(ids, ts)));
-            res.put(EntityType.GAMMA, new HashMap<>(gammaToAlphaRepository.getConnectedGammaEntitiesByAlphaIds(ids, ts)));
-        });
+        res.put(EntityType.BETA, alphaToBetaRepository.getConnectedBetaEntitiesIdsByAlphaIds(ids, ts));
+        res.put(EntityType.GAMMA, gammaToAlphaRepository.getConnectedGammaEntitiesIdsByAlphaIds(ids, ts));
 
         return res;
     }
