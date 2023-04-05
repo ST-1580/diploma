@@ -61,42 +61,42 @@ public abstract class AbstractCollectorService {
                                  Policy policy,
                                  long ts) {
         Graph graph = new Graph(policy);
-        Queue<BfsStage> queue = new ArrayDeque<>();
-        queue.add(new BfsStage(startEntity.getType(), Set.of(startEntity.getId())));
+        BfsStage stage = new BfsStage(startEntity.getType(), startEntity.getId());
 
-        while (!queue.isEmpty()) {
-            BfsStage currStage = queue.poll();
-            List<Long> notFinishEntitiesIds = new ArrayList<>();
-            for (long id : currStage.getEntitiesIds()) {
-                if (graph.canExtendFromEntityByPolicy(currStage.getType(), id)) {
-                    notFinishEntitiesIds.add(id);
-                } else {
-                    graph.addEntity(new LightEntity(currStage.getType(), id));
+        while (stage.hasNodesInCurrentLvl()) {
+            for (EntityType type : EntityType.values()) {
+                List<Long> notFinishEntitiesIds = new ArrayList<>();
+                for (long id : stage.getCurrentStageIdsWithType(type)) {
+                    if (graph.canExtendFromEntityByPolicy(type, id)) {
+                        notFinishEntitiesIds.add(id);
+                    } else {
+                        graph.addEntity(new LightEntity(type, id));
+                    }
                 }
+
+                Map<EntityType, Map<Long, List<Long>>> currStageNeighbors =
+                        graphConstructorService.getEntitiesNeighborsIds(type, notFinishEntitiesIds, ts);
+
+                currStageNeighbors.forEach((nextStageType, linkedEntitiesIds) -> {
+                    Set<Long> nextStageEntitiesIds = new HashSet<>();
+
+                    for (long entityId : linkedEntitiesIds.keySet()) {
+                        List<Long> neighbors = linkedEntitiesIds.get(entityId);
+
+                        graph.addLightNeighbors(
+                                type,
+                                entityId,
+                                Map.of(nextStageType, neighbors)
+                        );
+
+                        nextStageEntitiesIds.addAll(neighbors);
+                    }
+
+                    stage.putInNextLvlByType(nextStageType, nextStageEntitiesIds);
+                });
             }
 
-            Map<EntityType, Map<Long, List<Long>>> currStageNeighbors =
-                    graphConstructorService.getEntitiesNeighborsIds(currStage.getType(), notFinishEntitiesIds, ts);
-
-            currStageNeighbors.forEach((nextStageType, linkedEntitiesIds) -> {
-                Set<Long> nextStageEntitiesIds = new HashSet<>();
-
-                for (long entityId : linkedEntitiesIds.keySet()) {
-                    List<Long> neighbors = linkedEntitiesIds.get(entityId);
-
-                    graph.addLightNeighbors(
-                            currStage.getType(),
-                            entityId,
-                            Map.of(nextStageType, neighbors)
-                    );
-
-                    nextStageEntitiesIds.addAll(neighbors);
-                }
-
-                if (!nextStageEntitiesIds.isEmpty()) {
-                    queue.add(new BfsStage(nextStageType, nextStageEntitiesIds));
-                }
-            });
+            stage.incLvl();
         }
 
         return graph;
