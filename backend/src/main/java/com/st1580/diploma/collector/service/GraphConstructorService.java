@@ -16,12 +16,12 @@ import com.st1580.diploma.collector.graph.links.LinkType;
 import com.st1580.diploma.repository.AlphaRepository;
 import com.st1580.diploma.repository.AlphaToBetaRepository;
 import com.st1580.diploma.repository.BetaRepository;
-import com.st1580.diploma.repository.EntityCollectorRepository;
+import com.st1580.diploma.collector.repository.EntityCollectorRepository;
 import com.st1580.diploma.repository.DeltaRepository;
 import com.st1580.diploma.repository.GammaRepository;
 import com.st1580.diploma.repository.GammaToAlphaRepository;
 import com.st1580.diploma.repository.GammaToDeltaRepository;
-import com.st1580.diploma.repository.LinkCollectorRepository;
+import com.st1580.diploma.collector.repository.LinkCollectorRepository;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -54,8 +54,6 @@ public class GraphConstructorService {
         this.gammaToAlphaRepository = gammaToAlphaRepository;
         this.gammaToDeltaRepository = gammaToDeltaRepository;
     }
-
-
 
     private EntityCollectorRepository matchEntityRepository(EntityType type) {
         switch (type) {
@@ -103,8 +101,12 @@ public class GraphConstructorService {
 
     public Map<LightLink,? extends Link> getLinksByEnds(LinkType type, Set<LightLink> lightLinks, long ts) {
         LinkCollectorRepository linkCollectorRepository = matchLinkRepository(type);
-        List<Long> fromIds = lightLinks.stream().map(link -> link.getFrom().getId()).collect(Collectors.toList());
-        List<Long> toIds = lightLinks.stream().map(link -> link.getTo().getId()).collect(Collectors.toList());
-        return linkCollectorRepository.collectAllActiveLinksByEnds(fromIds, toIds, ts);
+        Map<Long, Long> linkEndIds = lightLinks.stream()
+                .collect(Collectors.toMap(
+                    link -> link.getFrom().getId(),
+                    link -> link.getTo().getId()
+                )
+            );
+        return linkCollectorRepository.collectAllActiveLinksByEnds(linkEndIds, ts);
     }
 }

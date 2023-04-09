@@ -24,6 +24,7 @@ import com.st1580.diploma.updater.events.AlphaEvent;
 import com.st1580.diploma.updater.events.AlphaToBetaEvent;
 import com.st1580.diploma.updater.events.BetaEvent;
 import com.st1580.diploma.updater.events.EntityEvent;
+import com.st1580.diploma.updater.events.EntityEventIdAndTs;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Result;
@@ -33,6 +34,8 @@ import org.springframework.stereotype.Repository;
 
 import static com.st1580.diploma.db.Tables.ALPHA_TO_BETA;
 import static com.st1580.diploma.repository.impl.RepositoryHelper.fillConnectedEntities;
+import static com.st1580.diploma.repository.impl.RepositoryHelper.isActiveLinkByEndStatus;
+import static com.st1580.diploma.repository.types.LinkEndActivityType.getTypeByEndStatus;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.noCondition;
 import static org.jooq.impl.DSL.row;
@@ -45,7 +48,7 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
     private final AlphaToBeta LOW_LVL_AB = ALPHA_TO_BETA.as("low_lvl");
 
     @Override
-    public Map<Long, List<Long>> getConnectedBetaEntitiesIdsByAlphaIds(Collection<Long> alphaIds, long ts) {
+    public Map<Long, List<Long>> getConnectedToEntitiesIdsByFromEntitiesIds(Collection<Long> alphaIds, long ts) {
         Condition condition = ALPHA_TO_BETA.ALPHA_ID.in(alphaIds)
                 .and(ALPHA_TO_BETA.CREATED_TS.lessOrEqual(ts));
 
@@ -57,7 +60,7 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
     }
 
     @Override
-    public Map<Long, List<Long>> getConnectedAlphaEntitiesIdsByBetaIds(Collection<Long> betaIds, long ts) {
+    public Map<Long, List<Long>> getConnectedFromEntitiesIdsByToEntitiesIds(Collection<Long> betaIds, long ts) {
         Condition condition = ALPHA_TO_BETA.BETA_ID.in(betaIds)
                 .and(ALPHA_TO_BETA.CREATED_TS.lessOrEqual(ts));
 
@@ -92,11 +95,14 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
     }
 
     @Override
-    public Map<LightLink, ? extends Link> collectAllActiveLinksByEnds(Collection<Long> fromIds,
-                                                                      Collection<Long> toIds, long ts) {
-        Condition condition = LOW_LVL_AB.ALPHA_ID.in(fromIds)
-                .and(LOW_LVL_AB.BETA_ID.in(toIds))
-                .and(LOW_LVL_AB.CREATED_TS.lessOrEqual(ts));
+    public Map<LightLink, ? extends Link> collectAllActiveLinksByEnds(Map<Long, Long> linkEndIds, long ts) {
+        Condition condition = noCondition();
+        linkEndIds.forEach((alphaId, betaId) -> condition.or(
+                    LOW_LVL_AB.ALPHA_ID.in(alphaId)
+                    .and(LOW_LVL_AB.BETA_ID.in(betaId))
+                    .and(LOW_LVL_AB.CREATED_TS.lessOrEqual(ts))
+                )
+        );
 
         return getABRecordByCondition(condition)
                 .stream()
@@ -127,40 +133,8 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
         Map<BetaEvent, List<AlphaToBetaRecord>> ABLinksByBetaEntity = getActualLinksForBeta(batchedBetaEvents);
 
         List<AlphaToBetaRecord> records = new ArrayList<>();
-
-        records.addAll(ABLinksByAlphaEntity.entrySet().stream()
-                .flatMap(entry -> entry.getValue().stream()
-                        .map(link -> new AlphaToBetaRecord(
-                                link.getAlphaId(),
-                                link.getBetaId(),
-                                link.getHash(),
-                                entry.getKey().getType() == EntityActiveType.DELETED ? false : link.getIsActive(),
-                                EntityActiveType.trueEntityActiveTypes.contains(entry.getKey().getType().name()) ?
-                                        LinkEndActivityType.TRUE.name() : LinkEndActivityType.FALSE.name(),
-                                LinkEndActivityType.UNDEFINED.name(),
-                                null,
-                                entry.getKey().getCreatedTs()
-                        ))
-                )
-                .collect(Collectors.toList())
-        );
-
-        records.addAll(ABLinksByBetaEntity.entrySet().stream()
-                .flatMap(entry -> entry.getValue().stream()
-                        .map(link -> new AlphaToBetaRecord(
-                                link.getAlphaId(),
-                                link.getBetaId(),
-                                link.getHash(),
-                                entry.getKey().getType() == EntityActiveType.DELETED ? false : link.getIsActive(),
-                                LinkEndActivityType.UNDEFINED.name(),
-                                EntityActiveType.trueEntityActiveTypes.contains(entry.getKey().getType().name()) ?
-                                        LinkEndActivityType.TRUE.name() : LinkEndActivityType.FALSE.name(),
-                                null,
-                                entry.getKey().getCreatedTs()
-                        ))
-                )
-                .collect(Collectors.toList())
-        );
+        records.addAll(convertLinksByEntityToRecords(ABLinksByAlphaEntity, false));
+        records.addAll(convertLinksByEntityToRecords(ABLinksByBetaEntity, true));
 
         context.insertInto(ALPHA_TO_BETA, ALPHA_TO_BETA.ALPHA_ID, ALPHA_TO_BETA.BETA_ID, ALPHA_TO_BETA.HASH,
                         ALPHA_TO_BETA.IS_ACTIVE, ALPHA_TO_BETA.IS_ACTIVE_ALPHA, ALPHA_TO_BETA.IS_ACTIVE_BETA,
@@ -177,9 +151,9 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
             Map<Long, AlphaEvent> eventById = new HashMap<>();
             Condition condition = noCondition();
             for (AlphaEvent event : batch) {
-                condition = condition.or(LOW_LVL_AB.ALPHA_ID.eq(event.getAlphaId())
+                condition = condition.or(LOW_LVL_AB.ALPHA_ID.eq(event.getEntityId())
                         .and(LOW_LVL_AB.CREATED_TS.lessThan(event.getCreatedTs())));
-                eventById.put(event.getAlphaId(), event);
+                eventById.put(event.getEntityId(), event);
             }
 
             res.putAll(getABRecordByCondition(condition)
@@ -198,9 +172,9 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
             Map<Long, BetaEvent> eventById = new HashMap<>();
             Condition condition = noCondition();
             for (BetaEvent event : batch) {
-                condition = condition.or(LOW_LVL_AB.BETA_ID.eq(event.getBetaId())
+                condition = condition.or(LOW_LVL_AB.BETA_ID.eq(event.getEntityId())
                         .and(LOW_LVL_AB.CREATED_TS.lessThan(event.getCreatedTs())));
-                eventById.put(event.getBetaId(), event);
+                eventById.put(event.getEntityId(), event);
             }
 
             res.putAll(getABRecordByCondition(condition)
@@ -213,25 +187,25 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
     }
 
     @Override
-    public List<EntityEvent> getUndefinedAlphaStateInRange(long tsFrom, long tsTo) {
+    public List<EntityEventIdAndTs> getUndefinedFromStateInRange(long tsFrom, long tsTo) {
         return context
                 .selectFrom(ALPHA_TO_BETA)
                 .where(ALPHA_TO_BETA.CREATED_TS.greaterOrEqual(tsFrom)
                         .and(ALPHA_TO_BETA.CREATED_TS.lessThan(tsTo))
                         .and(ALPHA_TO_BETA.IS_ACTIVE_ALPHA.eq(LinkEndActivityType.UNDEFINED.name())))
                 .fetch()
-                .map(record -> new EntityEvent(record.getAlphaId(), record.getCreatedTs()));
+                .map(record -> new EntityEventIdAndTs(record.getAlphaId(), record.getCreatedTs()));
     }
 
     @Override
-    public List<EntityEvent> getUndefinedBetaStateInRange(long tsFrom, long tsTo) {
+    public List<EntityEventIdAndTs> getUndefinedToStateInRange(long tsFrom, long tsTo) {
         return context
                 .selectFrom(ALPHA_TO_BETA)
                 .where(ALPHA_TO_BETA.CREATED_TS.greaterOrEqual(tsFrom)
                         .and(ALPHA_TO_BETA.CREATED_TS.lessThan(tsTo))
                         .and(ALPHA_TO_BETA.IS_ACTIVE_BETA.eq(LinkEndActivityType.UNDEFINED.name())))
                 .fetch()
-                .map(record -> new EntityEvent(record.getBetaId(), record.getCreatedTs()));
+                .map(record -> new EntityEventIdAndTs(record.getBetaId(), record.getCreatedTs()));
     }
 
     @Override
@@ -248,9 +222,9 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
     }
 
     @Override
-    public void batchUpdateLinksDependentOnAlpha(Map<EntityEvent, Boolean> alphaActiveStatusByEvent) {
+    public void batchUpdateLinksDependentOnFromEntity(Map<EntityEventIdAndTs, Boolean> alphaActiveStatusByEvent) {
         context.batched(ctx -> {
-            for (EntityEvent event : alphaActiveStatusByEvent.keySet()) {
+            for (EntityEventIdAndTs event : alphaActiveStatusByEvent.keySet()) {
                 ctx.dsl().update(ALPHA_TO_BETA)
                         .set(ALPHA_TO_BETA.IS_ACTIVE_ALPHA,
                                 LinkEndActivityType.parseBoolean(alphaActiveStatusByEvent.get(event)).name())
@@ -262,9 +236,9 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
     }
 
     @Override
-    public void batchUpdateLinksDependentOnBeta(Map<EntityEvent, Boolean> betaActiveStatusByEvent) {
+    public void batchUpdateLinksDependentOnToEntity(Map<EntityEventIdAndTs, Boolean> betaActiveStatusByEvent) {
         context.batched(ctx -> {
-            for (EntityEvent event : betaActiveStatusByEvent.keySet()) {
+            for (EntityEventIdAndTs event : betaActiveStatusByEvent.keySet()) {
                 ctx.dsl().update(ALPHA_TO_BETA)
                         .set(ALPHA_TO_BETA.IS_ACTIVE_BETA,
                                 LinkEndActivityType.parseBoolean(betaActiveStatusByEvent.get(event)).name())
@@ -290,10 +264,34 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
                 .fetch();
     }
 
+    private List<AlphaToBetaRecord> convertLinksByEntityToRecords(
+            Map<? extends EntityEvent, List<AlphaToBetaRecord>> linksByEntity,
+            boolean setFromStatusToUndefined) {
+
+        return linksByEntity.entrySet().stream()
+                .flatMap(entry -> entry.getValue().stream()
+                        .map(link -> new AlphaToBetaRecord(
+                                link.getAlphaId(),
+                                link.getBetaId(),
+                                link.getHash(),
+                                isActiveLinkByEndStatus(entry.getKey().getType(), link.getIsActive()),
+                                setFromStatusToUndefined ?
+                                        LinkEndActivityType.UNDEFINED.name() :
+                                        getTypeByEndStatus(entry.getKey().getType()).name(),
+                                setFromStatusToUndefined ?
+                                        getTypeByEndStatus(entry.getKey().getType()).name() :
+                                        LinkEndActivityType.UNDEFINED.name(),
+                                null,
+                                entry.getKey().getCreatedTs()
+                        ))
+                )
+                .collect(Collectors.toList());
+    }
+
     private Row5<Long, Long, String, Boolean, Long> covertToRecord(AlphaToBetaEvent event) {
         return row(
-                event.getAlphaId(),
-                event.getBetaId(),
+                event.getFromId(),
+                event.getToId(),
                 event.getHash(),
                 event.isActive(),
                 event.getCreatedTs()

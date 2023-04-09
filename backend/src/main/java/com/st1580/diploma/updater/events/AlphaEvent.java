@@ -6,7 +6,7 @@ import com.st1580.diploma.repository.types.EntityActiveType;
 import com.st1580.diploma.external.alpha.data.AlphaEventType;
 import com.st1580.diploma.external.alpha.data.entity.ExternalAlphaEntityEvent;
 
-public class AlphaEvent {
+public class AlphaEvent implements EntityEvent {
     private final long alphaId;
     private final String name;
     private final EntityActiveType type;
@@ -40,7 +40,7 @@ public class AlphaEvent {
         throw new IllegalArgumentException("Wrong AlphaEventType");
     }
 
-    public long getAlphaId() {
+    public long getEntityId() {
         return alphaId;
     }
 

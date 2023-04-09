@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import com.st1580.diploma.external.alpha.data.link.ExternalAlphaToBetaLinkEvent;
 
-public class AlphaToBetaEvent {
+public class AlphaToBetaEvent implements LinkEvent {
     private final long alphaId;
     private final long betaId;
     private final String hash;
@@ -27,11 +27,11 @@ public class AlphaToBetaEvent {
         this.createdTs = event.getEventTs();
     }
 
-    public long getAlphaId() {
+    public long getFromId() {
         return alphaId;
     }
 
-    public long getBetaId() {
+    public long getToId() {
         return betaId;
     }
 

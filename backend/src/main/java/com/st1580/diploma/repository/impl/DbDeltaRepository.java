@@ -11,23 +11,22 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 import com.st1580.diploma.collector.graph.EntityType;
-import com.st1580.diploma.collector.graph.Link;
 import com.st1580.diploma.collector.graph.entities.DeltaEntity;
+import com.st1580.diploma.db.tables.Delta;
+import com.st1580.diploma.db.tables.records.DeltaRecord;
 import com.st1580.diploma.repository.DeltaRepository;
 import com.st1580.diploma.repository.GammaToDeltaRepository;
 import com.st1580.diploma.repository.types.EntityActiveType;
-import com.st1580.diploma.db.tables.Delta;
-import com.st1580.diploma.db.tables.records.DeltaRecord;
 import com.st1580.diploma.updater.events.DeltaEvent;
-import com.st1580.diploma.updater.events.EntityEvent;
+import com.st1580.diploma.updater.events.EntityEventIdAndTs;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import static com.st1580.diploma.repository.impl.RepositoryHelper.getBatches;
 import static com.st1580.diploma.db.Tables.DELTA;
+import static com.st1580.diploma.repository.impl.RepositoryHelper.getBatches;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.noCondition;
 
@@ -58,7 +57,7 @@ public class DbDeltaRepository implements DeltaRepository {
     @Override
     public Map<EntityType, Map<Long, List<Long>>> collectAllNeighborsIdsByEntities(Collection<Long> ids, long ts) {
         Map<EntityType, Map<Long, List<Long>>> res = new HashMap<>();
-        res.put(EntityType.GAMMA, gammaToDeltaRepository.getConnectedGammaEntitiesIdsByDeltaIds(ids, ts));
+        res.put(EntityType.GAMMA, gammaToDeltaRepository.getConnectedFromEntitiesIdsByToEntitiesIds(ids, ts));
         return res;
     }
 
@@ -81,26 +80,26 @@ public class DbDeltaRepository implements DeltaRepository {
                 )
                 .fetchInto(DeltaEvent.class)
                 .stream()
-                .collect(Collectors.groupingBy(DeltaEvent::getDeltaId));
+                .collect(Collectors.groupingBy(DeltaEvent::getEntityId));
 
         return getBatches(deltaEventsById);
     }
 
     @Override
     public void correctDependentLinks(long tsFrom, long tsTo) {
-        List<EntityEvent> gammaToDeltaUndefinedDependencies =
-                gammaToDeltaRepository.getUndefinedDeltaStateInRange(tsFrom, tsTo);
+        List<EntityEventIdAndTs> gammaToDeltaUndefinedDependencies =
+                gammaToDeltaRepository.getUndefinedToStateInRange(tsFrom, tsTo);
 
-        Map<Long, List<EntityEvent>> deltaDependenciesById =
+        Map<Long, List<EntityEventIdAndTs>> deltaDependenciesById =
                 gammaToDeltaUndefinedDependencies.stream()
-                        .collect(Collectors.groupingBy(EntityEvent::getEntityId));
+                        .collect(Collectors.groupingBy(EntityEventIdAndTs::getEntityId));
 
-        Map<EntityEvent, Boolean> actualDeltaState = new HashMap<>();
-        for (Set<EntityEvent> batch : getBatches(deltaDependenciesById)) {
-            Map<Long, EntityEvent> eventById = new HashMap<>();
+        Map<EntityEventIdAndTs, Boolean> actualDeltaState = new HashMap<>();
+        for (Set<EntityEventIdAndTs> batch : getBatches(deltaDependenciesById)) {
+            Map<Long, EntityEventIdAndTs> eventById = new HashMap<>();
 
             Condition condition = noCondition();
-            for (EntityEvent event : batch) {
+            for (EntityEventIdAndTs event : batch) {
                 condition = condition.or(LOW_LVL_DELTA.ID.eq(event.getEntityId())
                         .and(LOW_LVL_DELTA.CREATED_TS.lessOrEqual(event.getCreatedTs())));
                 eventById.put(event.getEntityId(), event);
@@ -110,13 +109,13 @@ public class DbDeltaRepository implements DeltaRepository {
                     .stream()
                     .map(this::convertToDeltaEvent)
                     .collect(Collectors.toMap(
-                            event -> eventById.get(event.getDeltaId()),
+                            event -> eventById.get(event.getEntityId()),
                             event -> EntityActiveType.trueEntityActiveTypes.contains(event.getType().name())
                     ))
             );
         }
 
-        gammaToDeltaRepository.batchUpdateLinksDependentOnDelta(actualDeltaState);
+        gammaToDeltaRepository.batchUpdateLinksDependentOnToEntity(actualDeltaState);
     }
 
     private Result<DeltaRecord> getDeltaRecordByCondition(Condition condition) {
@@ -135,7 +134,7 @@ public class DbDeltaRepository implements DeltaRepository {
 
     private DeltaRecord covertToDeltaRecord(DeltaEvent event) {
         return new DeltaRecord(
-                event.getDeltaId(),
+                event.getEntityId(),
                 event.getName(),
                 event.getType().name(),
                 event.getCreatedTs()

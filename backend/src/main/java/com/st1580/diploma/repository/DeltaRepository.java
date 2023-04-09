@@ -1,14 +1,9 @@
 package com.st1580.diploma.repository;
 
-import java.util.List;
-import java.util.Set;
-
+import com.st1580.diploma.collector.repository.EntityCollectorRepository;
 import com.st1580.diploma.updater.events.DeltaEvent;
+import com.st1580.diploma.updater.repository.EntityEventRepository;
 
-public interface DeltaRepository extends EntityCollectorRepository {
-    void batchInsertNewEvents(List<DeltaEvent> events);
+public interface DeltaRepository extends EntityCollectorRepository, EntityEventRepository<DeltaEvent> {
 
-    List<Set<DeltaEvent>> getActiveStatusChangedEventsInRange(long tsFrom, long tsTo);
-
-    void correctDependentLinks(long tsFrom ,long tsTo);
 }

@@ -12,15 +12,14 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 
 import com.st1580.diploma.collector.graph.EntityType;
-import com.st1580.diploma.collector.graph.Link;
 import com.st1580.diploma.collector.graph.entities.GammaEntity;
+import com.st1580.diploma.db.tables.Gamma;
+import com.st1580.diploma.db.tables.records.GammaRecord;
 import com.st1580.diploma.repository.GammaRepository;
 import com.st1580.diploma.repository.GammaToAlphaRepository;
 import com.st1580.diploma.repository.GammaToDeltaRepository;
 import com.st1580.diploma.repository.types.EntityActiveType;
-import com.st1580.diploma.db.tables.Gamma;
-import com.st1580.diploma.db.tables.records.GammaRecord;
-import com.st1580.diploma.updater.events.EntityEvent;
+import com.st1580.diploma.updater.events.EntityEventIdAndTs;
 import com.st1580.diploma.updater.events.GammaEvent;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
@@ -28,8 +27,8 @@ import org.jooq.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import static com.st1580.diploma.repository.impl.RepositoryHelper.getBatches;
 import static com.st1580.diploma.db.Tables.GAMMA;
+import static com.st1580.diploma.repository.impl.RepositoryHelper.getBatches;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.noCondition;
 
@@ -63,8 +62,8 @@ public class DbGammaRepository implements GammaRepository {
     public Map<EntityType, Map<Long, List<Long>>> collectAllNeighborsIdsByEntities(Collection<Long> ids, long ts) {
         Map<EntityType, Map<Long, List<Long>>> res = new HashMap<>();
 
-        res.put(EntityType.ALPHA, gammaToAlphaRepository.getConnectedAlphaEntitiesIdsByGammaIds(ids, ts));
-        res.put(EntityType.DELTA, gammaToDeltaRepository.getConnectedDeltaEntitiesIdsByGammaIds(ids, ts));
+        res.put(EntityType.ALPHA, gammaToAlphaRepository.getConnectedToEntitiesIdsByFromEntitiesIds(ids, ts));
+        res.put(EntityType.DELTA, gammaToDeltaRepository.getConnectedToEntitiesIdsByFromEntitiesIds(ids, ts));
 
         return res;
     }
@@ -88,28 +87,28 @@ public class DbGammaRepository implements GammaRepository {
                 )
                 .fetchInto(GammaEvent.class)
                 .stream()
-                .collect(Collectors.groupingBy(GammaEvent::getGammaId));
+                .collect(Collectors.groupingBy(GammaEvent::getEntityId));
 
         return getBatches(gammaEventsById);
     }
 
     @Override
     public void correctDependentLinks(long tsFrom, long tsTo) {
-        List<EntityEvent> gammaToAlphaUndefinedDependencies =
-                gammaToAlphaRepository.getUndefinedGammaStateInRange(tsFrom, tsTo);
-        List<EntityEvent> gammaToDeltaUndefinedDependencies =
-                gammaToDeltaRepository.getUndefinedGammaStateInRange(tsFrom, tsTo);
+        List<EntityEventIdAndTs> gammaToAlphaUndefinedDependencies =
+                gammaToAlphaRepository.getUndefinedFromStateInRange(tsFrom, tsTo);
+        List<EntityEventIdAndTs> gammaToDeltaUndefinedDependencies =
+                gammaToDeltaRepository.getUndefinedFromStateInRange(tsFrom, tsTo);
 
-        Map<Long, List<EntityEvent>> gammaDependenciesById = Stream
+        Map<Long, List<EntityEventIdAndTs>> gammaDependenciesById = Stream
                 .concat(gammaToAlphaUndefinedDependencies.stream(), gammaToDeltaUndefinedDependencies.stream())
-                .collect(Collectors.groupingBy(EntityEvent::getEntityId));
+                .collect(Collectors.groupingBy(EntityEventIdAndTs::getEntityId));
 
-        Map<EntityEvent, Boolean> actualGammaState = new HashMap<>();
-        for (Set<EntityEvent> batch : getBatches(gammaDependenciesById)) {
-            Map<Long, EntityEvent> eventById = new HashMap<>();
+        Map<EntityEventIdAndTs, Boolean> actualGammaState = new HashMap<>();
+        for (Set<EntityEventIdAndTs> batch : getBatches(gammaDependenciesById)) {
+            Map<Long, EntityEventIdAndTs> eventById = new HashMap<>();
 
             Condition condition = noCondition();
-            for (EntityEvent event : batch) {
+            for (EntityEventIdAndTs event : batch) {
                 condition = condition.or(LOW_LVL_GAMMA.ID.eq(event.getEntityId())
                         .and(LOW_LVL_GAMMA.CREATED_TS.lessOrEqual(event.getCreatedTs())));
                 eventById.put(event.getEntityId(), event);
@@ -119,14 +118,14 @@ public class DbGammaRepository implements GammaRepository {
                     .stream()
                     .map(this::convertToGammaEvent)
                     .collect(Collectors.toMap(
-                            event -> eventById.get(event.getGammaId()),
+                            event -> eventById.get(event.getEntityId()),
                             event -> EntityActiveType.trueEntityActiveTypes.contains(event.getType().name())
                     ))
             );
         }
 
-        gammaToAlphaRepository.batchUpdateLinksDependentOnGamma(actualGammaState);
-        gammaToDeltaRepository.batchUpdateLinksDependentOnGamma(actualGammaState);
+        gammaToAlphaRepository.batchUpdateLinksDependentOnFromEntity(actualGammaState);
+        gammaToDeltaRepository.batchUpdateLinksDependentOnFromEntity(actualGammaState);
     }
 
     private Result<GammaRecord> getGammaRecordByCondition(Condition condition) {
@@ -145,7 +144,7 @@ public class DbGammaRepository implements GammaRepository {
 
     private GammaRecord convertToGammaRecord(GammaEvent event) {
         return new GammaRecord(
-                event.getGammaId(),
+                event.getEntityId(),
                 event.isMaster(),
                 event.getType().name(),
                 event.getCreatedTs()

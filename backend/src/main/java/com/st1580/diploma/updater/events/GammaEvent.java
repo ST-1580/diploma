@@ -6,7 +6,7 @@ import com.st1580.diploma.repository.types.EntityActiveType;
 import com.st1580.diploma.external.gamma.data.GammaEventType;
 import com.st1580.diploma.external.gamma.data.entity.ExternalGammaEntityEvent;
 
-public class GammaEvent {
+public class GammaEvent implements EntityEvent {
     private final long gammaId;
     private final boolean isMaster;
     private final EntityActiveType type;
@@ -40,7 +40,7 @@ public class GammaEvent {
         throw new IllegalArgumentException("Wrong GammaEventType");
     }
 
-    public long getGammaId() {
+    public long getEntityId() {
         return gammaId;
     }
 

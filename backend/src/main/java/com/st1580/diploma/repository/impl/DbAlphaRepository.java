@@ -12,7 +12,6 @@ import java.util.stream.Stream;
 import javax.inject.Inject;
 
 import com.st1580.diploma.collector.graph.EntityType;
-import com.st1580.diploma.collector.graph.Link;
 import com.st1580.diploma.collector.graph.entities.AlphaEntity;
 import com.st1580.diploma.repository.AlphaRepository;
 import com.st1580.diploma.repository.AlphaToBetaRepository;
@@ -21,15 +20,15 @@ import com.st1580.diploma.repository.types.EntityActiveType;
 import com.st1580.diploma.db.tables.Alpha;
 import com.st1580.diploma.db.tables.records.AlphaRecord;
 import com.st1580.diploma.updater.events.AlphaEvent;
-import com.st1580.diploma.updater.events.EntityEvent;
+import com.st1580.diploma.updater.events.EntityEventIdAndTs;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import static com.st1580.diploma.repository.impl.RepositoryHelper.getBatches;
 import static com.st1580.diploma.db.Tables.ALPHA;
+import static com.st1580.diploma.repository.impl.RepositoryHelper.getBatches;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.noCondition;
 
@@ -63,8 +62,8 @@ public class DbAlphaRepository implements AlphaRepository {
     public Map<EntityType, Map<Long, List<Long>>> collectAllNeighborsIdsByEntities(Collection<Long> ids, long ts) {
         Map<EntityType, Map<Long, List<Long>>> res = new HashMap<>();
 
-        res.put(EntityType.BETA, alphaToBetaRepository.getConnectedBetaEntitiesIdsByAlphaIds(ids, ts));
-        res.put(EntityType.GAMMA, gammaToAlphaRepository.getConnectedGammaEntitiesIdsByAlphaIds(ids, ts));
+        res.put(EntityType.BETA, alphaToBetaRepository.getConnectedToEntitiesIdsByFromEntitiesIds(ids, ts));
+        res.put(EntityType.GAMMA, gammaToAlphaRepository.getConnectedFromEntitiesIdsByToEntitiesIds(ids, ts));
 
         return res;
     }
@@ -88,28 +87,28 @@ public class DbAlphaRepository implements AlphaRepository {
                 )
                 .fetchInto(AlphaEvent.class)
                 .stream()
-                .collect(Collectors.groupingBy(AlphaEvent::getAlphaId));
+                .collect(Collectors.groupingBy(AlphaEvent::getEntityId));
 
         return getBatches(alphaEventsById);
     }
 
     @Override
     public void correctDependentLinks(long tsFrom, long tsTo) {
-        List<EntityEvent> alphaToBetaUndefinedDependencies =
-                alphaToBetaRepository.getUndefinedAlphaStateInRange(tsFrom, tsTo);
-        List<EntityEvent> gammaToAlphaUndefinedDependencies =
-                gammaToAlphaRepository.getUndefinedAlphaStateInRange(tsFrom, tsTo);
+        List<EntityEventIdAndTs> alphaToBetaUndefinedDependencies =
+                alphaToBetaRepository.getUndefinedFromStateInRange(tsFrom, tsTo);
+        List<EntityEventIdAndTs> gammaToAlphaUndefinedDependencies =
+                gammaToAlphaRepository.getUndefinedToStateInRange(tsFrom, tsTo);
 
-        Map<Long, List<EntityEvent>> alphaDependenciesById = Stream
+        Map<Long, List<EntityEventIdAndTs>> alphaDependenciesById = Stream
                 .concat(alphaToBetaUndefinedDependencies.stream(), gammaToAlphaUndefinedDependencies.stream())
-                .collect(Collectors.groupingBy(EntityEvent::getEntityId));
+                .collect(Collectors.groupingBy(EntityEventIdAndTs::getEntityId));
 
-        Map<EntityEvent, Boolean> actualAlphaState = new HashMap<>();
-        for (Set<EntityEvent> batch : getBatches(alphaDependenciesById)) {
-            Map<Long, EntityEvent> eventById = new HashMap<>();
+        Map<EntityEventIdAndTs, Boolean> actualAlphaState = new HashMap<>();
+        for (Set<EntityEventIdAndTs> batch : getBatches(alphaDependenciesById)) {
+            Map<Long, EntityEventIdAndTs> eventById = new HashMap<>();
 
             Condition condition = noCondition();
-            for (EntityEvent event : batch) {
+            for (EntityEventIdAndTs event : batch) {
                 condition = condition.or(LOW_LVL_ALPHA.ID.eq(event.getEntityId())
                         .and(LOW_LVL_ALPHA.CREATED_TS.lessOrEqual(event.getCreatedTs())));
                 eventById.put(event.getEntityId(), event);
@@ -119,14 +118,14 @@ public class DbAlphaRepository implements AlphaRepository {
                     .stream()
                     .map(this::covertToAlphaEvent)
                     .collect(Collectors.toMap(
-                            event -> eventById.get(event.getAlphaId()),
+                            event -> eventById.get(event.getEntityId()),
                             event -> EntityActiveType.trueEntityActiveTypes.contains(event.getType().name())
                     ))
             );
         }
 
-        alphaToBetaRepository.batchUpdateLinksDependentOnAlpha(actualAlphaState);
-        gammaToAlphaRepository.batchUpdateLinksDependentOnAlpha(actualAlphaState);
+        alphaToBetaRepository.batchUpdateLinksDependentOnFromEntity(actualAlphaState);
+        gammaToAlphaRepository.batchUpdateLinksDependentOnToEntity(actualAlphaState);
     }
 
     private Result<AlphaRecord> getAlphaRecordByCondition(Condition condition) {
@@ -152,7 +151,7 @@ public class DbAlphaRepository implements AlphaRepository {
 
     private AlphaRecord covertToAlphaRecord(AlphaEvent event) {
         return new AlphaRecord(
-                event.getAlphaId(),
+                event.getEntityId(),
                 event.getName(),
                 event.getType().name(),
                 event.getCreatedTs()

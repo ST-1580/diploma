@@ -1,14 +1,9 @@
 package com.st1580.diploma.repository;
 
-import java.util.List;
-import java.util.Set;
-
+import com.st1580.diploma.collector.repository.EntityCollectorRepository;
 import com.st1580.diploma.updater.events.GammaEvent;
+import com.st1580.diploma.updater.repository.EntityEventRepository;
 
-public interface GammaRepository extends EntityCollectorRepository {
-    void batchInsertNewEvents(List<GammaEvent> events);
+public interface GammaRepository extends EntityCollectorRepository, EntityEventRepository<GammaEvent> {
 
-    List<Set<GammaEvent>> getActiveStatusChangedEventsInRange(long tsFrom, long tsTo);
-
-    void correctDependentLinks(long tsFrom ,long tsTo);
 }

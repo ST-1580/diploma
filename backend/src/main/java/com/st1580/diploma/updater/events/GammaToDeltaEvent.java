@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import com.st1580.diploma.external.gamma.data.links.gd.ExternalGammaToDeltaLinkEvent;
 
-public class GammaToDeltaEvent {
+public class GammaToDeltaEvent implements LinkEvent {
     private final long gammaId;
     private final long deltaId;
     private final boolean isActive;
@@ -24,11 +24,11 @@ public class GammaToDeltaEvent {
         this.createdTs = event.getEventTs();
     }
 
-    public long getGammaId() {
+    public long getFromId() {
         return gammaId;
     }
 
-    public long getDeltaId() {
+    public long getToId() {
         return deltaId;
     }
 

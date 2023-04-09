@@ -5,7 +5,7 @@ import java.util.Objects;
 import com.st1580.diploma.repository.types.EntityActiveType;
 import com.st1580.diploma.external.beta.data.ExternalBetaEntityEvent;
 
-public class BetaEvent {
+public class BetaEvent implements EntityEvent {
     private final long betaId;
     private final int epoch;
     private final EntityActiveType type;
@@ -37,7 +37,7 @@ public class BetaEvent {
         throw new IllegalArgumentException("Wrong beta event type");
     }
 
-    public long getBetaId() {
+    public long getEntityId() {
         return betaId;
     }
 

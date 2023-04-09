@@ -4,7 +4,7 @@ import java.util.Objects;
 
 import com.st1580.diploma.external.gamma.data.links.ga.ExternalGammaToAlphaLinkEvent;
 
-public class GammaToAlphaEvent {
+public class GammaToAlphaEvent implements LinkEvent {
     private final long gammaId;
     private final long alphaId;
     private final long weight;
@@ -27,11 +27,11 @@ public class GammaToAlphaEvent {
         this.createdTs = event.getEventTs();
     }
 
-    public long getGammaId() {
+    public long getFromId() {
         return gammaId;
     }
 
-    public long getAlphaId() {
+    public long getToId() {
         return alphaId;
     }
 

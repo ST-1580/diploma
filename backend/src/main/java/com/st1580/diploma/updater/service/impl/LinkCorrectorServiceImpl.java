@@ -16,25 +16,34 @@ import com.st1580.diploma.updater.events.AlphaEvent;
 import com.st1580.diploma.updater.events.BetaEvent;
 import com.st1580.diploma.updater.events.DeltaEvent;
 import com.st1580.diploma.updater.events.GammaEvent;
+import com.st1580.diploma.updater.repository.EntityEventRepository;
 import com.st1580.diploma.updater.service.LinkCorrectorService;
 import org.springframework.stereotype.Service;
 
 @Service
 public class LinkCorrectorServiceImpl implements LinkCorrectorService {
+    private final AlphaRepository alphaRepository;
+    private final BetaRepository betaRepository;
+    private final GammaRepository gammaRepository;
+    private final DeltaRepository deltaRepository;
+    private final AlphaToBetaRepository alphaToBetaRepository;
+    private final GammaToAlphaRepository gammaToAlphaRepository;
+    private final GammaToDeltaRepository gammaToDeltaRepository;
+
     @Inject
-    private AlphaRepository alphaRepository;
-    @Inject
-    private BetaRepository betaRepository;
-    @Inject
-    private GammaRepository gammaRepository;
-    @Inject
-    private DeltaRepository deltaRepository;
-    @Inject
-    private AlphaToBetaRepository alphaToBetaRepository;
-    @Inject
-    private GammaToAlphaRepository gammaToAlphaRepository;
-    @Inject
-    private GammaToDeltaRepository gammaToDeltaRepository;
+    public LinkCorrectorServiceImpl(AlphaRepository alphaRepository, BetaRepository betaRepository,
+                                    GammaRepository gammaRepository, DeltaRepository deltaRepository,
+                                    AlphaToBetaRepository alphaToBetaRepository,
+                                    GammaToAlphaRepository gammaToAlphaRepository,
+                                    GammaToDeltaRepository gammaToDeltaRepository) {
+        this.alphaRepository = alphaRepository;
+        this.betaRepository = betaRepository;
+        this.gammaRepository = gammaRepository;
+        this.deltaRepository = deltaRepository;
+        this.alphaToBetaRepository = alphaToBetaRepository;
+        this.gammaToAlphaRepository = gammaToAlphaRepository;
+        this.gammaToDeltaRepository = gammaToDeltaRepository;
+    }
 
     @Override
     public void addLinkEventsByEntityUpdate(long tsFrom, long tsTo) {

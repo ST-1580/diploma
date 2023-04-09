@@ -11,23 +11,22 @@ import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 import com.st1580.diploma.collector.graph.EntityType;
-import com.st1580.diploma.collector.graph.Link;
 import com.st1580.diploma.collector.graph.entities.BetaEntity;
+import com.st1580.diploma.db.tables.Beta;
+import com.st1580.diploma.db.tables.records.BetaRecord;
 import com.st1580.diploma.repository.AlphaToBetaRepository;
 import com.st1580.diploma.repository.BetaRepository;
 import com.st1580.diploma.repository.types.EntityActiveType;
-import com.st1580.diploma.db.tables.Beta;
-import com.st1580.diploma.db.tables.records.BetaRecord;
 import com.st1580.diploma.updater.events.BetaEvent;
-import com.st1580.diploma.updater.events.EntityEvent;
+import com.st1580.diploma.updater.events.EntityEventIdAndTs;
 import org.jooq.Condition;
 import org.jooq.DSLContext;
 import org.jooq.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import static com.st1580.diploma.repository.impl.RepositoryHelper.getBatches;
 import static com.st1580.diploma.db.Tables.BETA;
+import static com.st1580.diploma.repository.impl.RepositoryHelper.getBatches;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.noCondition;
 
@@ -59,7 +58,7 @@ public class DbBetaRepository implements BetaRepository {
     @Override
     public Map<EntityType, Map<Long, List<Long>>> collectAllNeighborsIdsByEntities(Collection<Long> ids, long ts) {
         Map<EntityType, Map<Long, List<Long>>> res = new HashMap<>();
-        res.put(EntityType.ALPHA, alphaToBetaRepository.getConnectedAlphaEntitiesIdsByBetaIds(ids, ts));
+        res.put(EntityType.ALPHA, alphaToBetaRepository.getConnectedFromEntitiesIdsByToEntitiesIds(ids, ts));
         return res;
     }
 
@@ -82,26 +81,26 @@ public class DbBetaRepository implements BetaRepository {
                 )
                 .fetchInto(BetaEvent.class)
                 .stream()
-                .collect(Collectors.groupingBy(BetaEvent::getBetaId));
+                .collect(Collectors.groupingBy(BetaEvent::getEntityId));
 
         return getBatches(betaEventsById);
     }
 
     @Override
     public void correctDependentLinks(long tsFrom, long tsTo) {
-        List<EntityEvent> alphaToBetaUndefinedDependencies =
-                alphaToBetaRepository.getUndefinedBetaStateInRange(tsFrom, tsTo);
+        List<EntityEventIdAndTs> alphaToBetaUndefinedDependencies =
+                alphaToBetaRepository.getUndefinedToStateInRange(tsFrom, tsTo);
 
-        Map<Long, List<EntityEvent>> betaDependenciesById =
+        Map<Long, List<EntityEventIdAndTs>> betaDependenciesById =
                 alphaToBetaUndefinedDependencies.stream()
-                .collect(Collectors.groupingBy(EntityEvent::getEntityId));
+                        .collect(Collectors.groupingBy(EntityEventIdAndTs::getEntityId));
 
-        Map<EntityEvent, Boolean> actualBetaState = new HashMap<>();
-        for (Set<EntityEvent> batch : getBatches(betaDependenciesById)) {
-            Map<Long, EntityEvent> eventById = new HashMap<>();
+        Map<EntityEventIdAndTs, Boolean> actualBetaState = new HashMap<>();
+        for (Set<EntityEventIdAndTs> batch : getBatches(betaDependenciesById)) {
+            Map<Long, EntityEventIdAndTs> eventById = new HashMap<>();
 
             Condition condition = noCondition();
-            for (EntityEvent event : batch) {
+            for (EntityEventIdAndTs event : batch) {
                 condition = condition.or(LOW_LVL_BETA.ID.eq(event.getEntityId())
                         .and(LOW_LVL_BETA.CREATED_TS.lessOrEqual(event.getCreatedTs())));
                 eventById.put(event.getEntityId(), event);
@@ -111,13 +110,13 @@ public class DbBetaRepository implements BetaRepository {
                     .stream()
                     .map(this::covertToBetaEvent)
                     .collect(Collectors.toMap(
-                            event -> eventById.get(event.getBetaId()),
+                            event -> eventById.get(event.getEntityId()),
                             event -> EntityActiveType.trueEntityActiveTypes.contains(event.getType().name())
                     ))
             );
         }
 
-        alphaToBetaRepository.batchUpdateLinksDependentOnBeta(actualBetaState);
+        alphaToBetaRepository.batchUpdateLinksDependentOnToEntity(actualBetaState);
     }
 
     private Result<BetaRecord> getBetaRecordByCondition(Condition condition) {
@@ -136,7 +135,7 @@ public class DbBetaRepository implements BetaRepository {
 
     private BetaRecord covertToBetaRecord(BetaEvent event) {
         return new BetaRecord(
-                event.getBetaId(),
+                event.getEntityId(),
                 event.getEpoch(),
                 event.getType().name(),
                 event.getCreatedTs()

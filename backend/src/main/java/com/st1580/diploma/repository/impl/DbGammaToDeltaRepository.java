@@ -15,6 +15,7 @@ import com.st1580.diploma.collector.graph.Link;
 import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.graph.links.GammaToDeltaLink;
 import com.st1580.diploma.collector.graph.links.LightLink;
+import com.st1580.diploma.db.tables.records.GammaToAlphaRecord;
 import com.st1580.diploma.repository.GammaToDeltaRepository;
 import com.st1580.diploma.repository.types.EntityActiveType;
 import com.st1580.diploma.repository.types.LinkEndActivityType;
@@ -22,6 +23,7 @@ import com.st1580.diploma.db.tables.GammaToDelta;
 import com.st1580.diploma.db.tables.records.GammaToDeltaRecord;
 import com.st1580.diploma.updater.events.DeltaEvent;
 import com.st1580.diploma.updater.events.EntityEvent;
+import com.st1580.diploma.updater.events.EntityEventIdAndTs;
 import com.st1580.diploma.updater.events.GammaEvent;
 import com.st1580.diploma.updater.events.GammaToDeltaEvent;
 import org.jooq.Condition;
@@ -31,9 +33,10 @@ import org.jooq.Row4;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import static com.st1580.diploma.db.Tables.GAMMA_TO_ALPHA;
 import static com.st1580.diploma.db.Tables.GAMMA_TO_DELTA;
 import static com.st1580.diploma.repository.impl.RepositoryHelper.fillConnectedEntities;
+import static com.st1580.diploma.repository.impl.RepositoryHelper.isActiveLinkByEndStatus;
+import static com.st1580.diploma.repository.types.LinkEndActivityType.getTypeByEndStatus;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.noCondition;
 import static org.jooq.impl.DSL.row;
@@ -46,7 +49,7 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
     private final GammaToDelta LOW_LVL_GD = GAMMA_TO_DELTA.as("low_lvl");
 
     @Override
-    public Map<Long, List<Long>> getConnectedGammaEntitiesIdsByDeltaIds(Collection<Long> deltaIds, long ts) {
+    public Map<Long, List<Long>> getConnectedFromEntitiesIdsByToEntitiesIds(Collection<Long> deltaIds, long ts) {
         Condition condition = GAMMA_TO_DELTA.DELTA_ID.in(deltaIds)
                 .and(GAMMA_TO_DELTA.CREATED_TS.lessOrEqual(ts));
 
@@ -58,7 +61,7 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
     }
 
     @Override
-    public Map<Long, List<Long>> getConnectedDeltaEntitiesIdsByGammaIds(Collection<Long> gammaIds, long ts) {
+    public Map<Long, List<Long>> getConnectedToEntitiesIdsByFromEntitiesIds(Collection<Long> gammaIds, long ts) {
         Condition condition = GAMMA_TO_DELTA.GAMMA_ID.in(gammaIds)
                 .and(GAMMA_TO_DELTA.CREATED_TS.lessOrEqual(ts));
 
@@ -92,11 +95,14 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
     }
 
     @Override
-    public Map<LightLink, ? extends Link> collectAllActiveLinksByEnds(Collection<Long> fromIds,
-                                                                      Collection<Long> toIds, long ts) {
-        Condition condition = LOW_LVL_GD.GAMMA_ID.in(fromIds)
-                .and(LOW_LVL_GD.DELTA_ID.in(toIds))
-                .and(LOW_LVL_GD.CREATED_TS.lessOrEqual(ts));
+    public Map<LightLink, ? extends Link> collectAllActiveLinksByEnds(Map<Long, Long> linkEndIds, long ts) {
+        Condition condition = noCondition();
+        linkEndIds.forEach((gammaId, deltaId) -> condition.or(
+                        LOW_LVL_GD.GAMMA_ID.in(gammaId)
+                        .and(LOW_LVL_GD.DELTA_ID.in(deltaId))
+                        .and(LOW_LVL_GD.CREATED_TS.lessOrEqual(ts))
+                )
+        );
 
         return getGDRecordByCondition(condition)
                 .stream()
@@ -127,38 +133,8 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
         Map<DeltaEvent, List<GammaToDeltaRecord>> GDLinksByDeltaEntity = getActualLinksForDelta(deltaEvents);
 
         List<GammaToDeltaRecord> records = new ArrayList<>();
-
-        records.addAll(GDLinksByGammaEntity.entrySet().stream()
-                .flatMap(entry -> entry.getValue().stream()
-                        .map(link -> new GammaToDeltaRecord(
-                                link.getGammaId(),
-                                link.getDeltaId(),
-                                entry.getKey().getType() == EntityActiveType.DELETED ? false : link.getIsActive(),
-                                EntityActiveType.trueEntityActiveTypes.contains(entry.getKey().getType().name()) ?
-                                        LinkEndActivityType.TRUE.name() : LinkEndActivityType.FALSE.name(),
-                                LinkEndActivityType.UNDEFINED.name(),
-                                null,
-                                entry.getKey().getCreatedTs()
-                        ))
-                )
-                .collect(Collectors.toList())
-        );
-
-        records.addAll(GDLinksByDeltaEntity.entrySet().stream()
-                .flatMap(entry -> entry.getValue().stream()
-                        .map(link -> new GammaToDeltaRecord(
-                                link.getGammaId(),
-                                link.getDeltaId(),
-                                entry.getKey().getType() == EntityActiveType.DELETED ? false : link.getIsActive(),
-                                LinkEndActivityType.UNDEFINED.name(),
-                                EntityActiveType.trueEntityActiveTypes.contains(entry.getKey().getType().name()) ?
-                                        LinkEndActivityType.TRUE.name() : LinkEndActivityType.FALSE.name(),
-                                null,
-                                entry.getKey().getCreatedTs()
-                        ))
-                )
-                .collect(Collectors.toList())
-        );
+        records.addAll(convertLinksByEntityToRecords(GDLinksByGammaEntity, false));
+        records.addAll(convertLinksByEntityToRecords(GDLinksByDeltaEntity, true));
 
         context.insertInto(GAMMA_TO_DELTA, GAMMA_TO_DELTA.GAMMA_ID, GAMMA_TO_DELTA.DELTA_ID,
                         GAMMA_TO_DELTA.IS_ACTIVE, GAMMA_TO_DELTA.IS_ACTIVE_GAMMA, GAMMA_TO_DELTA.IS_ACTIVE_DELTA,
@@ -175,9 +151,9 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
             Map<Long, GammaEvent> eventById = new HashMap<>();
             Condition condition = noCondition();
             for (GammaEvent event : batch) {
-                condition = condition.or(LOW_LVL_GD.GAMMA_ID.eq(event.getGammaId())
+                condition = condition.or(LOW_LVL_GD.GAMMA_ID.eq(event.getEntityId())
                         .and(LOW_LVL_GD.CREATED_TS.lessThan(event.getCreatedTs())));
-                eventById.put(event.getGammaId(), event);
+                eventById.put(event.getEntityId(), event);
             }
 
             res.putAll(getGDRecordByCondition(condition)
@@ -196,9 +172,9 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
             Map<Long, DeltaEvent> eventById = new HashMap<>();
             Condition condition = noCondition();
             for (DeltaEvent event : batch) {
-                condition = condition.or(LOW_LVL_GD.DELTA_ID.eq(event.getDeltaId())
+                condition = condition.or(LOW_LVL_GD.DELTA_ID.eq(event.getEntityId())
                         .and(LOW_LVL_GD.CREATED_TS.lessThan(event.getCreatedTs())));
-                eventById.put(event.getDeltaId(), event);
+                eventById.put(event.getEntityId(), event);
             }
 
             res.putAll(getGDRecordByCondition(condition)
@@ -211,25 +187,25 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
     }
 
     @Override
-    public List<EntityEvent> getUndefinedGammaStateInRange(long tsFrom, long tsTo) {
+    public List<EntityEventIdAndTs> getUndefinedFromStateInRange(long tsFrom, long tsTo) {
         return context
                 .selectFrom(GAMMA_TO_DELTA)
                 .where(GAMMA_TO_DELTA.CREATED_TS.greaterOrEqual(tsFrom)
                         .and(GAMMA_TO_DELTA.CREATED_TS.lessThan(tsTo))
                         .and(GAMMA_TO_DELTA.IS_ACTIVE_GAMMA.eq(LinkEndActivityType.UNDEFINED.name())))
                 .fetch()
-                .map(record -> new EntityEvent(record.getGammaId(), record.getCreatedTs()));
+                .map(record -> new EntityEventIdAndTs(record.getGammaId(), record.getCreatedTs()));
     }
 
     @Override
-    public List<EntityEvent> getUndefinedDeltaStateInRange(long tsFrom, long tsTo) {
+    public List<EntityEventIdAndTs> getUndefinedToStateInRange(long tsFrom, long tsTo) {
         return context
                 .selectFrom(GAMMA_TO_DELTA)
                 .where(GAMMA_TO_DELTA.CREATED_TS.greaterOrEqual(tsFrom)
                         .and(GAMMA_TO_DELTA.CREATED_TS.lessThan(tsTo))
                         .and(GAMMA_TO_DELTA.IS_ACTIVE_DELTA.eq(LinkEndActivityType.UNDEFINED.name())))
                 .fetch()
-                .map(record -> new EntityEvent(record.getDeltaId(), record.getCreatedTs()));
+                .map(record -> new EntityEventIdAndTs(record.getDeltaId(), record.getCreatedTs()));
     }
 
     @Override
@@ -246,9 +222,9 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
     }
 
     @Override
-    public void batchUpdateLinksDependentOnGamma(Map<EntityEvent, Boolean> gammaActiveStatusByEvent) {
+    public void batchUpdateLinksDependentOnFromEntity(Map<EntityEventIdAndTs, Boolean> gammaActiveStatusByEvent) {
         context.batched(ctx -> {
-            for (EntityEvent event : gammaActiveStatusByEvent.keySet()) {
+            for (EntityEventIdAndTs event : gammaActiveStatusByEvent.keySet()) {
                 ctx.dsl().update(GAMMA_TO_DELTA)
                         .set(GAMMA_TO_DELTA.IS_ACTIVE_GAMMA,
                                 LinkEndActivityType.parseBoolean(gammaActiveStatusByEvent.get(event)).name())
@@ -260,9 +236,9 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
     }
 
     @Override
-    public void batchUpdateLinksDependentOnDelta(Map<EntityEvent, Boolean> deltaActiveStatusByEvent) {
+    public void batchUpdateLinksDependentOnToEntity(Map<EntityEventIdAndTs, Boolean> deltaActiveStatusByEvent) {
         context.batched(ctx -> {
-            for (EntityEvent event : deltaActiveStatusByEvent.keySet()) {
+            for (EntityEventIdAndTs event : deltaActiveStatusByEvent.keySet()) {
                 ctx.dsl().update(GAMMA_TO_DELTA)
                         .set(GAMMA_TO_DELTA.IS_ACTIVE_DELTA,
                                 LinkEndActivityType.parseBoolean(deltaActiveStatusByEvent.get(event)).name())
@@ -288,8 +264,31 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
                 .fetch();
     }
 
+    private List<GammaToDeltaRecord> convertLinksByEntityToRecords(
+            Map<? extends EntityEvent, List<GammaToDeltaRecord>> linksByEntity,
+            boolean setFromStatusToUndefined) {
+
+        return linksByEntity.entrySet().stream()
+                .flatMap(entry -> entry.getValue().stream()
+                        .map(link -> new GammaToDeltaRecord(
+                                link.getGammaId(),
+                                link.getDeltaId(),
+                                isActiveLinkByEndStatus(entry.getKey().getType(), link.getIsActive()),
+                                setFromStatusToUndefined ?
+                                        LinkEndActivityType.UNDEFINED.name() :
+                                        getTypeByEndStatus(entry.getKey().getType()).name(),
+                                setFromStatusToUndefined ?
+                                        getTypeByEndStatus(entry.getKey().getType()).name() :
+                                        LinkEndActivityType.UNDEFINED.name(),
+                                null,
+                                entry.getKey().getCreatedTs()
+                        ))
+                )
+                .collect(Collectors.toList());
+    }
+
     private Row4<Long, Long, Boolean, Long> covertToRow(GammaToDeltaEvent event) {
-        return row(event.getGammaId(), event.getDeltaId(), event.isActive(), event.getCreatedTs());
+        return row(event.getFromId(), event.getToId(), event.isActive(), event.getCreatedTs());
     }
 
     private GammaToDeltaLink convertToLink(GammaToDeltaRecord record) {

@@ -6,7 +6,7 @@ import com.st1580.diploma.repository.types.EntityActiveType;
 import com.st1580.diploma.external.delta.data.DeltaEventType;
 import com.st1580.diploma.external.delta.data.ExternalDeltaEntityEvent;
 
-public class DeltaEvent {
+public class DeltaEvent implements EntityEvent {
     private final long deltaId;
     private final String name;
     private final EntityActiveType type;
@@ -39,7 +39,7 @@ public class DeltaEvent {
     }
 
 
-    public long getDeltaId() {
+    public long getEntityId() {
         return deltaId;
     }
 

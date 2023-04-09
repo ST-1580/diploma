@@ -15,6 +15,7 @@ import com.st1580.diploma.collector.graph.Link;
 import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.graph.links.GammaToAlphaLink;
 import com.st1580.diploma.collector.graph.links.LightLink;
+import com.st1580.diploma.db.tables.records.AlphaToBetaRecord;
 import com.st1580.diploma.repository.GammaToAlphaRepository;
 import com.st1580.diploma.repository.types.EntityActiveType;
 import com.st1580.diploma.repository.types.LinkEndActivityType;
@@ -22,6 +23,7 @@ import com.st1580.diploma.db.tables.GammaToAlpha;
 import com.st1580.diploma.db.tables.records.GammaToAlphaRecord;
 import com.st1580.diploma.updater.events.AlphaEvent;
 import com.st1580.diploma.updater.events.EntityEvent;
+import com.st1580.diploma.updater.events.EntityEventIdAndTs;
 import com.st1580.diploma.updater.events.GammaEvent;
 import com.st1580.diploma.updater.events.GammaToAlphaEvent;
 import org.jooq.Condition;
@@ -31,9 +33,10 @@ import org.jooq.Row5;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
-import static com.st1580.diploma.db.Tables.ALPHA_TO_BETA;
 import static com.st1580.diploma.db.Tables.GAMMA_TO_ALPHA;
 import static com.st1580.diploma.repository.impl.RepositoryHelper.fillConnectedEntities;
+import static com.st1580.diploma.repository.impl.RepositoryHelper.isActiveLinkByEndStatus;
+import static com.st1580.diploma.repository.types.LinkEndActivityType.getTypeByEndStatus;
 import static org.jooq.impl.DSL.max;
 import static org.jooq.impl.DSL.noCondition;
 import static org.jooq.impl.DSL.row;
@@ -47,7 +50,7 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
 
 
     @Override
-    public Map<Long, List<Long>> getConnectedGammaEntitiesIdsByAlphaIds(Collection<Long> alphaIds, long ts) {
+    public Map<Long, List<Long>> getConnectedFromEntitiesIdsByToEntitiesIds(Collection<Long> alphaIds, long ts) {
         Condition condition = GAMMA_TO_ALPHA.ALPHA_ID.in(alphaIds)
                 .and(GAMMA_TO_ALPHA.CREATED_TS.lessOrEqual(ts));
 
@@ -59,7 +62,7 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
     }
 
     @Override
-    public Map<Long, List<Long>> getConnectedAlphaEntitiesIdsByGammaIds(Collection<Long> gammaIds, long ts) {
+    public Map<Long, List<Long>> getConnectedToEntitiesIdsByFromEntitiesIds(Collection<Long> gammaIds, long ts) {
         Condition condition = GAMMA_TO_ALPHA.GAMMA_ID.in(gammaIds)
                 .and(GAMMA_TO_ALPHA.CREATED_TS.lessOrEqual(ts));
 
@@ -94,11 +97,14 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
     }
 
     @Override
-    public Map<LightLink, ? extends Link> collectAllActiveLinksByEnds(Collection<Long> fromIds,
-                                                                      Collection<Long> toIds, long ts) {
-        Condition condition = LOW_LVL_GA.GAMMA_ID.in(fromIds)
-                .and(LOW_LVL_GA.ALPHA_ID.in(toIds))
-                .and(LOW_LVL_GA.CREATED_TS.lessOrEqual(ts));
+    public Map<LightLink, ? extends Link> collectAllActiveLinksByEnds(Map<Long, Long> linkEndIds, long ts) {
+        Condition condition = noCondition();
+        linkEndIds.forEach((gammaId, alphaId) -> condition.or(
+                        LOW_LVL_GA.GAMMA_ID.in(gammaId)
+                        .and(LOW_LVL_GA.ALPHA_ID.in(alphaId))
+                        .and(LOW_LVL_GA.CREATED_TS.lessOrEqual(ts))
+                )
+        );
 
         return getGARecordByCondition(condition)
                 .stream()
@@ -128,40 +134,8 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
         Map<AlphaEvent, List<GammaToAlphaRecord>> GALinksByAlphaEntity = getActualLinksForAlpha(alphaEvents);
 
         List<GammaToAlphaRecord> records = new ArrayList<>();
-
-        records.addAll(GALinksByGammaEntity.entrySet().stream()
-                .flatMap(entry -> entry.getValue().stream()
-                        .map(link -> new GammaToAlphaRecord(
-                                link.getGammaId(),
-                                link.getAlphaId(),
-                                link.getWeight(),
-                                entry.getKey().getType() == EntityActiveType.DELETED ? false : link.getIsActive(),
-                                EntityActiveType.trueEntityActiveTypes.contains(entry.getKey().getType().name()) ?
-                                        LinkEndActivityType.TRUE.name() : LinkEndActivityType.FALSE.name(),
-                                LinkEndActivityType.UNDEFINED.name(),
-                                null,
-                                entry.getKey().getCreatedTs()
-                        ))
-                )
-                .collect(Collectors.toList())
-        );
-
-        records.addAll(GALinksByAlphaEntity.entrySet().stream()
-                .flatMap(entry -> entry.getValue().stream()
-                        .map(link -> new GammaToAlphaRecord(
-                                link.getGammaId(),
-                                link.getAlphaId(),
-                                link.getWeight(),
-                                entry.getKey().getType() == EntityActiveType.DELETED ? false : link.getIsActive(),
-                                LinkEndActivityType.UNDEFINED.name(),
-                                EntityActiveType.trueEntityActiveTypes.contains(entry.getKey().getType().name()) ?
-                                        LinkEndActivityType.TRUE.name() : LinkEndActivityType.FALSE.name(),
-                                null,
-                                entry.getKey().getCreatedTs()
-                        ))
-                )
-                .collect(Collectors.toList())
-        );
+        records.addAll(convertLinksByEntityToRecords(GALinksByGammaEntity, false));
+        records.addAll(convertLinksByEntityToRecords(GALinksByAlphaEntity, true));
 
         context.insertInto(GAMMA_TO_ALPHA, GAMMA_TO_ALPHA.GAMMA_ID, GAMMA_TO_ALPHA.ALPHA_ID, GAMMA_TO_ALPHA.WEIGHT,
                         GAMMA_TO_ALPHA.IS_ACTIVE, GAMMA_TO_ALPHA.IS_ACTIVE_GAMMA, GAMMA_TO_ALPHA.IS_ACTIVE_ALPHA,
@@ -178,9 +152,9 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
             Map<Long, GammaEvent> eventById = new HashMap<>();
             Condition condition = noCondition();
             for (GammaEvent event : batch) {
-                condition = condition.or(LOW_LVL_GA.GAMMA_ID.eq(event.getGammaId())
+                condition = condition.or(LOW_LVL_GA.GAMMA_ID.eq(event.getEntityId())
                         .and(LOW_LVL_GA.CREATED_TS.lessThan(event.getCreatedTs())));
-                eventById.put(event.getGammaId(), event);
+                eventById.put(event.getEntityId(), event);
             }
 
             res.putAll(getGARecordByCondition(condition)
@@ -199,9 +173,9 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
             Map<Long, AlphaEvent> eventById = new HashMap<>();
             Condition condition = noCondition();
             for (AlphaEvent event : batch) {
-                condition = condition.or(LOW_LVL_GA.ALPHA_ID.eq(event.getAlphaId())
+                condition = condition.or(LOW_LVL_GA.ALPHA_ID.eq(event.getEntityId())
                         .and(LOW_LVL_GA.CREATED_TS.lessThan(event.getCreatedTs())));
-                eventById.put(event.getAlphaId(), event);
+                eventById.put(event.getEntityId(), event);
             }
 
             res.putAll(getGARecordByCondition(condition)
@@ -214,25 +188,25 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
     }
 
     @Override
-    public List<EntityEvent> getUndefinedGammaStateInRange(long tsFrom, long tsTo) {
+    public List<EntityEventIdAndTs> getUndefinedFromStateInRange(long tsFrom, long tsTo) {
         return context
                 .selectFrom(GAMMA_TO_ALPHA)
                 .where(GAMMA_TO_ALPHA.CREATED_TS.greaterOrEqual(tsFrom)
                         .and(GAMMA_TO_ALPHA.CREATED_TS.lessThan(tsTo))
                         .and(GAMMA_TO_ALPHA.IS_ACTIVE_GAMMA.eq(LinkEndActivityType.UNDEFINED.name())))
                 .fetch()
-                .map(record -> new EntityEvent(record.getGammaId(), record.getCreatedTs()));
+                .map(record -> new EntityEventIdAndTs(record.getGammaId(), record.getCreatedTs()));
     }
 
     @Override
-    public List<EntityEvent> getUndefinedAlphaStateInRange(long tsFrom, long tsTo) {
+    public List<EntityEventIdAndTs> getUndefinedToStateInRange(long tsFrom, long tsTo) {
         return context
                 .selectFrom(GAMMA_TO_ALPHA)
                 .where(GAMMA_TO_ALPHA.CREATED_TS.greaterOrEqual(tsFrom)
                         .and(GAMMA_TO_ALPHA.CREATED_TS.lessThan(tsTo))
                         .and(GAMMA_TO_ALPHA.IS_ACTIVE_ALPHA.eq(LinkEndActivityType.UNDEFINED.name())))
                 .fetch()
-                .map(record -> new EntityEvent(record.getAlphaId(), record.getCreatedTs()));
+                .map(record -> new EntityEventIdAndTs(record.getAlphaId(), record.getCreatedTs()));
     }
 
     @Override
@@ -249,9 +223,9 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
     }
 
     @Override
-    public void batchUpdateLinksDependentOnGamma(Map<EntityEvent, Boolean> gammaActiveStatusByEvent) {
+    public void batchUpdateLinksDependentOnFromEntity(Map<EntityEventIdAndTs, Boolean> gammaActiveStatusByEvent) {
         context.batched(ctx -> {
-            for (EntityEvent event : gammaActiveStatusByEvent.keySet()) {
+            for (EntityEventIdAndTs event : gammaActiveStatusByEvent.keySet()) {
                 ctx.dsl().update(GAMMA_TO_ALPHA)
                         .set(GAMMA_TO_ALPHA.IS_ACTIVE_GAMMA,
                                 LinkEndActivityType.parseBoolean(gammaActiveStatusByEvent.get(event)).name())
@@ -263,9 +237,9 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
     }
 
     @Override
-    public void batchUpdateLinksDependentOnAlpha(Map<EntityEvent, Boolean> alphaActiveStatusByEvent) {
+    public void batchUpdateLinksDependentOnToEntity(Map<EntityEventIdAndTs, Boolean> alphaActiveStatusByEvent) {
         context.batched(ctx -> {
-            for (EntityEvent event : alphaActiveStatusByEvent.keySet()) {
+            for (EntityEventIdAndTs event : alphaActiveStatusByEvent.keySet()) {
                 ctx.dsl().update(GAMMA_TO_ALPHA)
                         .set(GAMMA_TO_ALPHA.IS_ACTIVE_ALPHA,
                                 LinkEndActivityType.parseBoolean(alphaActiveStatusByEvent.get(event)).name())
@@ -291,10 +265,34 @@ public class DbGammaToAlphaRepository implements GammaToAlphaRepository {
                 .fetch();
     }
 
+    private List<GammaToAlphaRecord> convertLinksByEntityToRecords(
+            Map<? extends EntityEvent, List<GammaToAlphaRecord>> linksByEntity,
+            boolean setFromStatusToUndefined) {
+
+        return linksByEntity.entrySet().stream()
+                .flatMap(entry -> entry.getValue().stream()
+                        .map(link -> new GammaToAlphaRecord(
+                                link.getGammaId(),
+                                link.getAlphaId(),
+                                link.getWeight(),
+                                isActiveLinkByEndStatus(entry.getKey().getType(), link.getIsActive()),
+                                setFromStatusToUndefined ?
+                                        LinkEndActivityType.UNDEFINED.name() :
+                                        getTypeByEndStatus(entry.getKey().getType()).name(),
+                                setFromStatusToUndefined ?
+                                        getTypeByEndStatus(entry.getKey().getType()).name() :
+                                        LinkEndActivityType.UNDEFINED.name(),
+                                null,
+                                entry.getKey().getCreatedTs()
+                        ))
+                )
+                .collect(Collectors.toList());
+    }
+
     private Row5<Long, Long, Long, Boolean, Long> covertToRow(GammaToAlphaEvent event) {
         return row(
-                event.getGammaId(),
-                event.getAlphaId(),
+                event.getFromId(),
+                event.getToId(),
                 event.getWeight(),
                 event.isActive(),
                 event.getCreatedTs()

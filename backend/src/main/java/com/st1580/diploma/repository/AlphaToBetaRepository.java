@@ -1,32 +1,12 @@
 package com.st1580.diploma.repository;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.st1580.diploma.collector.graph.links.AlphaToBetaLink;
+import com.st1580.diploma.collector.repository.LinkCollectorRepository;
 import com.st1580.diploma.updater.events.AlphaEvent;
 import com.st1580.diploma.updater.events.AlphaToBetaEvent;
 import com.st1580.diploma.updater.events.BetaEvent;
-import com.st1580.diploma.updater.events.EntityEvent;
+import com.st1580.diploma.updater.repository.LinkEventRepository;
 
-public interface AlphaToBetaRepository extends LinkCollectorRepository {
-    Map<Long, List<Long>> getConnectedBetaEntitiesIdsByAlphaIds(Collection<Long> alphaIds, long ts);
+public interface AlphaToBetaRepository extends LinkCollectorRepository,
+        LinkEventRepository<AlphaToBetaEvent, AlphaEvent, BetaEvent> {
 
-    Map<Long, List<Long>> getConnectedAlphaEntitiesIdsByBetaIds(Collection<Long> betaIds, long ts);
-
-    void batchInsertNewEvents(List<AlphaToBetaEvent> events);
-
-    void addLinkEventsTriggeredByEntitiesUpdate(List<Set<AlphaEvent>> alphaEvents, List<Set<BetaEvent>> betaEvents);
-
-    List<EntityEvent> getUndefinedAlphaStateInRange(long tsFrom, long tsTo);
-
-    List<EntityEvent> getUndefinedBetaStateInRange(long tsFrom, long tsTo);
-
-    void deleteUndefinedLinks(long tsFrom, long tsTo);
-
-    void batchUpdateLinksDependentOnAlpha(Map<EntityEvent, Boolean> alphaActiveStatusByEvent);
-
-    void batchUpdateLinksDependentOnBeta(Map<EntityEvent, Boolean> betaActiveStatusByEvent);
 }

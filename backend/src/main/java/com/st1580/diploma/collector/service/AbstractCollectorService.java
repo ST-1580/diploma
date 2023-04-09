@@ -1,11 +1,9 @@
 package com.st1580.diploma.collector.service;
 
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Queue;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,9 +20,8 @@ import com.st1580.diploma.collector.graph.links.LinkType;
 import com.st1580.diploma.collector.policy.NonCyclicPolicy;
 import com.st1580.diploma.collector.policy.Policy;
 import com.st1580.diploma.collector.policy.StartEntityPolicy;
-import com.st1580.diploma.repository.EntityCollectorRepository;
+import com.st1580.diploma.collector.repository.EntityCollectorRepository;
 import com.st1580.diploma.collector.service.dto.GraphDto;
-import com.st1580.diploma.collector.service.dto.GraphLinkDto;
 import com.st1580.diploma.collector.service.dto.PolicyType;
 import com.st1580.diploma.repository.LastSyncRepository;
 

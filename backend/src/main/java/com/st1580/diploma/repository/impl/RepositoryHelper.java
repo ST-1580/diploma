@@ -6,8 +6,9 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
+
+import com.st1580.diploma.repository.types.EntityActiveType;
 
 public class RepositoryHelper {
     /**
@@ -41,9 +42,9 @@ public class RepositoryHelper {
         return batches;
     }
 
-    public static <T> Map<Long, List<T>> fillConnectedEntities(Collection<Long> ids,
-                                                               Map<Long, List<T>> existingLinks) {
-        Map<Long, List<T>> connectedEntities = new HashMap<>();
+    public static Map<Long, List<Long>> fillConnectedEntities(Collection<Long> ids,
+                                                               Map<Long, List<Long>> existingLinks) {
+        Map<Long, List<Long>> connectedEntities = new HashMap<>();
         for (long entityId : ids) {
             connectedEntities.put(
                     entityId,
@@ -52,5 +53,9 @@ public class RepositoryHelper {
         }
 
         return connectedEntities;
+    }
+
+    public static boolean isActiveLinkByEndStatus(EntityActiveType type, boolean currentActivity) {
+        return type == EntityActiveType.DELETED ? false : currentActivity;
     }
 }
