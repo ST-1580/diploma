@@ -44,6 +44,12 @@ function Space() {
                 ...prevValues,
                 [name]: Boolean((eventTarget as any).checked),
             }));
+        } else if (eventTarget.name == "timestampType" && eventTarget.value == "now") {
+            setFormValues((prevValues) => ({
+                ...prevValues,
+                [name]: eventTarget.value,
+                ["timestampValue"]: undefined,
+            }));
         } else {
             setFormValues((prevValues) => ({
                 ...prevValues,
