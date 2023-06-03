@@ -12,6 +12,7 @@ import com.st1580.diploma.collector.graph.Entity;
 import com.st1580.diploma.collector.graph.EntityType;
 import com.st1580.diploma.collector.graph.Link;
 import com.st1580.diploma.collector.graph.links.LightLink;
+import com.st1580.diploma.collector.graph.links.LinkEndIds;
 import com.st1580.diploma.collector.graph.links.LinkType;
 import com.st1580.diploma.repository.AlphaRepository;
 import com.st1580.diploma.repository.AlphaToBetaRepository;
@@ -101,12 +102,9 @@ public class GraphConstructorService {
 
     public Map<LightLink,? extends Link> getLinksByEnds(LinkType type, Set<LightLink> lightLinks, long ts) {
         LinkCollectorRepository linkCollectorRepository = matchLinkRepository(type);
-        Map<Long, Long> linkEndIds = lightLinks.stream()
-                .collect(Collectors.toMap(
-                    link -> link.getFrom().getId(),
-                    link -> link.getTo().getId()
-                )
-            );
+        List<LinkEndIds> linkEndIds = lightLinks.stream()
+                .map(link -> new LinkEndIds(link.getFrom().getId(), link.getTo().getId()))
+                .collect(Collectors.toList());
         return linkCollectorRepository.collectAllActiveLinksByEnds(linkEndIds, ts);
     }
 }

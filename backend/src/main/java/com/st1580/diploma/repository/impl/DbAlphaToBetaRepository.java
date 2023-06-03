@@ -15,6 +15,7 @@ import com.st1580.diploma.collector.graph.Link;
 import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.graph.links.AlphaToBetaLink;
 import com.st1580.diploma.collector.graph.links.LightLink;
+import com.st1580.diploma.collector.graph.links.LinkEndIds;
 import com.st1580.diploma.repository.AlphaToBetaRepository;
 import com.st1580.diploma.repository.types.EntityActiveType;
 import com.st1580.diploma.repository.types.LinkEndActivityType;
@@ -95,14 +96,15 @@ public class DbAlphaToBetaRepository implements AlphaToBetaRepository {
     }
 
     @Override
-    public Map<LightLink, ? extends Link> collectAllActiveLinksByEnds(Map<Long, Long> linkEndIds, long ts) {
+    public Map<LightLink, ? extends Link> collectAllActiveLinksByEnds(List<LinkEndIds> linkEndIds, long ts) {
         Condition condition = noCondition();
-        linkEndIds.forEach((alphaId, betaId) -> condition.or(
-                    LOW_LVL_AB.ALPHA_ID.in(alphaId)
-                    .and(LOW_LVL_AB.BETA_ID.in(betaId))
+        for (LinkEndIds link : linkEndIds) {
+            condition = condition.or(
+                    LOW_LVL_AB.ALPHA_ID.eq(link.getFromEntityId())
+                    .and(LOW_LVL_AB.BETA_ID.eq(link.getToEntityId()))
                     .and(LOW_LVL_AB.CREATED_TS.lessOrEqual(ts))
-                )
-        );
+            );
+        }
 
         return getABRecordByCondition(condition)
                 .stream()

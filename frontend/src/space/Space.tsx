@@ -3,7 +3,7 @@ import axios from 'axios';
 import * as d3 from "d3";
 import "./Space.css";
 import { BACKEND_URL } from '../Utils';
-import Graph from './Graph';
+import SpaceGraph from './SpaceGraph';
 
 const URL: string = BACKEND_URL + 'v1/';
 
@@ -36,12 +36,20 @@ function Space() {
     }
 
     const handleInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const { name, value } = event.target;
+        const eventTarget = event.target;
+        const name = eventTarget.name;
 
-        setFormValues((prevValues) => ({
-            ...prevValues,
-            [name]: value,
-        }));
+        if (eventTarget.type === "checkbox") {
+            setFormValues((prevValues) => ({
+                ...prevValues,
+                [name]: Boolean((eventTarget as any).checked),
+            }));
+        } else {
+            setFormValues((prevValues) => ({
+                ...prevValues,
+                [name]: eventTarget.value,
+            }));
+        }  
     };
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
@@ -88,13 +96,13 @@ function Space() {
                     <div>
                         <label>
                             Is Links Light:
-                            <input type="checkbox" name="entityId" defaultChecked={formValues.isLinksLight} onChange={handleInputChange} />
+                            <input type="checkbox" name="isLinksLight" defaultChecked={formValues.isLinksLight} onChange={handleInputChange} />
                         </label>
                     </div>
                     <div>
                         <label>
                             Is Entities Light:
-                            <input type="checkbox" name="entityId" defaultChecked={formValues.isEntitesLight} onChange={handleInputChange} />
+                            <input type="checkbox" name="isEntitesLight" defaultChecked={formValues.isEntitesLight} onChange={handleInputChange} />
                         </label>
                     </div>
                     <div>
@@ -124,7 +132,7 @@ function Space() {
             ) : (
                 <>
                     <button onClick={handleSettingClick}>Set generate configuration</button>
-                    <Graph jsonUrl={backendUrl}/>
+                    <SpaceGraph jsonUrl={backendUrl}/>
                 </>
             )}
         </div>

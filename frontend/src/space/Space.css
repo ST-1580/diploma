@@ -39,4 +39,9 @@ select {
     text-align: center;
 }
 
+#space_graph {
+    width: 1140px;
+    height: 720px;
+}
+
 

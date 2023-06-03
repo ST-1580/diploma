@@ -15,6 +15,7 @@ import com.st1580.diploma.collector.graph.Link;
 import com.st1580.diploma.collector.graph.entities.LightEntity;
 import com.st1580.diploma.collector.graph.links.GammaToDeltaLink;
 import com.st1580.diploma.collector.graph.links.LightLink;
+import com.st1580.diploma.collector.graph.links.LinkEndIds;
 import com.st1580.diploma.db.tables.records.GammaToAlphaRecord;
 import com.st1580.diploma.repository.GammaToDeltaRepository;
 import com.st1580.diploma.repository.types.EntityActiveType;
@@ -95,14 +96,15 @@ public class DbGammaToDeltaRepository implements GammaToDeltaRepository {
     }
 
     @Override
-    public Map<LightLink, ? extends Link> collectAllActiveLinksByEnds(Map<Long, Long> linkEndIds, long ts) {
+    public Map<LightLink, ? extends Link> collectAllActiveLinksByEnds(List<LinkEndIds> linkEndIds, long ts) {
         Condition condition = noCondition();
-        linkEndIds.forEach((gammaId, deltaId) -> condition.or(
-                        LOW_LVL_GD.GAMMA_ID.in(gammaId)
-                        .and(LOW_LVL_GD.DELTA_ID.in(deltaId))
-                        .and(LOW_LVL_GD.CREATED_TS.lessOrEqual(ts))
-                )
-        );
+        for (LinkEndIds link : linkEndIds) {
+            condition = condition.or(
+                    LOW_LVL_GD.GAMMA_ID.eq(link.getFromEntityId())
+                    .and(LOW_LVL_GD.DELTA_ID.eq(link.getToEntityId()))
+                    .and(LOW_LVL_GD.CREATED_TS.lessOrEqual(ts))
+            );
+        }
 
         return getGDRecordByCondition(condition)
                 .stream()

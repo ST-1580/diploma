@@ -33,16 +33,16 @@ function Header() {
         <div className="header_left">
           <Link to="/">Space</Link>
         </div>
-        <div className="header_right">
+        <div className="header_right header_alpha">
           <Link to="/alpha">Alpha</Link>
         </div>
-        <div className="header_right">
+        <div className="header_right header_beta">
           <Link to="/beta">Beta</Link>
         </div>
-        <div className="header_right">
+        <div className="header_right header_gamma">
           <Link to="/gamma">Gamma</Link>
         </div>
-        <div className="header_right">
+        <div className="header_right header_delta">
           <Link to="/delta">Delta</Link>
         </div>
       </div>

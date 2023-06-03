@@ -37,6 +37,22 @@ header a:hover {
     text-align: right;
 }
 
+.header_alpha a {
+    color: #12b84f;
+}
+
+.header_beta a {
+    color: #0088cc;
+}
+
+.header_gamma a {
+    color: orange;
+}
+
+.header_delta a {
+    color: purple;
+}
+
 .content {
     margin: 80px 20px 30px;
     color: #222;
